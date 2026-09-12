@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 dotenv.config();
 import mongoose from 'mongoose';
-import connectDB from './db/db.js'; // your db.js file
+import connectMongoDB from './db/MongoDB.js'; // Import the MongoDB connection function
 import app from './app.js';          // your Express app
 
 let server; // declared outside for access in shutdown()
@@ -9,7 +9,7 @@ let server; // declared outside for access in shutdown()
 async function startServer() {
   try {
     // Connect to MongoDB
-    await connectDB();
+    await connectMongoDB();
     console.log('✅ MongoDB connected.');
 
     const PORT = process.env.PORT || 10000;

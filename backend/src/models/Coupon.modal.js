@@ -1,5 +1,4 @@
-const mongoose = require('mongoose');
-
+import mongoose from 'mongoose';
 const CouponSchema = new mongoose.Schema(
   {
     code: { type: String, required: true, unique: true, uppercase: true, trim: true },
@@ -39,4 +38,4 @@ const CouponSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model('Coupon', CouponSchema);
+export default mongoose.model('Coupon', CouponSchema);

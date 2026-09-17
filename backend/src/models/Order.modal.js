@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const OrderSchema = new mongoose.Schema(
   {
@@ -82,4 +82,4 @@ cancelledAt: {
   { timestamps: true }
 );
 
-module.exports = mongoose.model('Order', OrderSchema);
+export default mongoose.model('Order', OrderSchema);

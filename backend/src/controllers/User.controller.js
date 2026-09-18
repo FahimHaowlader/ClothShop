@@ -1,6 +1,4 @@
 import User from '../models/User.modal.js';
-const crypto = require('crypto');
-const nodemailer = require('nodemailer');
 import bcrypt from 'bcryptjs';
 
 

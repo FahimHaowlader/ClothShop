@@ -1,6 +1,6 @@
-import Review from '../models/Review.js';
-import Order from '../models/Order.js';
-import Product from '../models/Product.js';
+import Review from '../models/Review.modal.js';
+import Order from '../models/Order.modal.js';
+import Product from '../models/Product.modal.js';
 
 /**
  * @desc    Create a product review (Optional verified-purchase check)

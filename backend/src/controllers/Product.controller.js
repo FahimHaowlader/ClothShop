@@ -1,4 +1,4 @@
-import Product from "../models/Product.js";
+import Product from "../models/Product.modal.js";
 
 /**
  * @desc    Create a new product with variants & discount rules

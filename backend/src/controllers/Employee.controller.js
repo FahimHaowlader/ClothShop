@@ -1,4 +1,4 @@
-import Employee from '../models/Employee.js';
+import Employee from '../models/Employee.modal.js';
 
 
 import { cookieOptions, refreshCookieOptions } from '../utils/const.js';

@@ -1,4 +1,4 @@
-import Coupon from '../models/Coupon.js';
+import Coupon from '../models/Coupon.modal.js';
 
 /**
  * @desc    Validate and calculate coupon discount for checkout

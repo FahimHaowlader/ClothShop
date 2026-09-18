@@ -7,36 +7,30 @@ import {
   updateCoupon,
   deleteCoupon,
 } from '../controllers/coupon.controller.js';
-import { protect } from '../middleware/auth.middleware.js';
-import { protectEmployee, authorizeRoles } from '../middleware/employeeAuth.middleware.js';
 
-const router = express.Router();
+import verufyUser from '../middleware/verifyUser.middleware.js';
 
-// ==========================================
-// 🎟️ CUSTOMER COUPON ROUTES
-// ==========================================
-
-// Validate and calculate discount for cart total
-router.post('/apply', protect, validateAndApplyCoupon);
+const couponRouter = express.Router();
 
 
-// ==========================================
-// 👮 STAFF & ADMIN COUPON MANAGEMENT
-// ==========================================
 
-// Protect all management endpoints for authorized staff
-router.use(protectEmployee);
-router.use(authorizeRoles('admin', 'major', 'officer'));
+// router.use(verufyUser);
+
+couponRouter.get('/',(req, res) => {
+  res.status(200).json({ message: "Coupon route is working!" });
+});
+
+
 
 // Create a new coupon OR get all coupons
-router.route('/')
+couponRouter.route('/re')
   .post(createCoupon)
   .get(getAllCoupons);
 
 // Single coupon management by ID
-router.route('/:id')
+couponRouter.route('/:id')
   .get(getCouponById)
   .put(updateCoupon)
   .delete(deleteCoupon);
 
-export default router;
+export default couponRouter;

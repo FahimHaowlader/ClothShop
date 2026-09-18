@@ -1,25 +1,21 @@
 import express from 'express';
 import {
-  getCart,
-  addToCart,
-  updateCartItemQuantity,
-  removeCartItem,
-  clearCart,
-} from '../controllers/cart.controller.js';
-import { protect } from '../middleware/auth.middleware.js';
+  addItemToCart,
+  getUserCart,
+  removeItemFromCart
+} from '../controllers/Cart.controller.js';
+import verifyUser from '../middleware/verifyUser.middleware.js'
 
-const router = express.Router();
+const cartRouter = express.Router();
 
 // Enforce authentication on all cart operations
-router.use(protect);
+//  cartRouter.use(verifyUser);
+cartRouter.get('/', (req, res) => {
+  res.status(200).json({ message: "Cart route is working!" });
+});
+cartRouter.route('/checkout')
+  .get(getUserCart)
+  .post(addItemToCart)
+  .delete(removeItemFromCart);
 
-router.route('/')
-  .get(getCart)
-  .post(addToCart)
-  .delete(clearCart);
-
-router.route('/items/:itemId')
-  .patch(updateCartItemQuantity)
-  .delete(removeCartItem);
-
-export default router;
+export default cartRouter;

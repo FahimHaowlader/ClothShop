@@ -8,23 +8,27 @@ import {
   updatePaymentStatus,
   processRefund,
 } from '../controllers/order.controller.js';
-import { protect } from '../middleware/auth.middleware.js';
-import { protectEmployee, authorizeRoles } from '../middleware/employeeAuth.middleware.js';
 
-const router = express.Router();
+import verifyUser from '../middleware/verifyUser.middleware.js';
+
+const orderRouter = express.Router();
 
 // ==========================================
 // 🛒 CUSTOMER & PUBLIC ORDER ROUTES
 // ==========================================
 
+orderRouter.get('/', (req, res) => {
+  res.status(200).json({ message: "Order route is working!" });
+});
+
 // Create a new order (Supports guest or logged-in checkout)
-router.post('/', createOrder);
+orderRouter.post('/', createOrder);
 
 // Get orders belonging to the logged-in user
-router.get('/my-orders', protect, getMyOrders);
+orderRouter.get('/my-orders', verifyUser, getMyOrders);
 
 // Get single order details by Mongo ID or custom orderId (e.g., ORD-829401)
-router.get('/:id', getOrderById);
+orderRouter.get('/:id', getOrderById);
 
 
 // ==========================================
@@ -32,19 +36,20 @@ router.get('/:id', getOrderById);
 // ==========================================
 
 // Protect all following endpoints for authorized staff members
-router.use(protectEmployee);
-router.use(authorizeRoles('admin', 'major', 'officer'));
+
+
+
 
 // Get all store orders with query filtering (status, payment, preOrder, pagination)
-router.get('/', getAllOrders);
+orderRouter.get('/', getAllOrders);
 
 // Update order shipping/delivery workflow status (shipped, delivered, cancelled)
-router.patch('/:id/status', updateOrderStatus);
+orderRouter.patch('/:id/status', updateOrderStatus);
 
 // Update payment details and transaction ID
-router.patch('/:id/payment', updatePaymentStatus);
+orderRouter.patch('/:id/payment', updatePaymentStatus);
 
 // Process or record customer order refunds
-router.patch('/:id/refund', processRefund);
+orderRouter.patch('/:id/refund', processRefund);
 
-export default router;
+export default orderRouter;

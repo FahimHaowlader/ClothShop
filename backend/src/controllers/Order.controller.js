@@ -1,6 +1,6 @@
-import Order from '../models/Order.js';
-import Product from '../models/Product.js';
-import Coupon from '../models/Coupon.js';
+import Order from '../models/Order.modal.js';
+import Product from '../models/Product.modal.js';
+import Coupon from '../models/Coupon.modal.js';
 
 // Helper function to generate a unique short Order ID (e.g., ORD-829401)
 const generateOrderId = () => {

@@ -1,8 +1,7 @@
-import dotenv from 'dotenv';
-dotenv.config();
+import 'dotenv/config';
 import mongoose from 'mongoose';
 import connectMongoDB from './db/MongoDB.js'; // Import the MongoDB connection function
-import app from './app.js';          // your Express app
+import app from './app.js';        // your Express app
 
 let server; // declared outside for access in shutdown()
 

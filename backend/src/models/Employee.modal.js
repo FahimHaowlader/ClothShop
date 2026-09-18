@@ -4,47 +4,64 @@ import jwt from 'jsonwebtoken';
 
 const EmployeeSchema = new mongoose.Schema(
   {
-    name: { type: String, required: true, trim: true },
+    name: { 
+      type: String, 
+      required: [true, 'Employee name is required'], 
+      trim: true 
+    },
+    employeeId: { 
+      type: String, 
+      unique: true, 
+      sparse: true, 
+      trim: true 
+    },
     email: {
-    type: String,
-    lowercase: true,
-    trim: true,
-    validate: {
-      validator: function (v) {
-        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+      type: String,
+      unique: true,
+      lowercase: true,
+      trim: true,
+      validate: {
+        validator: function (v) {
+          return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+        },
+        message: 'Please enter a valid email address.',
       },
-      message: 'Please enter a valid email address containing "@" and a domain.',
     },
-  },
-    pic: { type: String },
-    password: { type: String,minlength: 8 },
-    joinAt: { type: Date },
-    leaveAt: { type: Date },
-    employeeId: { type: String, unique: true, sparse: true },
     phone: {
-  type: String,
-  required: [true, 'Phone number is required'],
-  trim: true,
-  validate: {
-    validator: function (v) {
-      // Must contain numbers ONLY, start with 01, and be 11 digits long
-      return /^01[0-9]{9}$/.test(v);
+      type: String,
+      required: [true, 'Phone number is required'],
+      unique: true,
+      trim: true,
+      validate: {
+        validator: function (v) {
+          return /^01[0-9]{9}$/.test(v);
+        },
+        message: 'Phone number must contain only numbers, start with 01, and be 11 digits long.',
+      },
     },
-    message: 'Phone number must contain only numbers, start with 01, and be 11 digits long.',
-  },
-},
-    address: { type: String },
-    isActive: { type: Boolean, default: true },
+    password: { 
+      type: String, 
+      required: [true, 'Password is required'],
+      minlength: [8, 'Password must be at least 8 characters'] 
+    },
+    pic: { type: String, required: true },
+    address: { type: String, trim: true },
+    role: { 
+      type: String, 
+      enum: ['officer', 'general', 'major'], // Fixed unquoted string bug
+      default: 'officer' 
+    },
+    joinAt: { type: Date, required: true, },
+    leaveAt: { type: Date },
+    access: { type: Boolean, default: true },
     refreshToken: { type: String },
-    role: { type: String,enum :['officer','general',major], default: 'officer' },
   },
   { timestamps: true }
 );
 
-
-// 🔹 Pre-save middleware for hashing password
-EmployeeSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
+// 🔹 Pre-save hook: Hash password before saving
+EmployeeSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) return next();
 
   try {
     this.password = await bcrypt.hash(this.password, 12);
@@ -54,37 +71,35 @@ EmployeeSchema.pre("save", async function (next) {
   }
 });
 
-// 🔹 Compare passwords
-EmployeeSchema.methods.isPasswordCorrect = async function (password) {
-  return await bcrypt.compare(password, this.password);
+// 🔹 Instance method: Compare passwords
+EmployeeSchema.methods.isPasswordCorrect = async function (enteredPassword) {
+  return await bcrypt.compare(enteredPassword, this.password);
 };
 
-// 🔹 Generate access token
+// 🔹 Instance method: Generate Access Token
 EmployeeSchema.methods.generateAccessToken = function () {
   return jwt.sign(
     {
       _id: this._id,
-      studentId: this.studentId,
-      accountType: this.accountType,
+      employeeId: this.employeeId,
+      email: this.email,
       role: this.role,
     },
     process.env.ACCESS_TOKEN_SECRET,
-    { expiresIn: process.env.ACCESS_TOKEN_EXPIRY }
+    { expiresIn: process.env.ACCESS_TOKEN_EXPIRY || '1d' }
   );
 };
 
-// 🔹 Generate refresh token
+// 🔹 Instance method: Generate Refresh Token
 EmployeeSchema.methods.generateRefreshToken = function () {
   return jwt.sign(
-    {
-      _id: this._id,
-    },
+    { _id: this._id },
     process.env.REFRESH_TOKEN_SECRET,
-    { expiresIn: process.env.REFRESH_TOKEN_EXPIRY }
+    { expiresIn: process.env.REFRESH_TOKEN_EXPIRY || '10d' }
   );
 };
 
-// 🔹 Validate refresh token
+// 🔹 Instance method: Validate Refresh Token
 EmployeeSchema.methods.validateRefreshToken = function (token) {
   try {
     const decoded = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
@@ -94,4 +109,4 @@ EmployeeSchema.methods.validateRefreshToken = function (token) {
   }
 };
 
-export default mongoose.model('Employee', EmployeeSchema);
+export default  mongoose.model('Employee', EmployeeSchema);

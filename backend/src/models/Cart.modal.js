@@ -14,14 +14,26 @@ const CartSchema = new mongoose.Schema(
           productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
           pic: { type: String },
           color: { type: String },
+          size: { type: String  ,required: true},
           quantity: { type: Number, required: true, min: 1 },
           unitPrice: { type: Number, required: true },
           preOrder: { type: Boolean, default: false },
+          preOrderValid: {
+            type: Date,
+            validate: {
+              validator: function (v) {
+                if (!v) return true; // Allows null/undefined if optional
+                return v >= new Date();
+              },
+              message: "preOrderValid date cannot be earlier than the current date.",
+            },
+          },
+          
         },
       ],
       validate: [
-        (val) => val.length <= 10,
-        'Cart max limit reached (10 items max)',
+        (val) => val.length <= 20,
+        'Cart max limit reached (20 items max)',
       ],
     },
   },

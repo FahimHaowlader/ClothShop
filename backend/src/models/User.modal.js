@@ -4,50 +4,56 @@ import jwt from 'jsonwebtoken';
 
 const UserSchema = new mongoose.Schema(
   {
-    name: { type: String, required: true, trim: true },
+    name: { 
+      type: String, 
+      required: [true, 'Name is required'], 
+      trim: true 
+    },
     phone: {
       type: String,
-      required: [true, "Phone number is required"],
+      unique: true, // Prevents duplicate registrations
       trim: true,
       validate: {
         validator: function (v) {
-          // Must contain numbers ONLY, start with 01, and be 11 digits long
+          // Validates 11-digit Bangladeshi mobile numbers starting with 01
           return /^01[0-9]{9}$/.test(v);
         },
-        message:
-          "Phone number must contain only numbers, start with 01, and be 11 digits long.",
+        message: 'Phone number must contain only numbers, start with 01, and be 11 digits long.',
       },
     },
     email: {
-    type: String,
-    required: [true, 'Email is required'],
-    lowercase: true,
-    trim: true,
-    validate: {
-      validator: function (v) {
-        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+      type: String,
+      required: [true, 'Email is required'],
+      unique: true, // Prevents duplicate accounts
+      lowercase: true,
+      trim: true,
+      validate: {
+        validator: function (v) {
+          return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+        },
+        message: 'Please enter a valid email address.',
       },
-      message: 'Please enter a valid email address containing "@" and a domain.',
     },
-  },
-    pass: { type: String, required: true ,minlength: 8},
+    password: { 
+      type: String, 
+      required: [true, 'Password is required'], 
+      minlength: [8, 'Password must be at least 8 characters'] 
+    },
     refreshToken: { type: String },
-    address: { type: String },
-    city: { type: String },
-    postCode: { type: String },
-    isActive: { type: Boolean, default: true },
-    cart: { type: mongoose.Schema.Types.ObjectId, ref: "Cart" },
-    order: { type: mongoose.Schema.Types.ObjectId, ref: "Order" },
-    coupon: { type: mongoose.Schema.Types.ObjectId, ref: "Coupon" },
+    address: { type: String, trim: true },
+    city: { type: String, trim: true },
+    postCode: { type: String, trim: true },
+    access: { type: Boolean, default: true },
+    cart: { type: mongoose.Schema.Types.ObjectId, ref: 'Cart' },
+    orders: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Order' }], // Changed to Array
+    coupons: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Coupon' }],
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
-
-
-// 🔹 Pre-save middleware for hashing password
-UserSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
+// 🔹 Pre-save hook: Hash password before saving
+UserSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) return next();
 
   try {
     this.password = await bcrypt.hash(this.password, 12);
@@ -57,37 +63,34 @@ UserSchema.pre("save", async function (next) {
   }
 });
 
-// 🔹 Compare passwords
-UserSchema.methods.isPasswordCorrect = async function (password) {
-  return await bcrypt.compare(password, this.password);
+// 🔹 Instance method: Compare passwords
+UserSchema.methods.isPasswordCorrect = async function (enteredPassword) {
+  return await bcrypt.compare(enteredPassword, this.password);
 };
 
-// 🔹 Generate access token
+// 🔹 Instance method: Generate Access Token
 UserSchema.methods.generateAccessToken = function () {
   return jwt.sign(
     {
       _id: this._id,
-      studentId: this.studentId,
-      accountType: this.accountType,
-      role: this.role,
+      email: this.email,
+      phone: this.phone,
     },
     process.env.ACCESS_TOKEN_SECRET,
-    { expiresIn: process.env.ACCESS_TOKEN_EXPIRY }
+    { expiresIn: process.env.ACCESS_TOKEN_EXPIRY || '1d' }
   );
 };
 
-// 🔹 Generate refresh token
+// 🔹 Instance method: Generate Refresh Token
 UserSchema.methods.generateRefreshToken = function () {
   return jwt.sign(
-    {
-      _id: this._id,
-    },
+    { _id: this._id },
     process.env.REFRESH_TOKEN_SECRET,
-    { expiresIn: process.env.REFRESH_TOKEN_EXPIRY }
+    { expiresIn: process.env.REFRESH_TOKEN_EXPIRY || '10d' }
   );
 };
 
-// 🔹 Validate refresh token
+// 🔹 Instance method: Validate Refresh Token
 UserSchema.methods.validateRefreshToken = function (token) {
   try {
     const decoded = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
@@ -97,4 +100,4 @@ UserSchema.methods.validateRefreshToken = function (token) {
   }
 };
 
-module.exports = mongoose.model("User", UserSchema);
+export default  mongoose.model('User', UserSchema);

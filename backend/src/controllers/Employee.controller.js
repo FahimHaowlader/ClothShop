@@ -237,3 +237,74 @@ export const logoutEmployee = async (req, res) => {
     return res.status(500).json({ success: false, message: error.message });
   }
 };
+
+
+
+export const promoteEmployeeToMajor = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { newRole } = req.body;
+
+    // Validate new role
+    if (!['officer', 'major', 'general'].includes(newRole)) {
+      return res.status(400).json({ success: false, message: 'Invalid role specified.' });
+    }
+
+    const employee = await Employee.findById(id);
+    if (!employee) {
+      return res.status(404).json({ success: false, message: 'Employee not found.' });
+    }
+
+    employee.role = newRole;
+    await employee.save();
+
+    return res.status(200).json({
+      success: true,
+      message: `Employee promoted to ${newRole} successfully`,
+      employee,
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+
+export const promoteEmployeeToGeneral = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const employee = await Employee.findById(id);
+    if (!employee) {
+      return res.status(404).json({ success: false, message: 'Employee not found.' });
+    }
+
+    employee.role = 'general';
+    await employee.save();
+
+    return res.status(200).json({
+      success: true,
+      message: 'Employee promoted to general successfully',
+      employee,
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const deleteEmployee = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const employee = await Employee.findByIdAndDelete(id);
+    if (!employee) {
+      return res.status(404).json({ success: false, message: 'Employee not found.' });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Employee deleted successfully',
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};

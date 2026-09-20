@@ -55,6 +55,19 @@ export const loginUser = async (req, res) => {
   }
 };
 
+export const logoutUser = async (req, res) => {
+  try {
+    // Clear the refresh token from the user document
+    const userId = req.user._id;
+    await User.findByIdAndUpdate(userId, { refreshToken: null });
+
+    res.status(200).json({ message: 'User logged out successfully' });
+  } catch (error) {
+    console.error('Error logging out user:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
 // 🔹 Get profile 
 export const getProfile = async (req, res) => {
   try {
@@ -176,4 +189,17 @@ export const forgotPassword = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 }
+
+
+// admin only
+
+export const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find().select('-password -refreshToken');
+    res.status(200).json(users);
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
 

@@ -78,6 +78,7 @@ export const createReview = async (req, res) => {
  * @route   GET /api/reviews/product/:productId
  * @access  Public
  */
+
 export const getProductReviews = async (req, res) => {
   try {
     const { productId } = req.params;
@@ -190,6 +191,55 @@ export const deleteReview = async (req, res) => {
     return res.status(500).json({ success: false, message: error.message });
   }
 };
+
+  
+
+// manager or admin can see all reviews for a product with pagination and rating aggregate
+export const getProductAllReviews = async (req, res) => {
+  try {
+    const { productId } = req.params;
+    const { page = 1, limit = 10 } = req.query;
+
+    const skip = (Number(page) - 1) * Number(limit);
+
+    // Fetch approved reviews with user details
+    const [reviews, total] = await Promise.all([
+      Review.find({ product: productId, isApproved: true })
+        .populate('user', 'name pic')
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(Number(limit)),
+      Review.countDocuments({ product: productId, isApproved: true }),
+    ]);
+
+    // Calculate rating aggregates (Average & Distribution)
+    const stats = await Review.aggregate([
+      { $match: { product: product._id || new Review().schema.tree.product.type(productId), isApproved: true } },
+      {
+        $group: {
+          _id: '$product',
+          averageRating: { $avg: '$rating' },
+          totalReviews: { $sum: 1 },
+        },
+      },
+    ]);
+
+    const averageRating = stats.length > 0 ? Number(stats[0].averageRating.toFixed(1)) : 0;
+
+    return res.status(200).json({
+      success: true,
+      count: reviews.length,
+      total,
+      page: Number(page),
+      totalPages: Math.ceil(total / Number(limit)),
+      averageRating,
+      reviews,
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 
 /**
  * @desc    Toggle review approval status (Moderation)

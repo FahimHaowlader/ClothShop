@@ -203,7 +203,7 @@ export const updateCoupon = async (req, res) => {
   }
 };
 
-/**
+/** 
  * @desc    Delete coupon
  * @route   DELETE /api/coupons/:id
  * @access  Private (Admin / Major)
@@ -219,6 +219,29 @@ export const deleteCoupon = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: 'Coupon deleted successfully',
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+
+export const getCouponUsageStats = async (req, res) => {
+  try {
+    const { code } = req.params;
+
+    const coupon = await Coupon.findOne({ code: code.toUpperCase().trim() });
+    if (!coupon) {
+      return res.status(404).json({ success: false, message: 'Coupon not found.' });
+    }
+
+    // Assuming you have an Order model that tracks coupon usage
+    const usageCount = await Order.countDocuments({ coupon: coupon._id });
+
+    return res.status(200).json({
+      success: true,
+      couponCode: coupon.code,
+      usageCount,
     });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });

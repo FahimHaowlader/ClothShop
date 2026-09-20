@@ -17,6 +17,7 @@ const EmployeeSchema = new mongoose.Schema(
     },
     email: {
       type: String,
+      required: [true, 'Email address is required'],
       unique: true,
       lowercase: true,
       trim: true,
@@ -48,7 +49,7 @@ const EmployeeSchema = new mongoose.Schema(
     address: { type: String, trim: true },
     role: { 
       type: String, 
-      enum: ['officer', 'general', 'major'], // Fixed unquoted string bug
+      enum: ['officer','major', 'general', ], // Fixed unquoted string bug
       default: 'officer' 
     },
     joinAt: { type: Date, required: true, },

@@ -1,8 +1,16 @@
 import mongoose from 'mongoose';
+import { customAlphabet } from 'nanoid';
+
+const nanoid8Upper = customAlphabet('23456789ABCDEFGHJKLMNPQRSTUVWXYZ', 8);
 
 const OrderSchema = new mongoose.Schema(
   {
-    orderId: { type: String, required: true, unique: true },
+   orderId: {
+      type: String,
+      required: true,
+      unique: true,
+      default: () => `${nanoid8Upper()}`,
+    },
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     name: { type: String },
     phone: { type: String },
@@ -26,7 +34,7 @@ const OrderSchema = new mongoose.Schema(
     preOrder: { type: Boolean, default: false },
     orderStatus: {
       type: String,
-      enum: ['pending', 'processing','confirmed','shipped' ,'delivered', 'cancelled'],
+      enum: ['pending',,'confirmed','packed','shipped' ,'delivered', 'cancelled'],
       default: 'pending',
     },
     processedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'Employee' },
@@ -73,11 +81,12 @@ cancelledAt: {
     paidAt: { type: Date },
     refundStatus: {
       type: String,
-      enum: [ 'requested', 'refunded'],
+      enum: [ 'requested', 'refunded','rejected' ],
     },
     refundMethod: { type: String },
     refundReason: { type: String },
     refundDate: { type: Date },
+    employeeId : { type: mongoose.Schema.Types.ObjectId, ref: 'Employee' },
   },
   { timestamps: true }
 );

@@ -1,5 +1,8 @@
 import Product from "../models/Product.modal.js";
 
+// user controllers 
+
+
 /**
  * @desc    Create a new product with variants & discount rules
  * @route   POST /api/products
@@ -143,6 +146,25 @@ export const getAllProducts = async (req, res) => {
   }
 };
 
+export const getproductsByCategory = async (req, res) => {
+  try {
+    const { category } = req.params;
+    const products = await Product.find({ category, display: true }).sort({ createdAt: -1 });
+
+    if (!products || products.length === 0) {
+      return res.status(404).json({ success: false, message: "No products found for this category" });
+    }
+
+    return res.status(200).json({
+      success: true,
+      count: products.length,
+      products,
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 /**
  * @desc    Get single product details with active discount calculation
  * @route   GET /api/products/:id
@@ -185,11 +207,11 @@ export const getProductById = async (req, res) => {
 };
 
 /**
- * @desc    Update product details or active discount settings
+ * @desc    Update product details or active discount settings // name , price ,              description , gender , category , product code , 
  * @route   PUT /api/products/:id
  * @access  Private (Admin / Major / Officer)
  */
-export const updateProduct = async (req, res) => {
+export const updateProductBasicInfo = async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -205,6 +227,216 @@ export const updateProduct = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "Product updated successfully",
+      product,
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const updateProductVariants = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { variants } = req.body;
+
+    if (!Array.isArray(variants)) {
+      return res.status(400).json({
+        success: false,
+        message: "Variants must be an array.",
+      });
+    }
+
+    const product = await Product.findByIdAndUpdate(
+      id,
+      { variants },
+      { new: true, runValidators: true }
+    );
+
+    if (!product) {
+      return res.status(404).json({ success: false, message: "Product not found" });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Product variants updated successfully",
+      product,
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const updateProductDiscount = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { discount } = req.body;
+
+    if (!discount || typeof discount !== "object") {
+      return res.status(400).json({
+        success: false,
+        message: "Discount must be an object with type, amount, and valid fields.",
+      });
+    }
+
+    const product = await Product.findByIdAndUpdate(
+      id,
+      { discount },
+      { new: true, runValidators: true }
+    );
+
+    if (!product) {
+      return res.status(404).json({ success: false, message: "Product not found" });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Product discount updated successfully",
+      product,
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+
+export const updateProductDisplayStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { display } = req.body;
+
+    if (typeof display !== "boolean") {
+      return res.status(400).json({
+        success: false,
+        message: "Display status must be a boolean value.",
+      });
+    }
+
+    const product = await Product.findByIdAndUpdate(
+      id,
+      { display },
+      { new: true, runValidators: true }
+    );
+
+    if (!product) {
+      return res.status(404).json({ success: false, message: "Product not found" });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Product display status updated successfully",
+      product,
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+
+export const updateProductPreOrderStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { canPreOrder, preOrderValid } = req.body;
+
+    if (typeof canPreOrder !== "boolean") {
+      return res.status(400).json({
+        success: false,
+        message: "canPreOrder must be a boolean value.",
+      });
+    }
+
+    if (preOrderValid && new Date(preOrderValid) < new Date()) {
+      return res.status(400).json({
+        success: false,
+        message: "preOrderValid date cannot be earlier than the current date.",
+      });
+    }
+
+    const product = await Product.findByIdAndUpdate(
+      id,
+      { canPreOrder, preOrderValid },
+      { new: true, runValidators: true }
+    );
+
+    if (!product) {
+      return res.status(404).json({ success: false, message: "Product not found" });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Product pre-order status updated successfully",
+      product,
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const updateProductCode = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { productCode } = req.body;
+
+    if (!productCode) {
+      return res.status(400).json({
+        success: false,
+        message: "productCode is required.",
+      });
+    }
+
+    // Check for duplicate product code
+    const existingProduct = await Product.findOne({ productCode, _id: { $ne: id } });
+    if (existingProduct) {
+      return res.status(400).json({
+        success: false,
+        message: "A product with this productCode already exists.",
+      });
+    }
+
+    const product = await Product.findByIdAndUpdate(
+      id,
+      { productCode },
+      { new: true, runValidators: true }
+    );
+
+    if (!product) {
+      return res.status(404).json({ success: false, message: "Product not found" });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Product code updated successfully",
+      product,
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const updateProductSizeGuide = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { sizeGuide } = req.body;
+
+    if (!sizeGuide) {
+      return res.status(400).json({
+        success: false,
+        message: "sizeGuide is required.",
+      });
+    }
+
+    const product = await Product.findByIdAndUpdate(
+      id,
+      { sizeGuide },
+      { new: true, runValidators: true }
+    );
+
+    if (!product) {
+      return res.status(404).json({ success: false, message: "Product not found" });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Product size guide updated successfully",
       product,
     });
   } catch (error) {

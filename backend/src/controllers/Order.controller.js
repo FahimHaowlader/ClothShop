@@ -639,6 +639,96 @@ export const updateOrderStatus = asyncHandler(async (req, res) => {
   });
 });
 
+
+export const cancelOrder = asyncHandler(async (req, res) => {
+  const { orderId } = req.params;
+  const currentUserId = req.employee._id;
+  const userRole = req.employee.role;
+
+  // 1. Start Mongoose Session
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    // 2. Fetch order within the transaction session
+    const order = await Order.findOne({
+      $or: [
+        { _id: mongoose.Types.ObjectId.isValid(orderId) ? orderId : null },
+        { orderId: orderId },
+      ],
+    }).session(session);
+
+    if (!order) {
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(404).json({ success: false, message: 'Order not found.' });
+    }
+
+    // 3. Authorization check
+    const isAdminOrManager = ['admin', 'manager'].includes(userRole);
+    const isAssignedEmployee = order.employeeId?.toString() === currentUserId.toString();
+
+    if (!isAdminOrManager && !isAssignedEmployee) {
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(403).json({
+        success: false,
+        message: 'You are not authorized to update this order.',
+      });
+    }
+
+    // 4. Status check: Prevent modifying completed, delivered, or already cancelled orders
+    if (['delivered', 'cancelled'].includes(order.orderStatus)) {
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(400).json({
+        success: false,
+        message: `Cannot change an order that is already '${order.orderStatus}'.`,
+      });
+    }
+
+    // 5. Update order status and set timestamp & audit fields
+    order.orderStatus = 'cancelled';
+    order.cancelledAt = new Date();
+
+    await order.save({ session });
+
+    // 6. Restock Product Quantity in Nested Variants Array
+    if (order.orderItems && order.orderItems.length > 0) {
+      const bulkOps = order.orderItems.map((item) => ({
+        updateOne: {
+          filter: { _id: item.productId },
+          $inc: {
+            'variants.$[v].availability.$[a].quntity': item.quantity,
+          },
+          arrayFilters: [
+            { 'v.color': item.color },
+            { 'a.size': item.size },
+          ],
+        },
+      }));
+
+      // Pass session into bulkWrite
+      await Product.bulkWrite(bulkOps, { session });
+    }
+
+    // 7. Commit transaction if all database writes succeed
+    await session.commitTransaction();
+    session.endSession();
+
+    return res.status(200).json({
+      success: true,
+      message: 'Order status updated to cancelled and product stock restocked successfully.',
+      order,
+    });
+  } catch (error) {
+    // Abort transaction on any runtime error
+    await session.abortTransaction();
+    session.endSession();
+    throw error; // Re-throw error to be caught by asyncHandler
+  }
+});
+
 // manager and admin controllers
 
 export const reassignOrderToEmployee = asyncHandler(async (req, res) => {

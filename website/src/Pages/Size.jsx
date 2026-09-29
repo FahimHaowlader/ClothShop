@@ -1,7 +1,7 @@
 const Size = () => {
   return (
     <div>
-      <h1>Size Page</h1>
+      <h1>Size page</h1>
     </div>
   );
 };

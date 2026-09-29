@@ -7,17 +7,17 @@ import './App.css'
 import MainLayout from './layouts/MainLayout.jsx'
 
 
-// Pages
-import Shop from './Pages/Shop.jsx'
-import Product from './Pages/Product.jsx'
-import Profile from './Pages/Profile.jsx'
-import Order from './Pages/Order.jsx'
-import Cart from './Pages/Cart.jsx'
-import Home from './Pages/Home.jsx'
-import About from './Pages/About.jsx'
-import Privacy from './Pages/Privacy.jsx'
-import Size from './Pages/Size.jsx'
-import CheckOut from './Pages/CheckOut.jsx'
+// pages
+import Shop from './pages/Shop.jsx'
+import Product from './pages/Product.jsx'
+import Profile from './pages/Profile.jsx'
+import Order from './pages/Order.jsx'
+import Cart from './pages/Cart.jsx'
+import Home from './pages/Home.jsx'
+import About from './pages/About.jsx'
+import Privacy from './pages/Privacy.jsx'
+import Size from './pages/Size.jsx'
+import CheckOut from './pages/CheckOut.jsx'
 
 const router = createBrowserRouter([
   {

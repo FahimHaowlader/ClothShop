@@ -5,9 +5,15 @@
   /* Colors -> bg-brand, text-brand, border-brand, ring-brand, fill-brand, etc. */
   --color-brand: #3b82f6;
   --color-brand-dark: #1e40af;
+  --color-bg-primary: #ffffff;
+  --color-text-primary: #000000;
+  --color-text-secondary: #1A1A1A;
 
   /* Spacing -> p-128, m-128, w-128, h-128, gap-128, top-128, etc. */
   --spacing-128: 32rem;
+  --spacing-primary-boundary-xl: 1.25rem;
+  --spacing-primary-boundary-t: 1.25rem;
+  --spacing-primary-boundary-m: 1.25rem;
 
   /* Font Family -> font-heading, font-body */
   --font-primary: "Spartan", sans-serif;

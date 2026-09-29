@@ -11,9 +11,9 @@
 
   /* Spacing -> p-128, m-128, w-128, h-128, gap-128, top-128, etc. */
   --spacing-128: 32rem;
-  --spacing-primary-boundary-xl: 1.25rem;
-  --spacing-primary-boundary-t: 1.25rem;
-  --spacing-primary-boundary-m: 1.25rem;
+  --spacing-primary-boundary-xl: 5rem;
+  --spacing-primary-boundary-t: 2.25rem;
+  --spacing-primary-boundary-m: 1rem;
 
   /* Font Family -> font-heading, font-body */
   --font-primary: "Spartan", sans-serif;

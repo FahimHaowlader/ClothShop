@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, Link } from 'react-router';
-import { Search, UserRound, ShoppingBag } from 'lucide-react';
+import { Search, UserRound, ShoppingBag, Menu, X } from 'lucide-react';
 
 // Custom React Hook to track page scroll
 const useScroll = () => {
@@ -8,7 +8,7 @@ const useScroll = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 0);
+      setIsScrolled(window.scrollY > 100);
     };
 
     window.addEventListener('scroll', handleScroll);
@@ -20,6 +20,7 @@ const useScroll = () => {
 
 const Navbar = () => {
   const isScrolled = useScroll();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const linkStyles = ({ isActive }) => `
     relative pt-1 pb-[1px] font-secondary text-sm font-medium transition-colors
@@ -37,24 +38,36 @@ const Navbar = () => {
   `;
 
   return (
-    <header className={`bg-white sticky top-0 z-50 px-10 transition-shadow duration-[1500ms] ${isScrolled ? 'shadow-2xl border border-2. border-gray-100' : 'shadow-none'}`}>
-      <div className={`${isScrolled ? 'py-3.5' : 'py-10'} transition-all duration-[1500ms] ease-in-out flex justify-between items-center relative`}>
+    <header className={`bg-white sticky top-0 z-50 px-primary-boundary-m md:px-primary-boundary-t lg:px-primary-boundary-xl transition-shadow duration-[1500ms] ${isScrolled ? 'shadow-2xl' : 'shadow-none'}`}>
+      <div className={`${isScrolled ? 'py-2 lg:py-4' : 'py-10'} transition-all duration-[1500ms] ease-in-out flex justify-between items-center relative`}>
         
-        {/* Left Navigation Links */}
-        <nav className="flex items-center gap-10">
-          <NavLink to="/home" className={linkStyles}>Home</NavLink>
-          <NavLink to="/shop" className={linkStyles}>Shop</NavLink>
-          <NavLink to="/men" className={linkStyles}>Men</NavLink>
-          <NavLink to="/women" className={linkStyles}>Women</NavLink>
-        </nav>
+        {/* Left Side: Mobile Hamburger + Brand / Desktop Nav */}
+        <div className="flex items-center gap-4 lg:gap-0">
+          {/* Mobile / Tablet Hamburger Toggle */}
+          <button
+            aria-label="Open menu"
+            onClick={() => setIsMobileMenuOpen(true)}
+            className="lg:hidden p-1 text-gray-800 cursor-pointer focus:outline-none transition-transform duration-300 active:scale-90"
+          >
+            <Menu size={24} />
+          </button>
 
-        {/* Center Brand Name (Exact X-Axis Center) */}
-        <div className="absolute left-1/2 -translate-x-1/2 font-primary text-2xl font-bold text-gray-900 tracking-tight">
+          {/* Left Navigation Links (Desktop Only) */}
+          <nav className="hidden lg:flex items-center gap-10">
+            <NavLink to="/home" className={linkStyles}>Home</NavLink>
+            <NavLink to="/shop" className={linkStyles}>Shop</NavLink>
+            <NavLink to="/men" className={linkStyles}>Men</NavLink>
+            <NavLink to="/women" className={linkStyles}>Women</NavLink>
+          </nav>
+        </div>
+
+        {/* Brand Name: Left-aligned on Mobile, Absolute Centered on Tablet & Desktop */}
+        <div className="md:absolute md:left-1/2 md:-translate-x-1/2 font-primary text-2xl font-bold text-gray-900 tracking-tight">
           <Link to="/">BachelorShop</Link>
         </div>
 
         {/* Right Action Icons */}
-        <div className="flex items-center gap-5">
+        <div className="flex items-center gap-5 md:gap-6  lg:gap-7">
           {/* Search Button */}
           <button 
             aria-label="Search" 
@@ -88,6 +101,62 @@ const Navbar = () => {
         </div>
 
       </div>
+
+      {/* Mobile / Tablet Dropdown Drawer */}
+      <div 
+        className={`lg:hidden fixed top-0 left-0 h-full w-72 bg-white shadow-2xl z-50 transform transition-transform duration-1500 ease-[cubic-bezier(0.16,1,0.3,1)] p-6 ${
+          isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
+        {/* Header with Centered Close (X) Button */}
+        <div className="flex justify-between items-center pb-6 border-b border-gray-100">
+          <span className="font-primary font-bold text-lg text-gray-900">Menu</span>
+          
+          {/* Close Button centered inside container */}
+          <button
+            aria-label="Close menu"
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="w-10 h-10 flex items-center justify-center rounded-full text-gray-700 hover:bg-gray-100 transition-colors duration-300 focus:outline-none cursor-pointer"
+          >
+            <X size={22} />
+          </button>
+        </div>
+
+        {/* Links with Staggered Fade & Slide Animation */}
+        <nav className="flex flex-col gap-6 pt-6">
+          <div className={`transition-all duration-1500 delay-100 ${isMobileMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+            <NavLink to="/home" className={linkStyles} onClick={() => setIsMobileMenuOpen(false)}>
+              Home
+            </NavLink>
+          </div>
+
+          <div className={`transition-all duration-1500 delay-150 ${isMobileMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+            <NavLink to="/shop" className={linkStyles} onClick={() => setIsMobileMenuOpen(false)}>
+              Shop
+            </NavLink>
+          </div>
+
+          <div className={`transition-all duration-1500 delay-200 ${isMobileMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+            <NavLink to="/men" className={linkStyles} onClick={() => setIsMobileMenuOpen(false)}>
+              Men
+            </NavLink>
+          </div>
+
+          <div className={`transition-all duration-1500 delay-250 ${isMobileMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+            <NavLink to="/women" className={linkStyles} onClick={() => setIsMobileMenuOpen(false)}>
+              Women
+            </NavLink>
+          </div>
+        </nav>
+      </div>
+
+      {/* Backdrop overlay with Fade Transition */}
+      <div 
+        onClick={() => setIsMobileMenuOpen(false)}
+        className={`lg:hidden fixed inset-0 bg-black/40 z-40 transition-opacity duration-500 ${
+          isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+        }`}
+      />
     </header>
   );
 };

@@ -89,7 +89,7 @@ const Hero = () => {
         h-screen
         min-h-[400px]
         sm:min-h-[500px]
-        lg:min-h-[650px]
+        lg:min-h-[600px]
         w-full
         overflow-hidden
         bg-white
@@ -400,6 +400,7 @@ const Hero = () => {
 
                 <h1
                   className="
+                  text-center
                     max-w-lg
                     uppercase
                     text-lg
@@ -420,6 +421,7 @@ const Hero = () => {
 
                 <p
                   className="
+                  text-center
                     mt-6
                     max-w-md
                     text-xs

@@ -1,7 +1,9 @@
+import Hero from "../components/Hero";
+
 const CheckOut = () => {
   return (
     <div>
-      <h1>CheckOut page</h1>
+      <Hero />
     </div>
   );
 };

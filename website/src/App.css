@@ -3,8 +3,6 @@
 
 @theme {
   /* Colors -> bg-brand, text-brand, border-brand, ring-brand, fill-brand, etc. */
-  --color-brand: #3b82f6;
-  --color-brand-dark: #1e40af;
   --color-bg-primary: #ffffff;
   --color-text-primary: #000000;
   --color-text-secondary: #1A1A1A;

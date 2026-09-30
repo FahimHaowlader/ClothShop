@@ -34,7 +34,7 @@ const router = createBrowserRouter([
       { path: 'about-us', element: <About /> },
       { path: 'privacy-policy', element: <Privacy /> },
       { path: 'size-guide', element: <Size /> },
-      { path: 'checkout', element: <CheckOut /> },
+      { path: 'check-out', element: <CheckOut /> },
     ],
   },
    { path : '*', element: <h2>404 Not Found</h2> },

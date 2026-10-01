@@ -10,6 +10,7 @@ import ProductCardSkeleton from "../components/ProductCardSkeleton";
 import image1 from "../assets/images.webp";
 import image2 from "../assets/images2.webp";
 import ServiceFeatures from "../components/ServicesFeatures";
+import SocialShowcase from "../components/SocialShowCase";
 
 const products = [
   {
@@ -95,6 +96,7 @@ const CheckOut = () => {
     </div>
 
     <ServiceFeatures />
+    <SocialShowcase />
       
     </div>
   );

@@ -43,9 +43,9 @@ const Collection = ({ onSelectGender }) => {
         <div className="mb-6 flex items-end justify-between">
           <div>
             <div className="mb-2 flex items-center gap-2.5">
-              <span className="h-px w-5 bg-black" />
+              <span className="h-px w-8 bg-black" />
 
-              <span className="text-[10px] font-semibold uppercase tracking-[0.35em] text-black/45">
+              <span className="text-[10px] sm:text-[12px] font-semibold uppercase tracking-[0.35em] text-black/45">
                 Collections
               </span>
             </div>
@@ -55,7 +55,7 @@ const Collection = ({ onSelectGender }) => {
             </h2>
           </div>
 
-          <p className="hidden text-right text-[14px] leading-5 text-black/40 md:block">
+          <p className="hidden text-right text-[14px] sm:text-base leading-5 text-black/40 md:block">
             Explore our latest clothing collections
             <br />
             designed for everyday wear.

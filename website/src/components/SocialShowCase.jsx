@@ -27,25 +27,30 @@ const SocialShowcase = () => {
 
   return (
     <section className="w-full px-5 py-16 sm:px-8 md:py-20 lg:px-12">
-      <div className="mx-auto max-w-7xl">
+      <div className="">
 
         {/* Heading */}
-        <div className="mb-10 flex flex-col justify-between gap-4 md:mb-12 md:flex-row md:items-end">
-          <div>
-            <p className="mb-3 text-[10px] font-medium uppercase tracking-[0.2em] text-black/40">
-              Stay Connected
-            </p>
+       <div className="mb-6 flex items-end justify-between">
+  <div>
+    <div className="mb-2 flex items-center gap-2.5">
+      <span className="h-px w-8 bg-black" />
 
-            <h2 className="text-3xl font-medium tracking-[-0.04em] sm:text-4xl md:text-5xl">
-              Follow Our World
-            </h2>
-          </div>
+      <span className="text-[10px] font-semibold uppercase tracking-[0.35em] text-black/45 sm:text-[12px]">
+        Stay Connected
+      </span>
+    </div>
 
-          <p className="max-w-sm text-sm leading-6 text-black/45">
-            Follow us for new collections, styling inspiration and
-            everything happening at BachelorShop.
-          </p>
-        </div>
+    <h2 className="text-[clamp(2rem,4vw,3.5rem)] font-bold leading-[0.9] tracking-[-0.06em]">
+      Follow Our World
+    </h2>
+  </div>
+
+  <p className="hidden text-right text-[14px] leading-5 text-black/40 sm:text-base md:block">
+    Follow us for new collections, styling inspiration
+    <br />
+    and everything happening at BachelorShop.
+  </p>
+</div>
 
         {/* Social Sections */}
         <div className="grid grid-cols-1 md:grid-cols-2">

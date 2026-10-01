@@ -2,21 +2,21 @@ import React from "react";
 import {
   Truck,
   Headphones,
+  Sparkles,
   ShieldCheck,
-  RotateCcw,
 } from "lucide-react";
 
 const ServiceFeatures = () => {
   const features = [
     {
+      icon: Sparkles,
+      title: "Premium Quality",
+      description: "Carefully selected fabrics",
+    },
+    {
       icon: Truck,
       title: "Fast Delivery",
       description: "Across Bangladesh",
-    },
-    {
-      icon: Headphones,
-      title: "24/7 Support",
-      description: "We're always here to help",
     },
     {
       icon: ShieldCheck,
@@ -24,9 +24,9 @@ const ServiceFeatures = () => {
       description: "Safe & secure checkout",
     },
     {
-      icon: RotateCcw,
-      title: "Easy Returns",
-      description: "Simple return process",
+      icon: Headphones,
+      title: "24/7 Support",
+      description: "We're always here to help",
     },
   ];
 
@@ -41,8 +41,6 @@ const ServiceFeatures = () => {
               key={feature.title}
               className="
                 group
-                
-                
                 px-5
                 py-5
                 sm:py-7

@@ -11,6 +11,7 @@ import image1 from "../assets/images.webp";
 import image2 from "../assets/images2.webp";
 import ServiceFeatures from "../components/ServicesFeatures";
 import SocialShowcase from "../components/SocialShowCase";
+import BrandStory from "../components/BrandStory";
 
 const products = [
   {
@@ -97,6 +98,10 @@ const CheckOut = () => {
 
     <ServiceFeatures />
     <SocialShowcase />
+    <div className=" py-20">
+
+    <BrandStory />
+    </div>
       
     </div>
   );

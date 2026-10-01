@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import menImg from "../assets/images.webp";
 import womenImg from "../assets/images2.webp";
 
-const GenderSelector = ({ onSelectGender }) => {
+const Collection = ({ onSelectGender }) => {
   const collections = [
     {
       id: "men",
@@ -34,7 +34,7 @@ const GenderSelector = ({ onSelectGender }) => {
   }, []);
 
   return (
-    <section className="w-full overflow-hidden px-primary-boundary-m py-primary-boundary-m text-black md:px-primary-boundary-t md:py-primary-boundary-t lg:py-primary-boundary-xl lg:px-primary-boundary-xl">
+    <section className="w-full overflow-hidden px-primary-boundary-m  text-black md:px-primary-boundary-t  lg:px-primary-boundary-xl">
       <div className="">
         {/* =========================
             HEADER
@@ -88,9 +88,9 @@ const GenderSelector = ({ onSelectGender }) => {
                         {collection.label}
                       </span>
 
-                      <span className="text-[7px] text-black/30">
+                      {/* <span className="text-[7px] text-black/30">
                         {collection.number}
-                      </span>
+                      </span> */}
                     </div>
 
                     {/* Center */}
@@ -104,76 +104,14 @@ const GenderSelector = ({ onSelectGender }) => {
                         {collection.description}
                       </p>
 
-                      {/* Button */}
-                      {/* 
-                      <button
-                        type="button"
-                        onClick={() => onSelectGender(collection.id)}
-                        className="
-                          group
-                          mt-4
-                          inline-flex
-                          items-center
-                          gap-2
-                          rounded-full
-                          border
-                          border-black
-                          bg-black
-                          px-3
-                          py-2
-                          text-[10px]
-                          font-semibold
-                          tracking-wide
-                          text-white
-                          shadow-lg
-                          shadow-black/15
-                          transition-all
-                          duration-300
-                          hover:-translate-y-1
-                          hover:bg-white
-                          hover:text-black
-                          hover:shadow-xl
-                        "
-                      >
-                        <span>Shop Now</span>
-
-                        <span
-                          className="
-                            flex
-                            h-5
-                            w-5
-                            items-center
-                            justify-center
-                            rounded-full
-                            bg-white
-                            text-[10px]
-                            text-black
-                            transition-all
-                            duration-300
-                            group-hover:translate-x-1
-                            group-hover:bg-black
-                            group-hover:text-white
-                          "
-                        >
-                          →
-                        </span>
-                      </button> */}
+                      
+                  
                     </div>
 
                     {/* Bottom */}
                     <div></div>
 
-                    {/* <div className="flex items-center justify-between border-t border-black/10 pt-3">
-
-                      <span className="text-[6px] uppercase tracking-[0.3em] text-black/30">
-                        BachelorShop
-                      </span>
-
-                      <span className="text-[6px] uppercase tracking-[0.3em] text-black/30">
-                        2026
-                      </span>
-
-                    </div> */}
+                   
                   </div>
 
                   {/* =========================
@@ -191,7 +129,7 @@ const GenderSelector = ({ onSelectGender }) => {
       transition-transform
       duration-[1500ms]
       ease-out
-      group-hover:scale-[1.035]
+      group-hover:scale-[1.20]
     "
                     />
 
@@ -366,7 +304,7 @@ const GenderSelector = ({ onSelectGender }) => {
   );
 };
 
-export default GenderSelector;
+export default Collection;
 
 /**
  * @SecondDesign

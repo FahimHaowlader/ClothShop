@@ -47,7 +47,7 @@ const Navbar = () => {
           <button
             aria-label="Open menu"
             onClick={() => setIsMobileMenuOpen(true)}
-            className="lg:hidden p-1 text-gray-800 cursor-pointer focus:outline-none transition-transform duration-300 active:scale-90"
+            className="lg:hidden py-1  text-gray-800 cursor-pointer focus:outline-none transition-transform duration-300 active:scale-90"
           >
             <Menu size={24} />
           </button>

@@ -1,11 +1,13 @@
 import Hero from "../components/Hero";
-import GenderSelector from "../components/GenderSelector";
+import Collection from "../components/Collection";
+import FeaturedProduct from "../components/FeaturedProduct";
 
 const CheckOut = () => {
   return (
     <div>
       <Hero />
-      <GenderSelector />
+      <FeaturedProduct />
+      <Collection />
     </div>
   );
 };

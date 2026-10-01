@@ -378,6 +378,7 @@ const Hero = () => {
 
                 transition-all
                 duration-[1000ms]
+                delay-[800ms]
 
                 ease-[cubic-bezier(0.22,1,0.36,1)]
 

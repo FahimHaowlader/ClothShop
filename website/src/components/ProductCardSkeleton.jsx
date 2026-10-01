@@ -52,7 +52,7 @@ const ProductCardSkeleton = () => {
 
           {/* Text */}
           <div className="flex items-center justify-center py-2">
-            <div className="h-5 w-40 rounded-sm bg-neutral-200" />
+            <div className="h-5 w-60 rounded-sm bg-neutral-200" />
           </div>
 
           {/* Bottom Line */}

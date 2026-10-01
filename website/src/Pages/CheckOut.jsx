@@ -1,6 +1,7 @@
 import Hero from "../components/Hero";
 import Collection from "../components/Collection";
 import FeaturedProduct from "../components/FeaturedProduct";
+import FeaturedProductSkeleton from "../components/FeatureProductSkeleton";
 
 const CheckOut = () => {
   return (
@@ -8,6 +9,7 @@ const CheckOut = () => {
       <Hero />
       <FeaturedProduct />
       <Collection />
+      <FeaturedProductSkeleton />
     </div>
   );
 };

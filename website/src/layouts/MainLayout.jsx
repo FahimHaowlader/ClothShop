@@ -23,7 +23,7 @@ const MainLayout = () => {
       <Navbar />
 
       {/* Main Content (Child routes render here) */}
-      <main className="flex-1 min-h-[2400px] w-full color-bg-primary text-primiary ">
+      <main className="flex-1 min-h-[2400px] w-full color-bg-primary font-primary ">
         <Outlet />
       </main>
 

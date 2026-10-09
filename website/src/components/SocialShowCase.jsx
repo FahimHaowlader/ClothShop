@@ -35,7 +35,7 @@ const SocialShowcase = () => {
     <div className="mb-2 flex items-center gap-2.5">
       <span className="h-px w-8 bg-black" />
 
-      <span className="text-[10px] font-semibold uppercase tracking-[0.35em] text-black/45 sm:text-[12px]">
+      <span className="text-[10px] font-semibold uppercase tracking-[0.35em] text-black/45 ">
         Stay Connected
       </span>
     </div>
@@ -45,7 +45,7 @@ const SocialShowcase = () => {
     </h2>
   </div>
 
-  <p className="hidden text-right text-[14px] leading-5 text-black/40 sm:text-base md:block">
+  <p className="hidden text-right text-xs sm:text-sm  leading-5 text-black/40  md:block">
     Follow us for new collections, styling inspiration
     <br />
     and everything happening at BachelorShop.

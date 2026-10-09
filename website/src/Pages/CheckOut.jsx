@@ -12,6 +12,7 @@ import image2 from "../assets/images2.webp";
 import ServiceFeatures from "../components/ServicesFeatures";
 import SocialShowcase from "../components/SocialShowCase";
 import BrandStory from "../components/BrandStory";
+import ProductBasic from "../components/ProductBasic";
 
 const products = [
   {
@@ -102,6 +103,7 @@ const CheckOut = () => {
 
     <BrandStory />
     </div>
+    <ProductBasic />
       
     </div>
   );

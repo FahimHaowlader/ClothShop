@@ -20,7 +20,7 @@ const Hero = () => {
       eyebrow: "NEW COLLECTION",
       title: "Hoodie with embroidered slogan",
       subtitle:
-        "Discover effortless streetwear designed for everyday comfort and modern style.",
+        "Discover one of the effortless streetwear designed for everyday comfort and modern style.",
       leftImage: heroImg1,
       rightImage: heroImg2,
     },
@@ -52,7 +52,7 @@ const Hero = () => {
       eyebrow: "ESSENTIAL APPAREL",
       title: "Made for Your Lifestyle",
       subtitle:
-        "Simple, versatile pieces that fit effortlessly into your daily routine.",
+        "Simple, versatile pieces that fit effortlessly to your  into your daily routine.",
       leftImage: heroImg2,
       rightImage: heroImg1,
     },
@@ -60,16 +60,16 @@ const Hero = () => {
       eyebrow: "BACHELORSHOP",
       title: "Built for Modern Living",
       subtitle:
-        "Discover timeless pieces created for comfort, confidence, and everyday life.",
+        "Discover most timeless pieces to the created for comfort, confidence, and everyday life.",
       leftImage: heroImg1,
       rightImage: heroImg2,
     },
   ];
 
   /*
-   * ============================================
-   * SLIDER
-   * ============================================
+- ============================================
+- SLIDER
+- ============================================
    */
 
   useEffect(() => {
@@ -110,26 +110,25 @@ const Hero = () => {
           (currentSection + 1) % sections.length;
 
         /*
-         * ============================================
-         * LAYER
-         * ============================================
+- ============================================
+- LAYER (Fixed stacking order for smooth 1-to-2 transition)
+- ============================================
          */
 
-        let layerClass =
-          "z-10 pointer-events-none";
+        let layerClass = "z-10 pointer-events-none";
 
         if (isActive) {
-          layerClass =
-            "z-30 pointer-events-auto";
+          layerClass = "z-30 pointer-events-auto";
         } else if (isPrev) {
-          layerClass =
-            "z-20 pointer-events-none";
+          layerClass = "z-20 pointer-events-none";
+        } else {
+          layerClass = "z-10 pointer-events-none";
         }
 
         /*
-         * ============================================
-         * LEFT IMAGE TRANSFORM
-         * ============================================
+- ============================================
+- LEFT IMAGE TRANSFORM
+- ============================================
          */
 
         let leftTransform =
@@ -147,9 +146,9 @@ const Hero = () => {
         }
 
         /*
-         * ============================================
-         * RIGHT IMAGE TRANSFORM
-         * ============================================
+- ============================================
+- RIGHT IMAGE TRANSFORM
+- ============================================
          */
 
         let rightTransform =
@@ -167,9 +166,9 @@ const Hero = () => {
         }
 
         /*
-         * ============================================
-         * MOBILE IMAGE TRANSFORM
-         * ============================================
+- ============================================
+- MOBILE IMAGE TRANSFORM
+- ============================================
          */
 
         let mobileTransform =
@@ -236,9 +235,10 @@ const Hero = () => {
                     w-full
                     origin-center
                     transform
+                    will-change-transform
                     transition-transform
-                    duration-[1500ms]
-                    ease-[cubic-bezier(0.65,0,0.35,1)]
+                    duration-[1800ms]
+                    ease-[cubic-bezier(0.25,1,0.5,1)]
                     [backface-visibility:hidden]
                     ${leftTransform}
                   `}
@@ -276,9 +276,10 @@ const Hero = () => {
                     w-full
                     origin-center
                     transform
+                    will-change-transform
                     transition-transform
-                    duration-[1500ms]
-                    ease-[cubic-bezier(0.65,0,0.35,1)]
+                    duration-[1800ms]
+                    ease-[cubic-bezier(0.25,1,0.5,1)]
                     [backface-visibility:hidden]
                     ${rightTransform}
                   `}
@@ -322,9 +323,10 @@ const Hero = () => {
                   w-full
                   origin-center
                   transform
+                  will-change-transform
                   transition-transform
-                  duration-[1500ms]
-                  ease-[cubic-bezier(0.65,0,0.35,1)]
+                  duration-[1800ms]
+                  ease-[cubic-bezier(0.25,1,0.5,1)]
                   [backface-visibility:hidden]
                   ${mobileTransform}
                 `}
@@ -352,40 +354,48 @@ const Hero = () => {
                 pointer-events-none
                 absolute
                 inset-0
-              
               "
             />
+          </div>
+        );
+      })}
 
-            {/* ========================================
-                CENTER CONTENT
-            ======================================== */}
+      {/* ============================================
+          CENTER CONTENT (Moved outside the image loops to z-50 absolute top layer)
+      ============================================ */}
 
+     <div
+        className="
+          absolute
+          inset-0
+          z-[100]
+          flex
+          items-center
+          justify-center
+          px-5
+          sm:px-8
+          text-center
+          pointer-events-none
+        "
+      >
+        {sections.map((sec, index) => {
+          const isActive = index === currentSection;
+
+          return (
             <div
+              key={index}
               className={`
-                pointer-events-none
                 absolute
                 inset-0
-                z-40
-
                 flex
                 items-center
                 justify-center
-
-                px-5
-                sm:px-8
-
-                text-center
-
-                transition-all
-                duration-[1000ms]
-                delay-[800ms]
-
-                ease-[cubic-bezier(0.22,1,0.36,1)]
-
+                transition-opacity
+                duration-1000
                 ${
                   isActive
-                    ? "translate-y-0 scale-100 opacity-100"
-                    : "translate-y-8 scale-95 opacity-0"
+                    ? "opacity-100 pointer-events-auto"
+                    : "opacity-0 pointer-events-none"
                 }
               `}
             >
@@ -395,147 +405,161 @@ const Hero = () => {
                   max-w-2xl
                   flex-col
                   items-center
+                  pointer-events-auto
                 "
               >
-                {/* TITLE */}
+               {/* TITLE */}
+<h1
+  className={`
+    text-center
+    max-w-lg
+    uppercase
+    text-lg
+    sm:text-xl
+    font-black
+    leading-[0.95]
+    tracking-[-0.04em]
+    text-black
+    drop-shadow-[0_2px_8px_rgba(255,255,255,0.5)]
+    lg:max-w-2xl
+    lg:text-2xl
+    transition-all
+    duration-1500
+    ease-[cubic-bezier(0.25,1,0.5,1)]
+    ${
+      isActive
+        ? "opacity-100 scale-100"
+        : "opacity-0 scale-95"
+    }
+  `}
+>
+  {sec.title}
+</h1>
 
-                <h1
-                  className="
-                  text-center
-                    max-w-lg
-                    uppercase
-                    text-lg
-                    sm:text-xl
-                    font-black
-                    leading-[0.95]
-                    tracking-[-0.04em]
-                    text-black
-                    drop-shadow-[0_2px_8px_rgba(255,255,255,0.5)]
-                    lg:max-w-2xl
-                    lg:text-2xl
-                  "
-                >
-                  {sec.title}
-                </h1>
-
-                {/* SUBTITLE */}
-
-                <p
-                  className="
-                  text-center
-                    mt-6
-                    max-w-md
-                    text-xs
-                    font-medium
-                    leading-6
-                    text-black/70
-                    sm:leading-7
-                    md:text-sm
-                    lg:max-w-lg
-                  "
-                >
-                  {sec.subtitle}
-                </p>
+{/* SUBTITLE */}
+<p
+  className={`
+    text-center
+    mt-6
+    max-w-md
+    text-xs
+    font-medium
+    leading-6
+    text-black/70
+    sm:leading-7
+    md:text-sm
+    lg:max-w-lg
+    transition-all
+    duration-1500
+    ease-[cubic-bezier(0.25,1,0.5,1)]
+    ${
+      isActive
+        ? "opacity-100 scale-100"
+        : "opacity-0 scale-95"
+    }
+  `}
+>
+  {sec.subtitle}
+</p>
 
                 {/* BUTTON */}
-
                 <button
-  type="button"
-  className="
-    group
-    pointer-events-auto
-    cursor-pointer
+                  type="button"
+                  className="
+                    group
+                    pointer-events-auto
+                    cursor-pointer
+                    relative
+                    z-[130]
+                   
+                    mt-6
 
-    mt-6
+                    inline-flex
+                    items-center
+                    gap-2
 
-    inline-flex
-    items-center
-    gap-2
+                    rounded-full
+                  
+                    bg-black
 
-    rounded-full
+                    px-5
+                    py-3
 
-    border
-    border-black
-    hover:border-bg-primary
+                    text-xs
+                    font-semibold
+                    tracking-wide
 
-    bg-black
+                    text-white
 
-    px-3
-    py-2
+                    shadow-xl
+                    shadow-black/20
 
-    text-xs
-    font-semibold
-    tracking-wide
+                    transition-all
+                    duration-300
+                    ease-out
 
-    text-white
+                    hover:-translate-y-0.5
+                    hover:scale-105
+                    hover:bg-white
+                    hover:text-black
+                    hover:shadow-2xl
+                    hover:shadow-black/40
 
-    shadow-xl
-    shadow-black/20
+                    active:translate-y-0
+                           
+                    md:px-6
+                    md:py-3
+                    md:text-sm
 
-    transition-all
-    duration-300
-    ease-out
+                    lg:mt-8
+                    lg:gap-3
+                    lg:px-8
+                    lg:py-4
+                  "
+                >
+                  <span className="font-primary">Shop Now</span>
 
-    hover:-translate-y-1
-    hover:bg-white
-    hover:text-black
-    hover:shadow-2xl
-    hover:shadow-black/20
+                  <span
+                    className="
+                      flex
+                      h-6
+                      w-6
+                      items-center
+                      justify-center
 
-    active:translate-y-0
+                      rounded-full
 
-    md:px-4
-    md:py-2.5
-    md:text-sm
+                      bg-white
+                      text-black
 
-    lg:mt-8
-    lg:gap-3
-    lg:px-8
-    lg:py-4
-  "
->
-  <span>Shop Now</span>
+                      text-xs
 
-  <span
-    className="
-      flex
-      h-6
-      w-6
-      items-center
-      justify-center
+                      transition-all
+                      duration-300
 
-      rounded-full
+                      group-hover:translate-x-1
+                      group-hover:bg-black
+                      group-hover:text-white
 
-      bg-white
-      text-black
-
-      text-xs
-
-      transition-all
-      duration-300
-
-      group-hover:translate-x-1
-      group-hover:bg-black
-      group-hover:text-white
-
-      md:h-6
-      md:w-6
-
-      lg:h-7
-      lg:w-7
-      lg:text-sm
-    "
-  >
-    →
-  </span>
-</button>
+                      md:h-6
+                      md:w-6
+                      font-sans
+                      lg:h-7
+                      lg:w-7
+                      lg:text-sm
+                    "
+                  >
+                    →
+                  </span>
+                </button>
               </div>
             </div>
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
+      
 
-      {/* ============================================
+    {/* ============================================
           SLIDE INDICATORS
       ============================================ */}
 
@@ -544,7 +568,8 @@ const Hero = () => {
           absolute
           bottom-8
           left-1/2
-          z-50
+          z-[120]
+          pointer-events-auto
 
           flex
           -translate-x-1/2
@@ -562,6 +587,8 @@ const Hero = () => {
             className={`
               h-1.5
               rounded-full
+              
+              pointer-events-auto
 
               transition-all
               duration-500
@@ -580,59 +607,31 @@ const Hero = () => {
           SIDE LABEL
       ============================================ */}
 
-  <div
-  className="
-    absolute
-    bottom-8
-    left-4
-    sm:left-6
-    z-50
-    
-
-
-    block
-
-    text-[10px]
-    font-semibold
-    tracking-[0.3em]
-
-    text-black/60
-
-    [writing-mode:vertical-lr]
-
-    md:[writing-mode:horizontal-tb]
-  "
->
-  BachelorShop
-</div>
-
-      {/* ============================================
-          SLIDE NUMBER
-      ============================================ */}
-
-      {/* <div
+      <div
         className="
           absolute
           bottom-8
-          right-6
+          left-4
+          sm:left-6
           z-50
+          
+          block
 
-          hidden
-
-          text-xs
+          text-[10px]
           font-semibold
-          tracking-widest
+          tracking-[0.3em]
 
           text-black/60
 
-          md:block
+          [writing-mode:vertical-lr]
+
+          md:[writing-mode:horizontal-tb]
         "
-      ></div> */}
+      >
+        BachelorShop
+      </div>
     </section>
   );
 };
 
 export default Hero;
-
-
-

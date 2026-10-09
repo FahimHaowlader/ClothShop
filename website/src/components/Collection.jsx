@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import menImg from "../assets/images.webp";
 import womenImg from "../assets/images2.webp";
@@ -34,18 +34,18 @@ const Collection = ({ onSelectGender }) => {
   }, []);
 
   return (
-    <section className="w-full overflow-hidden px-primary-boundary-m  text-black md:px-primary-boundary-t  lg:px-primary-boundary-xl">
+    <section className="w-full overflow-hidden px-primary-boundary-m  text-black md:px-primary-boundary-t  lg:px-primary-boundary-xl font-primary">
       <div className="">
         {/* =========================
             HEADER
         ========================= */}
 
-        <div className="mb-6 flex items-end justify-between">
+        <div className="mb-6 flex flex-col sm:flex-row sm:items-end items-start justify-between">
           <div>
             <div className="mb-2 flex items-center gap-2.5">
               <span className="h-px w-8 bg-black" />
 
-              <span className="text-[10px] sm:text-[12px] font-semibold uppercase tracking-[0.35em] text-black/45">
+              <span className="text-[10px]  font-semibold uppercase tracking-[0.35em] text-black/45">
                 Collections
               </span>
             </div>
@@ -55,10 +55,8 @@ const Collection = ({ onSelectGender }) => {
             </h2>
           </div>
 
-          <p className="hidden text-right text-[14px] sm:text-base leading-5 text-black/40 md:block">
-            Explore our latest clothing collections
-            <br />
-            designed for everyday wear.
+          <p className="text-xs leading-relaxed text-black/50 hidden sm:block sm:text-right sm:text-sm ">
+            Explore our latest clothing collections designed <br/> for everyday wear.
           </p>
         </div>
 
@@ -136,96 +134,95 @@ const Collection = ({ onSelectGender }) => {
                     {/* Image Label */}
 
                     <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-                      <button
-                        type="button"
-                        className="
-        group
-        pointer-events-auto
-        cursor-pointer
+          <button
+                  type="button"
+                  className="
+                    group
+                    pointer-events-auto
+                    cursor-pointer
+                    relative
+                    z-[130]
+                   
+                    mt-6
 
-        mt-6
+                    inline-flex
+                    items-center
+                    gap-2
 
-        inline-flex
-        items-center
-        gap-2
+                    rounded-full
+                  
+                    bg-black
 
-        rounded-full
+                    px-5
+                    py-3
 
-        border
-        border-black
-        hover:border-bg-primary
+                    text-xs
+                    font-semibold
+                    tracking-wide
 
-        bg-black
+                    text-white
 
-        px-3
-        py-2
+                    shadow-xl
+                    shadow-black/20
 
-        text-xs
-        font-semibold
-        tracking-wide
+                    transition-all
+                    duration-300
+                    ease-out
 
-        text-white
+                    hover:-translate-y-0.5
+                    hover:scale-105
+                    hover:bg-white
+                    hover:text-black
+                    hover:shadow-2xl
+                    hover:shadow-black/40
 
-        shadow-xl
-        shadow-black/20
+                    active:translate-y-0
+                           
+                    md:px-6
+                    md:py-3
+                    md:text-sm
 
-        transition-all
-        duration-300
-        ease-out
+                    lg:mt-8
+                    lg:gap-3
+                    lg:px-8
+                    lg:py-4
+                  "
+                >
+                  <span className="font-primary">Shop Now</span>
 
-        hover:-translate-y-1
-        hover:bg-white
-        hover:text-black
-        hover:shadow-2xl
-        hover:shadow-black/20
+                  <span
+                    className="
+                      flex
+                      h-6
+                      w-6
+                      items-center
+                      justify-center
 
-        active:translate-y-0
+                      rounded-full
 
-        md:px-4
-        md:py-2.5
-        md:text-sm
+                      bg-white
+                      text-black
 
-        lg:mt-8
-        lg:gap-3
-        lg:px-8
-        lg:py-4
-      "
-                      >
-                        <span>Shop Now</span>
+                      text-xs
 
-                        <span
-                          className="
-          flex
-          h-6
-          w-6
-          items-center
-          justify-center
+                      transition-all
+                      duration-300
 
-          rounded-full
+                      group-hover:translate-x-1
+                      group-hover:bg-black
+                      group-hover:text-white
 
-          bg-white
-          text-black
-
-          text-xs
-
-          transition-all
-          duration-300
-
-          group-hover:translate-x-1
-          group-hover:bg-black
-          group-hover:text-white
-
-          md:h-6
-          md:w-6
-
-          lg:h-7
-          lg:w-7
-          lg:text-sm
-        "
-                        >
-                          →
-                        </span>
-                      </button>
+                      md:h-6
+                      md:w-6
+                      font-sans
+                      lg:h-7
+                      lg:w-7
+                      lg:text-sm
+                    "
+                  >
+                    →
+                  </span>
+                </button>
                     </div>
 
                     {/* Image Bottom */}
@@ -675,3 +672,6 @@ export default Collection;
 // };
 
 // export default GenderSelector;
+
+
+

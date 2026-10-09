@@ -24,7 +24,7 @@ const BrandStory = () => {
             <div className="mb-2 flex items-center gap-2.5">
               <span className="h-px w-8 bg-black" />
 
-              <span className="text-[10px] font-semibold uppercase tracking-[0.35em] text-black/45 sm:text-[12px]">
+              <span className="text-[10px] font-semibold uppercase tracking-[0.35em] text-black/45 ">
                 Our Story
               </span>
             </div>
@@ -34,7 +34,7 @@ const BrandStory = () => {
             </h2>
           </div>
 
-          <p className="hidden text-right text-[14px] leading-5 text-black/40 sm:text-base md:block">
+          <p className="hidden text-right text-xs sm:text-sm  leading-5 text-black/40  md:block">
             Built around modern essentials,
             <br />
             designed for everyday confidence.
@@ -77,13 +77,13 @@ const BrandStory = () => {
               We believe great style should feel effortless.
             </p>
 
-            <p className="mt-6 text-sm leading-6 text-black/50 sm:text-base">
+            <p className="mt-6 text-sm leading-6 text-black/50 ">
               BachelorShop was created for those who appreciate simple
               silhouettes, quality materials and clothing that fits naturally
               into everyday life.
             </p>
 
-            <p className="mt-4 text-sm leading-6 text-black/50 sm:text-base">
+            <p className="mt-4 text-sm leading-6 text-black/50 ">
               From everyday essentials to standout pieces, every collection is
               thoughtfully selected to keep your wardrobe modern, versatile and
               distinctly yours.

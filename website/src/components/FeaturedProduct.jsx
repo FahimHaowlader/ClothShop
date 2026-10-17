@@ -1310,78 +1310,90 @@ const FeaturedProduct = () => {
             >
               {product.colors.map((color) => (
                 <button
-                  key={color.name}
-                  type="button"
-                  onClick={() => setSelectedColor(color.name)}
-                  aria-label={`Select ${color.name}`}
-                  className="
-                    group/color
-                    relative
-                    flex
-                    h-13
-                    w-13
-                    shrink-0
-                    items-center
-                    justify-center
-                    rounded-full
-                    sm:h-15
-                    sm:w-15
-                  "
-                >
-                  {/* Tooltip */}
+  key={color.name}
+  type="button"
+  onClick={() => setSelectedColor(color.name)}
+  aria-label={`Select color ${color.name}`}
+  aria-pressed={selectedColor === color.name}
+  className="
+    group/color
+    relative
+    flex
+    h-13
+    w-13
+    shrink-0
+    cursor-pointer
+    items-center
+    justify-center
+    rounded-full
+    focus-visible:outline-none
+    focus-visible:ring-2
+    focus-visible:ring-black
+    focus-visible:ring-offset-2
+    sm:h-15
+    sm:w-15
+  "
+>
+  {/* TOOLTIP */}
+  <span
+    className="
+      pointer-events-none
+      absolute
+      bottom-full
+      left-1/2
+      z-30
+      mb-2
+      -translate-x-1/2
+      translate-y-1
+      scale-95
+      whitespace-nowrap
+      rounded-full
+      bg-black
+      px-3
+      py-1
+      text-[11px]
+      font-medium
+      tracking-wide
+      text-white
+      opacity-0
+      shadow-md
+      transition-all
+      duration-200
+      ease-out
+      group-hover/color:translate-y-0
+      group-hover/color:scale-100
+      group-hover/color:opacity-100
+    "
+  >
+    {color.name}
+  </span>
 
-                  <span
-                    className="
-                      pointer-events-none
-                      absolute
-                      bottom-full
-                      left-1/2
-                      mb-1
-                      -translate-x-1/2
-                      translate-y-2
-                      whitespace-nowrap
-                      rounded-full
-                      bg-black
-                      px-3
-                      py-1.5
-                      text-[12px]
-                      font-medium
-                      text-white
-                      opacity-0
-                      transition-all
-                      duration-300
-                      group-hover/color:translate-y-0
-                      group-hover/color:opacity-100
-                    "
-                  >
-                    {color.name}
-                  </span>
+  {/* COLOR SWATCH */}
+  <span
+    className={`
+      h-11
+      w-11
+      rounded-full
+      border
+      transition-all
+      duration-300
+      ease-out
+      group-hover/color:scale-105
+      group-active/color:scale-95
+      sm:h-12
+      sm:w-12
 
-                  {/* Swatch */}
-
-                  <span
-                    className={`
-                      h-11
-                      w-11
-                      rounded-full
-                      border
-                      transition-all
-                      duration-300
-                      group-hover/color:scale-110
-                      sm:h-12
-                      sm:w-12
-
-                      ${
-                        selectedColor === color.name
-                          ? "ring-2 ring-black ring-offset-2"
-                          : "border-black/10"
-                      }
-                    `}
-                    style={{
-                      backgroundColor: color.value,
-                    }}
-                  />
-                </button>
+      ${
+        selectedColor === color.name
+          ? "ring-2 ring-black ring-offset-2 border-transparent shadow-sm"
+          : "border-black/10 "
+      }
+    `}
+    style={{
+      backgroundColor: color.value,
+    }}
+  />
+</button>
               ))}
             </div>
           </div>

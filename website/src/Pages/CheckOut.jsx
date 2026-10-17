@@ -14,57 +14,76 @@ import SocialShowcase from "../components/SocialShowCase";
 import BrandStory from "../components/BrandStory";
 import ProductBasic from "../components/ProductBasic";
 
-const products = [
-  {
+  const products = [{
     id: 1,
-    name: "Levi's Essential Western Denim Shirt",
+    name: "Essential Western Shirt",
     price: 126,
-    oldPrice: 160,
-    soldOut: false,
-
+    oldPrice: 158,          // optional: shows struck-through price and -% pill
+    soldOut: false,         // optional
     variants: [
-      {
-        name: "Brown",
-        image: image1,
-      },
-      {
-        name: "Black",
-        image: image2,
-      },
-      {
-        name: "Red",
-        image: image1,
-      },
-      {
-        name: "White",
-        image: image2,
-      },
+      { name: "Olive",  image: image1 },
+      { name: "Black",  image: image2 },
+      { name: "Purple", image: image1 },
     ],
   },
-
   {
     id: 2,
-    name: "Classic Relaxed Fit Denim Jacket",
-    price: 145,
-    oldPrice: 180,
-    soldOut: true,
-
-    variants: [
-      {
-        name: "Blue",
-        image: image1,
-      },
-      {
-        name: "Black",
-        image: image2,
-      },
-      {
-        name: "Grey",
-        image: image1,
-      },
-    ],
+    name: "Relaxed Hoodie",
+    price: 89,
+    image: image2,          // no variants: use a single image instead
   },
 ];
+// const products = [
+//   {
+//     id: 1,
+//     name: "Levi's Essential Western Denim Shirt",
+//     price: 126,
+//     oldPrice: 160,
+//     soldOut: false,
+
+//     variants: [
+//       {
+//         name: "Brown",
+//         image: image1,
+//       },
+//       {
+//         name: "Black",
+//         image: image2,
+//       },
+//       {
+//         name: "Red",
+//         image: image1,
+//       },
+//       {
+//         name: "White",
+//         image: image2,
+//       },
+//     ],
+//   },
+
+//   {
+//     id: 2,
+//     name: "Classic Relaxed Fit Denim Jacket",
+//     price: 145,
+//     oldPrice: 180,
+//     soldOut: true,
+
+//     variants: [
+//       {
+//         name: "Blue",
+//         image: image1,
+//       },
+//       {
+//         name: "Black",
+//         image: image2,
+//       },
+//       {
+//         name: "Grey",
+//         image: image1,
+//       },
+//     ],
+//   },
+// ];
 
 const CheckOut = () => {
   return (
@@ -74,7 +93,7 @@ const CheckOut = () => {
       <Collection />
       <FeaturedProductSkeleton />
        <div
-      className=" py-20
+      className=" py-20 px-20
         grid
         grid-cols-1
         gap-x-3

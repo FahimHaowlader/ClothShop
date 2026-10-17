@@ -1,6 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router";
+
+// Time each image stays before swapping automatically (ms)
+const AUTOPLAY_DELAY = 4000;
 
 const ProductCard = ({ product }) => {
+  const navigate = useNavigate();
   const variants = product.variants || [];
 
   const sliderImages =
@@ -15,6 +20,20 @@ const ProductCard = ({ product }) => {
   const [isAnimating, setIsAnimating] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
 
+  // Synchronous lock ref to block rapid double-clicks immediately
+  const isLockedRef = useRef(false);
+  const lastClickTimeRef = useRef(0);
+
+  // Autoplay helpers
+  const cardRef = useRef(null);
+  const [isHovered, setIsHovered] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
+  const [isInView, setIsInView] = useState(true);
+
+  // Each card gets a small random offset so a grid of cards
+  // does not flip all its images at the same moment
+  const autoplayOffset = useRef(Math.random() * 1500);
+
   const hasDiscount =
     product.oldPrice && product.oldPrice > product.price;
 
@@ -27,18 +46,38 @@ const ProductCard = ({ product }) => {
     : null;
 
   /* ==========================================
-     NEXT IMAGE
+     IMAGE CLICK HANDLER (Programmatic Navigation)
   ========================================== */
 
-  const nextImage = () => {
-    if (
-      isAnimating ||
-      isResetting ||
-      variants.length <= 1
-    ) {
+  const handleImageClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const now = Date.now();
+    if (now - lastClickTimeRef.current < 400 || isLockedRef.current) {
       return;
     }
 
+    lastClickTimeRef.current = now;
+    navigate(product.path || `/products/${product.id}`);
+  };
+
+  /* ==========================================
+     NEXT IMAGE
+  ========================================== */
+
+  const nextImage = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.nativeEvent) e.nativeEvent.stopImmediatePropagation();
+
+    const now = Date.now();
+    if (now - lastClickTimeRef.current < 400 || isLockedRef.current || variants.length <= 1) {
+      return;
+    }
+
+    lastClickTimeRef.current = now;
+    isLockedRef.current = true;
     setIsAnimating(true);
     setCurrentImage((prev) => prev + 1);
   };
@@ -47,26 +86,31 @@ const ProductCard = ({ product }) => {
      PREVIOUS IMAGE
   ========================================== */
 
-  const previousImage = () => {
-    if (
-      isAnimating ||
-      isResetting ||
-      variants.length <= 1
-    ) {
+  const previousImage = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.nativeEvent) e.nativeEvent.stopImmediatePropagation();
+
+    const now = Date.now();
+    if (now - lastClickTimeRef.current < 400 || isLockedRef.current || variants.length <= 1) {
       return;
     }
 
+    lastClickTimeRef.current = now;
+    isLockedRef.current = true;
+
     if (currentImage === 0) {
+      // 1. Teleport to the clone (looks identical to the first image)
       setIsResetting(true);
       setCurrentImage(variants.length);
 
+      // 2. After the browser has painted that, re-enable the
+      //    transition and animate one step back to the last image
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
+          setIsResetting(false);
+          setIsAnimating(true);
           setCurrentImage(variants.length - 1);
-
-          requestAnimationFrame(() => {
-            setIsResetting(false);
-          });
         });
       });
 
@@ -81,11 +125,15 @@ const ProductCard = ({ product }) => {
      SELECT VARIANT
   ========================================== */
 
-  const selectVariant = (index) => {
-    if (
-      isAnimating ||
-      isResetting
-    ) {
+  const selectVariant = (index, e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (e.nativeEvent) e.nativeEvent.stopImmediatePropagation();
+    }
+
+    const now = Date.now();
+    if (now - lastClickTimeRef.current < 400 || isLockedRef.current) {
       return;
     }
 
@@ -98,6 +146,8 @@ const ProductCard = ({ product }) => {
       return;
     }
 
+    lastClickTimeRef.current = now;
+    isLockedRef.current = true;
     setIsAnimating(true);
     setCurrentImage(index);
   };
@@ -106,7 +156,13 @@ const ProductCard = ({ product }) => {
      TRANSITION END
   ========================================== */
 
-  const handleTransitionEnd = () => {
+  const handleTransitionEnd = (e) => {
+    // Ignore transitionend events that bubble up from child
+    // elements (for example the image hover zoom)
+    if (e && e.target !== e.currentTarget) {
+      return;
+    }
+
     if (
       currentImage === variants.length &&
       variants.length > 1
@@ -119,6 +175,7 @@ const ProductCard = ({ product }) => {
         requestAnimationFrame(() => {
           setIsResetting(false);
           setIsAnimating(false);
+          isLockedRef.current = false;
         });
       });
 
@@ -126,7 +183,76 @@ const ProductCard = ({ product }) => {
     }
 
     setIsAnimating(false);
+    isLockedRef.current = false;
   };
+
+  /* ==========================================
+     SAFETY NET
+  ========================================== */
+
+  useEffect(() => {
+    if (!isAnimating) return;
+
+    const timeout = setTimeout(() => {
+      handleTransitionEnd(null);
+    }, 1500);
+
+    return () => clearTimeout(timeout);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAnimating, currentImage]);
+
+  /* ==========================================
+     AUTOPLAY
+  ========================================== */
+
+  useEffect(() => {
+    const element = cardRef.current;
+    if (!element || typeof IntersectionObserver === "undefined") return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsInView(entry.isIntersecting),
+      { threshold: 0.3 }
+    );
+
+    observer.observe(element);
+
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (
+      variants.length <= 1 ||
+      product.soldOut ||
+      isHovered ||
+      isFocused ||
+      !isInView ||
+      isLockedRef.current
+    ) {
+      return;
+    }
+
+    if (
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      return;
+    }
+
+    const timeout = setTimeout(() => {
+      isLockedRef.current = true;
+      setIsAnimating(true);
+      setCurrentImage((prev) => prev + 1);
+    }, AUTOPLAY_DELAY + autoplayOffset.current);
+
+    return () => clearTimeout(timeout);
+  }, [
+    currentImage,
+    isHovered,
+    isFocused,
+    isInView,
+    variants.length,
+    product.soldOut,
+  ]);
 
   /* ==========================================
      ACTIVE VARIANT
@@ -140,7 +266,16 @@ const ProductCard = ({ product }) => {
       : 0;
 
   return (
-    <article className="group w-full">
+    <article
+      ref={cardRef}
+      onPointerEnter={(e) => e.pointerType === "mouse" && setIsHovered(true)}
+      onPointerLeave={() => setIsHovered(false)}
+      onFocus={(e) => {
+        if (e.target.matches(":focus-visible")) setIsFocused(true);
+      }}
+      onBlur={() => setIsFocused(false)}
+      className="group/card relative w-full"
+    >
       {/* ========================================
           IMAGE SECTION
       ======================================== */}
@@ -159,57 +294,69 @@ const ProductCard = ({ product }) => {
           lg:h-[350px]
         "
       >
-        {/* SLIDER */}
-
+        {/* CLICKABLE IMAGE CONTAINER (Isolated from buttons) */}
         <div
-          onTransitionEnd={handleTransitionEnd}
-          className="
-            absolute
-            inset-0
-            flex
-            h-full
-            w-full
-          "
-          style={{
-            transform: `translateX(-${
-              currentImage * 100
-            }%)`,
-            transition: isResetting
-              ? "none"
-              : "transform 1200ms cubic-bezier(0.65, 0, 0.35, 1)",
-          }}
+          onClick={handleImageClick}
+          className="absolute inset-0 z-10 cursor-pointer h-full w-full"
         >
-          {sliderImages.map((image, index) => (
-            <div
-              key={index}
-              className="
-                relative
-                h-full
-                min-w-full
-                shrink-0
-                overflow-hidden
-              "
-            >
-              <img
-                src={image}
-                alt={`${product.name} ${index + 1}`}
-                className="
-                  block
-                  h-full
-                  w-full
-                  select-none
-                  object-cover
+          {/* SLIDER */}
+          <div
+            onTransitionEnd={handleTransitionEnd}
+            className="
+              absolute
+              inset-0
+              flex
+              h-full
+              w-full
+              will-change-transform
+            "
+            style={{
+              transform: `translate3d(-${currentImage * 100}%, 0, 0)`,
+              transition: isResetting
+                ? "none"
+                : "transform 1000ms cubic-bezier(0.25, 1, 0.5, 1)",
+              backfaceVisibility: "hidden",
+            }}
+          >
+            {sliderImages.map((image, index) => {
+              const isClone =
+                variants.length > 1 &&
+                index === sliderImages.length - 1;
 
-                  transition-transform
-                  duration-[1000ms]
-                  ease-out
+              return (
+                <div
+                  key={index}
+                  aria-hidden={isClone || undefined}
+                  className="
+                    relative
+                    h-full
+                    min-w-full
+                    shrink-0
+                    overflow-hidden
+                  "
+                >
+                  <img
+                    src={image}
+                    alt={isClone ? "" : `${product.name} ${index + 1}`}
+                    className="
+                      block
+                      h-full
+                      w-full
+                      select-none
+                      object-cover
 
-                  group-hover/image:scale-[1.025]
-                "
-                draggable="false"
-              />
-            </div>
-          ))}
+                      transition-transform
+                      duration-[1000ms]
+                      ease-out
+
+                      group-hover/card:scale-[1.025]
+                    "
+                    draggable="false"
+                  />
+                </div>
+              );
+            })}
+          </div>
         </div>
 
         {/* DISCOUNT */}
@@ -230,6 +377,7 @@ const ProductCard = ({ product }) => {
               tracking-wide
               text-black
               shadow-sm
+              pointer-events-none
             "
           >
             -{discountPercentage}%
@@ -247,6 +395,7 @@ const ProductCard = ({ product }) => {
               flex
               items-center
               justify-center
+              pointer-events-none
             "
           >
             <span
@@ -267,7 +416,7 @@ const ProductCard = ({ product }) => {
           </div>
         )}
 
-        {/* PREVIOUS */}
+        {/* PREVIOUS - Placed at z-30, completely floating above the image click layer */}
 
         {variants.length > 1 && !product.soldOut && (
           <button
@@ -277,37 +426,43 @@ const ProductCard = ({ product }) => {
             disabled={isAnimating || isResetting}
             className="
               absolute
-              left-4
+              left-3
               top-1/2
-              z-40
+              z-30
               flex
-              h-10
-              w-10
+              h-7
+              w-7
               -translate-y-1/2
               items-center
               justify-center
               rounded-full
               bg-white/90
-              text-lg
+              text-sm
               text-black
               shadow-lg
               transition-all
               duration-300
               hover:scale-105
               hover:bg-white
+              focus-visible:outline
+              focus-visible:outline-2
+              focus-visible:outline-offset-2
+              focus-visible:outline-black
               active:scale-95
               disabled:pointer-events-none
 
-              sm:left-5
-              sm:h-11
-              sm:w-11
+              sm:left-3.5
+              sm:h-8
+              sm:w-8
+              font-sans
+              font-medium
             "
           >
             ←
           </button>
         )}
 
-        {/* NEXT */}
+        {/* NEXT - Placed at z-30, completely floating above the image click layer */}
 
         {variants.length > 1 && !product.soldOut && (
           <button
@@ -317,37 +472,43 @@ const ProductCard = ({ product }) => {
             disabled={isAnimating || isResetting}
             className="
               absolute
-              right-4
+              right-3
               top-1/2
-              z-40
+              z-30
               flex
-              h-10
-              w-10
+              h-7
+              w-7
               -translate-y-1/2
               items-center
               justify-center
               rounded-full
               bg-white/90
-              text-lg
+              text-sm
               text-black
               shadow-lg
               transition-all
               duration-300
               hover:scale-105
               hover:bg-white
+              focus-visible:outline
+              focus-visible:outline-2
+              focus-visible:outline-offset-2
+              focus-visible:outline-black
               active:scale-95
               disabled:pointer-events-none
 
-              sm:right-5
-              sm:h-11
-              sm:w-11
+              sm:right-3.5
+              sm:h-8
+              sm:w-8
+              font-sans
+              font-medium
             "
           >
             →
           </button>
         )}
 
-        {/* INDICATORS */}
+        {/* INDICATORS - Placed at z-30 */}
 
         {variants.length > 1 && !product.soldOut && (
           <div
@@ -355,7 +516,7 @@ const ProductCard = ({ product }) => {
               absolute
               bottom-3
               left-1/2
-              z-40
+              z-30
               flex
               -translate-x-1/2
               items-center
@@ -366,14 +527,19 @@ const ProductCard = ({ product }) => {
               <button
                 key={index}
                 type="button"
-                onClick={() => selectVariant(index)}
+                onClick={(e) => selectVariant(index, e)}
                 disabled={isAnimating || isResetting}
                 aria-label={`View image ${index + 1}`}
+                aria-current={activeVariant === index}
                 className={`
                   h-1.5
                   rounded-full
                   transition-all
                   duration-300
+                  focus-visible:outline
+                  focus-visible:outline-2
+                  focus-visible:outline-offset-2
+                  focus-visible:outline-black
                   disabled:pointer-events-none
 
                   ${
@@ -402,10 +568,14 @@ const ProductCard = ({ product }) => {
             font-semibold
             leading-5
             text-black
-            
           "
         >
-          {product.name}
+          <Link
+            to={product.path || `/products/${product.id}`}
+            className=""
+          >
+            {product.name}
+          </Link>
         </h3>
 
         {/* PRICE */}
@@ -432,7 +602,7 @@ const ProductCard = ({ product }) => {
             <span
               className="
                 text-xs
-                text-black/35
+                text-black/50
                 line-through
               "
             >
@@ -443,7 +613,7 @@ const ProductCard = ({ product }) => {
 
         {/* VARIANTS */}
 
-        <div className="mt-3 min-h-[30px]">
+        <div className="relative z-20 mt-3 min-h-[30px]">
           {variants.length > 0 && (
             <div
               className="
@@ -457,8 +627,8 @@ const ProductCard = ({ product }) => {
                   <button
                     key={variant.name || index}
                     type="button"
-                    onClick={() =>
-                      selectVariant(index)
+                    onClick={(e) =>
+                      selectVariant(index, e)
                     }
                     disabled={
                       isAnimating ||
@@ -467,16 +637,22 @@ const ProductCard = ({ product }) => {
                     aria-label={`Select ${
                       variant.name || "color"
                     }`}
+                    aria-pressed={activeVariant === index}
+                    title={variant.name}
                     className={`
                       relative
                       h-7
                       w-7
                       shrink-0
+                      cursor-pointer
                       overflow-hidden
                       rounded-full
                       transition-all
                       duration-300
-                      
+                      focus-visible:outline
+                      focus-visible:outline-2
+                      focus-visible:outline-offset-2
+                      focus-visible:outline-black
 
                       ${
                         activeVariant === index
@@ -487,7 +663,7 @@ const ProductCard = ({ product }) => {
                   >
                     <img
                       src={variant.image}
-                      alt={variant.name || ""}
+                      alt=""
                       className="
                         h-full
                         w-full
@@ -503,7 +679,7 @@ const ProductCard = ({ product }) => {
                   className="
                     text-[10px]
                     font-medium
-                    text-black/40
+                    text-black/50
                   "
                 >
                   +{variants.length - 6}
@@ -514,81 +690,68 @@ const ProductCard = ({ product }) => {
         </div>
 
         {/* VIEW DETAILS */}
+        <Link
+          to={product.path || `/products/${product.id}`}
+          className="
+            group/details
+            relative
+            z-20
+            mt-5
+            flex
+            w-full
+            items-center
+            justify-center
+            gap-3
+            font-semibold
+            text-[12px]
+            tracking-[0.12em]
+          "
+        >
+          {/* Left line */}
+          <span
+            className="
+              block
+              h-px
+              w-10
+              bg-black/40
+              transition-all
+              duration-[2000ms]
+              ease-out
+              motion-reduce:transition-none
+              group-hover/details:grow
+              group-hover/details:bg-black
+            "
+          />
 
-    <button
-  type="button"
-  onClick={() => {
-    window.location.href = `/products/${product.id}`;
-  }}
-  className="
-  cursor-pointer
-    group/details
-    pointer-events-auto
-    mt-5
-    w-full
+          <span
+            className="
+              shrink-0
+              transition-all
+              duration-[1400ms]
+              ease-out
+              motion-reduce:transition-none
+              group-hover/details:tracking-[0.18em]
+            "
+          >
+            View Details
+          </span>
 
-    flex
-    flex-col
-    items-center
-
-    text-[11px]
-    font-bold
-    uppercase
-    tracking-[0.16em]
-    text-black
-  "
->
-  {/* Top Line */}
-  <span
-    className="
-      h-px
-      w-full
-      bg-gray-300
-    " 
-  />
-
-  {/* Button Content */}
-  <span
-    className="
-      flex
-      items-center
-      justify-center
-      gap-0
-      py-2
-    "
-  >
-    <span>View Details</span>
-
-    <span
-      className="
-        max-w-0
-        overflow-hidden
-        whitespace-nowrap
-        text-sm
-        opacity-0
-
-        transition-all
-        duration-[1000ms]
-        ease-out
-
-        group-hover/details:ml-2
-        group-hover/details:max-w-4
-        group-hover/details:opacity-100
-      "
-    >
-      →
-    </span>
-  </span>
-
-  {/* Bottom Line */}
-  <span
-    className="
-      h-px
-      w-full
-      bg-gray-300
-    "
-  />
-</button>
+          {/* Right line */}
+          <span
+            className="
+              block
+              h-px
+              w-10
+              bg-black/40
+              transition-all
+              duration-[2000ms]
+              ease-out
+              motion-reduce:transition-none
+              group-hover/details:grow
+              group-hover/details:bg-black
+            "
+          />
+        </Link>
       </div>
     </article>
   );

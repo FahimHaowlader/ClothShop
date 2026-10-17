@@ -1011,7 +1011,7 @@ const FeaturedProduct = () => {
           className="
             group
             relative
-            h-[100svh]
+            h-[100vh]
             min-h-[500px]
             w-full
             overflow-hidden
@@ -1097,6 +1097,7 @@ const FeaturedProduct = () => {
               sm:left-5
               sm:h-11
               sm:w-11
+              font-sans
             "
           >
             ←
@@ -1134,6 +1135,7 @@ const FeaturedProduct = () => {
               sm:right-5
               sm:h-11
               sm:w-11
+              font-sans
             "
           >
             →
@@ -1251,13 +1253,32 @@ const FeaturedProduct = () => {
           <p
             className="
               mt-5
-              text-lg
+              text-md
               font-medium
               text-black/70
               sm:text-xl
             "
           >
             ${product.price}
+          </p>
+
+          {/* =================================================
+              SKU
+          ================================================== */}
+
+          <p
+            className="
+              mt-3
+              text-[11px]
+              font-medium
+              tracking-wide
+              text-black/50
+            "
+          >
+            <span className="text-black/80">
+              SKU:
+            </span>{" "}
+            {"123456789"}
           </p>
 
           {/* Color */}
@@ -1526,6 +1547,7 @@ const FeaturedProduct = () => {
                 className="
                   flex
                   h-full
+                  pt-1
                   w-9
                   shrink-0
                   items-center
@@ -1567,6 +1589,7 @@ const FeaturedProduct = () => {
                 className="
                   flex
                   h-full
+                  pt-1
                   w-9
                   shrink-0
                   items-center

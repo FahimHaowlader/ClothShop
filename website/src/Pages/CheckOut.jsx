@@ -14,12 +14,15 @@ import SocialShowcase from "../components/SocialShowCase";
 import BrandStory from "../components/BrandStory";
 import ProductBasic from "../components/ProductBasic";
 
-  const products = [{
+
+
+const products = [
+  {
     id: 1,
     name: "Essential Western Shirt",
     price: 126,
     oldPrice: 158,          // optional: shows struck-through price and -% pill
-    soldOut: false,         // optional
+    soldOut: false,         
     variants: [
       { name: "Olive",  image: image1 },
       { name: "Black",  image: image2 },
@@ -30,9 +33,18 @@ import ProductBasic from "../components/ProductBasic";
     id: 2,
     name: "Relaxed Hoodie",
     price: 89,
-    image: image2,          // no variants: use a single image instead
+    image: image2,          // no variants: uses a single image instead
+    soldOut: false,
+  },
+  {
+    id: 3,
+    name: "Limited Edition Jacket",
+    price: 210,
+    soldOut: true,          // sold out case: greys out / overlays the sold out badge
+    image: image1,          // works with single image or variants
   },
 ];
+
 // const products = [
 //   {
 //     id: 1,
@@ -93,9 +105,9 @@ const CheckOut = () => {
       <Collection />
       <FeaturedProductSkeleton />
        <div
-      className=" py-20 px-20
+      className=" p-4 md:py-20 md:px-20
         grid
-        grid-cols-1
+        grid-cols-2
         gap-x-3
         gap-y-10
         sm:gap-x-5

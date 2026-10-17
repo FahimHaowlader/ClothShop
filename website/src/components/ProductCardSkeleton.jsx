@@ -9,14 +9,15 @@ const ProductCardSkeleton = () => {
 
       <div
         className="
-          h-[260px]
+         
+           h-[220px]
           w-full
           overflow-hidden
           bg-neutral-200
 
-          sm:h-[300px]
-          md:h-[320px]
-          lg:h-[350px]
+          sm:h-[280px]
+          md:h-[300px]
+          xl:h-[370px]
         "
       />
 
@@ -49,13 +50,13 @@ const ProductCardSkeleton = () => {
 
         <div className="mt-5 flex w-full items-center justify-center gap-3">
           {/* Left Line */}
-          <span className="block h-px w-10 bg-neutral-200" />
+          {/* <span className="block h-px w-5 sm:w-10 bg-neutral-200" /> */}
 
           {/* Text */}
-          <span className="h-3 w-24 rounded-sm bg-neutral-200" />
+          <span className="h-4 w-40 xl:w-60 rounded-sm bg-neutral-200" />
 
           {/* Right Line */}
-          <span className="block h-px w-10 bg-neutral-200" />
+          {/* <span className="block h-px w-5 sm:w-10 bg-neutral-200" /> */}
         </div>
       </div>
     </article>

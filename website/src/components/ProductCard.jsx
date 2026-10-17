@@ -67,9 +67,11 @@ const ProductCard = ({ product }) => {
   ========================================== */
 
   const nextImage = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.nativeEvent) e.nativeEvent.stopImmediatePropagation();
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (e.nativeEvent) e.nativeEvent.stopImmediatePropagation();
+    }
 
     const now = Date.now();
     if (now - lastClickTimeRef.current < 400 || isLockedRef.current || variants.length <= 1) {
@@ -202,7 +204,7 @@ const ProductCard = ({ product }) => {
   }, [isAnimating, currentImage]);
 
   /* ==========================================
-     AUTOPLAY
+     AUTOPLAY INTERSECTION OBSERVER
   ========================================== */
 
   useEffect(() => {
@@ -219,14 +221,17 @@ const ProductCard = ({ product }) => {
     return () => observer.disconnect();
   }, []);
 
+  /* ==========================================
+     AUTOPLAY INTERVAL LOOP
+  ========================================== */
+
   useEffect(() => {
     if (
       variants.length <= 1 ||
       product.soldOut ||
       isHovered ||
       isFocused ||
-      !isInView ||
-      isLockedRef.current
+      !isInView
     ) {
       return;
     }
@@ -238,15 +243,16 @@ const ProductCard = ({ product }) => {
       return;
     }
 
-    const timeout = setTimeout(() => {
+    const interval = setInterval(() => {
+      if (isLockedRef.current) return;
+      
       isLockedRef.current = true;
       setIsAnimating(true);
       setCurrentImage((prev) => prev + 1);
     }, AUTOPLAY_DELAY + autoplayOffset.current);
 
-    return () => clearTimeout(timeout);
+    return () => clearInterval(interval);
   }, [
-    currentImage,
     isHovered,
     isFocused,
     isInView,
@@ -284,17 +290,17 @@ const ProductCard = ({ product }) => {
         className="
           group/image
           relative
-          h-[260px]
+          h-[220px]
           w-full
           overflow-hidden
           bg-neutral-100
 
-          sm:h-[300px]
-          md:h-[320px]
-          lg:h-[350px]
+          sm:h-[280px]
+          md:h-[300px]
+          xl:h-[370px]
         "
       >
-        {/* CLICKABLE IMAGE CONTAINER (Isolated from buttons) */}
+        {/* CLICKABLE IMAGE CONTAINER */}
         <div
           onClick={handleImageClick}
           className="absolute inset-0 z-10 cursor-pointer h-full w-full"
@@ -306,6 +312,7 @@ const ProductCard = ({ product }) => {
               absolute
               inset-0
               flex
+              flex-nowrap
               h-full
               w-full
               will-change-transform
@@ -330,10 +337,11 @@ const ProductCard = ({ product }) => {
                   className="
                     relative
                     h-full
-                    min-w-full
-                    shrink-0
+                    w-full
+                    flex-shrink-0
                     overflow-hidden
                   "
+                  style={{ flexBasis: "100%" }}
                 >
                   <img
                     src={image}
@@ -416,7 +424,7 @@ const ProductCard = ({ product }) => {
           </div>
         )}
 
-        {/* PREVIOUS - Placed at z-30, completely floating above the image click layer */}
+        {/* PREVIOUS */}
 
         {variants.length > 1 && !product.soldOut && (
           <button
@@ -462,7 +470,7 @@ const ProductCard = ({ product }) => {
           </button>
         )}
 
-        {/* NEXT - Placed at z-30, completely floating above the image click layer */}
+        {/* NEXT */}
 
         {variants.length > 1 && !product.soldOut && (
           <button
@@ -508,7 +516,7 @@ const ProductCard = ({ product }) => {
           </button>
         )}
 
-        {/* INDICATORS - Placed at z-30 */}
+        {/* INDICATORS */}
 
         {variants.length > 1 && !product.soldOut && (
           <div
@@ -656,7 +664,7 @@ const ProductCard = ({ product }) => {
 
                       ${
                         activeVariant === index
-                          ? "ring-1 ring-black ring-offset-2"
+                          ? "ring-1 ring-gray-300 ring-offset-2"
                           : ""
                       }
                     `}
@@ -712,7 +720,8 @@ const ProductCard = ({ product }) => {
             className="
               block
               h-px
-              w-10
+              w-5
+              sm:w-10
               bg-black/40
               transition-all
               duration-[2000ms]
@@ -741,7 +750,8 @@ const ProductCard = ({ product }) => {
             className="
               block
               h-px
-              w-10
+              w-5
+              sm:w-10
               bg-black/40
               transition-all
               duration-[2000ms]

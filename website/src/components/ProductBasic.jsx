@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Ruler, ShoppingBag } from "lucide-react";
 
 // Images
 import image1 from "../assets/images.webp";
 import image2 from "../assets/images2.webp";
 
-const ProductDetails = () => {
+const ProductDetails = ({ setCartCount }) => {
   const [isAdding, setIsAdding] = useState(false);
   const [isAdded, setIsAdded] = useState(false);
 
@@ -13,31 +13,10 @@ const ProductDetails = () => {
   const [isOrdering, setIsOrdering] = useState(false);
   const [isOrdered, setIsOrdered] = useState(false);
 
-  const handleAddToBag = async () => {
-    if (isAdding) return;
-    setIsAdding(true);
+  // Flying Product Thumbnail State
+  const [flyingParticle, setFlyingParticle] = useState(null);
 
-    try {
-      setIsAdded(true);
-      await new Promise((resolve) => setTimeout(resolve, 1600));
-    } finally {
-      setIsAdded(false);
-      setIsAdding(false);
-    }
-  };
-
-  const handleOrderNow = async () => {
-    if (isOrdering) return;
-    setIsOrdering(true);
-
-    try {
-      setIsOrdered(true);
-      await new Promise((resolve) => setTimeout(resolve, 1600));
-    } finally {
-      setIsOrdered(false);
-      setIsOrdering(false);
-    }
-  };
+  const addToBagBtnRef = useRef(null);
 
   const product = {
     name: "Levi's essential western aasa",
@@ -74,6 +53,123 @@ const ProductDetails = () => {
   const [selectedColor, setSelectedColor] = useState("Indianred");
   const [selectedSize, setSelectedSize] = useState("S");
   const [quantity, setQuantity] = useState(1);
+
+  const handleAddToBag = async () => {
+    if (isAdding) return;
+    setIsAdding(true);
+
+    if (addToBagBtnRef.current) {
+      const btnRect = addToBagBtnRef.current.getBoundingClientRect();
+      const cartIcon = document.getElementById("navbar-cart-icon");
+
+      // Start coordinates on the LEFT side of the Add to Bag button
+      const startX = btnRect.left + btnRect.width / 2 + 24;
+      const startY = btnRect.top + btnRect.height / 2 - 30;
+
+      // Target coordinates anchored on the navbar bag section
+      let targetX;
+      let targetY;
+
+      if (window.innerWidth < 640) {
+        targetX = window.innerWidth - 45;
+        targetY = 5;
+      } else if (window.innerWidth < 1024) {
+        targetX = window.innerWidth - 70;
+        targetY = 7;
+      } else {
+        targetX = window.innerWidth - 120;
+        targetY = 10;
+      }
+
+      // If the cart icon exists, it takes priority over the fallback
+      if (cartIcon) {
+        const cartRect = cartIcon.getBoundingClientRect();
+        targetX = cartRect.left + cartRect.width / 2 - 24;
+        targetY = cartRect.top + cartRect.height / 2 - 24;
+      }
+
+      setFlyingParticle({
+        startX,
+        startY,
+        image: product.images[0],
+      });
+
+      // Smooth Hyperbolic Arc Animation via requestAnimationFrame
+      requestAnimationFrame(() => {
+        const el = document.getElementById("flying-product-thumbnail");
+        if (!el) return;
+
+        const duration = 800;
+        const startTime = performance.now();
+
+        // Control point centered horizontally and clamped safely inside screen top boundary
+        const peakX = window.innerWidth / 2 - 180;
+        const peakY = Math.max(30, Math.min(startY, targetY) - 120);
+
+        const animateParticle = (currentTime) => {
+          const elapsed = currentTime - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+
+          // Optimized buttery-smooth cubic bezier easing curve
+          const easeProgress =
+            progress < 0.5
+              ? 4 * progress * progress * progress
+              : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+
+          const currentX =
+            Math.pow(1 - easeProgress, 2) * startX +
+            2 * (1 - easeProgress) * easeProgress * peakX +
+            Math.pow(easeProgress, 2) * targetX;
+
+          const currentY =
+            Math.pow(1 - easeProgress, 2) * startY +
+            2 * (1 - easeProgress) * easeProgress * peakY +
+            Math.pow(easeProgress, 2) * targetY;
+
+          const currentScale = 1 - easeProgress * 0.85;
+          const currentRotate = easeProgress * -35;
+          const currentOpacity = progress > 0.85 ? (1 - progress) / 0.15 : 1;
+
+          el.style.transform = `translate3d(${currentX - startX}px, ${
+            currentY - startY
+          }px, 0) scale(${currentScale}) rotate(${currentRotate}deg)`;
+          el.style.opacity = currentOpacity;
+
+          if (progress < 1) {
+            requestAnimationFrame(animateParticle);
+          } else {
+            setFlyingParticle(null);
+            if (setCartCount) {
+              setCartCount((prev) => prev + quantity);
+            }
+          }
+        };
+
+        requestAnimationFrame(animateParticle);
+      });
+    }
+
+    try {
+      setIsAdded(true);
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+    } finally {
+      setIsAdded(false);
+      setIsAdding(false);
+    }
+  };
+
+  const handleOrderNow = async () => {
+    if (isOrdering) return;
+    setIsOrdering(true);
+
+    try {
+      setIsOrdered(true);
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+    } finally {
+      setIsOrdered(false);
+      setIsOrdering(false);
+    }
+  };
 
   // =====================================================
   // IMAGE SLIDER
@@ -120,7 +216,7 @@ const ProductDetails = () => {
 
       setIsAnimating(true);
       setCurrentImage((prev) => prev + 1);
-    }, 3500);
+    }, 4000);
 
     return () => clearInterval(interval);
   }, [isAnimating, isResetting]);
@@ -145,7 +241,28 @@ const ProductDetails = () => {
   };
 
   return (
-    <section className="w-full overflow-hidden bg-white">
+    <section className="relative w-full overflow-hidden bg-white font-primary">
+      {/* =================================================
+          FLYING THUMBNAIL PARTICLES (SMOOTH ARC)
+      ================================================== */}
+      {flyingParticle && (
+        <div
+          id="flying-product-thumbnail"
+          className="pointer-events-none fixed z-[999] h-12 w-12 overflow-hidden rounded-full border border-gray-400 bg-white shadow-2xl"
+          style={{
+            left: `${flyingParticle.startX}px`,
+            top: `${flyingParticle.startY}px`,
+            willChange: "transform, opacity",
+          }}
+        >
+          <img
+            src={flyingParticle.image}
+            alt="Flying product"
+            className="h-full w-full object-cover"
+          />
+        </div>
+      )}
+
       <div className="grid w-full items-stretch lg:grid-cols-2">
         {/* =================================================
             IMAGE SECTION
@@ -159,7 +276,7 @@ const ProductDetails = () => {
               transform: `translate3d(-${currentImage * 100}%, 0, 0)`,
               transition: isResetting
                 ? "none"
-                : "transform 1200ms cubic-bezier(0.65, 0, 0.35, 1)",
+                : "transform 1000ms cubic-bezier(0.25, 1, 0.5, 1)",
             }}
           >
             {sliderImages.map((image, index) => (
@@ -170,7 +287,7 @@ const ProductDetails = () => {
                 <img
                   src={image}
                   alt={`${product.name} ${index + 1}`}
-                  className="block h-full w-full select-none object-cover"
+                  className="block h-full w-full select-none object-cover transition-transform duration-1000 ease-out hover:scale-105"
                   draggable="false"
                 />
               </div>
@@ -182,7 +299,7 @@ const ProductDetails = () => {
             onClick={previousImageHandler}
             aria-label="Previous image"
             disabled={isAnimating || isResetting}
-            className="absolute left-4 top-1/2 z-40 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-lg text-black shadow-lg transition-all duration-300 hover:scale-105 hover:bg-white active:scale-95 disabled:pointer-events-none sm:left-5 sm:h-11 sm:w-11 font-sans"
+            className="absolute left-4 top-1/2 z-45 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/95 font-sans text-lg text-black shadow-lg transition-all duration-300 hover:scale-105 hover:bg-white active:scale-95 disabled:pointer-events-none sm:left-5 sm:h-11 sm:w-11"
           >
             ←
           </button>
@@ -192,12 +309,12 @@ const ProductDetails = () => {
             onClick={nextImage}
             aria-label="Next image"
             disabled={isAnimating || isResetting}
-            className="absolute right-4 top-1/2 z-40 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-lg text-black shadow-lg transition-all duration-300 hover:scale-105 hover:bg-white active:scale-95 disabled:pointer-events-none sm:right-5 sm:h-11 sm:w-11 font-sans"
+            className="absolute right-4 top-1/2 z-45 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/95 font-sans text-lg text-black shadow-lg transition-all duration-300 hover:scale-105 hover:bg-white active:scale-95 disabled:pointer-events-none sm:right-5 sm:h-11 sm:w-11"
           >
             →
           </button>
 
-          <div className="absolute bottom-5 left-1/2 z-40 flex -translate-x-1/2 items-center gap-2 sm:bottom-6">
+          <div className="absolute bottom-5 left-1/2 z-45 flex -translate-x-1/2 items-center gap-2 sm:bottom-6">
             {product.images.map((_, index) => (
               <button
                 key={index}
@@ -302,7 +419,7 @@ const ProductDetails = () => {
                   <span
                     className={`h-11 w-11 rounded-full border transition-all duration-300 ease-out group-hover/color:scale-105 group-active/color:scale-95 sm:h-12 sm:w-12 ${
                       selectedColor === color.name
-                        ? "ring-2 ring-black ring-offset-2 border-transparent shadow-sm"
+                        ? "border-transparent ring-2 ring-black ring-offset-2 shadow-sm"
                         : "border-black/10"
                     }`}
                     style={{
@@ -335,7 +452,7 @@ const ProductDetails = () => {
             <div className="rounded-full border border-black/15 bg-white p-1">
               <div className="relative grid h-9 grid-cols-5 sm:h-10">
                 <div
-                  className="pointer-events-none absolute inset-y-0 left-0 w-1/5 rounded-full bg-black will-change-transform transition-transform duration-500 ease-[cubic-bezier(0.65,0,0.35,1)]"
+                  className="pointer-events-none absolute inset-y-0 left-0 w-1/5 rounded-full bg-black will-change-transform transition-transform duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]"
                   style={{
                     transform: `translate3d(${
                       product.sizes.indexOf(selectedSize) * 100
@@ -365,13 +482,13 @@ const ProductDetails = () => {
           ================================================== */}
 
           <div className="mt-7 flex w-full items-center gap-2 sm:mt-8 sm:gap-3">
-            {/* Quantity */}
+            {/* Quantity Selector */}
             <div className="flex h-12 w-[112px] shrink-0 items-center overflow-hidden rounded-full border border-black/15 bg-white sm:w-[130px]">
               <button
                 type="button"
                 onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
                 aria-label="Decrease quantity"
-                className="flex h-full pt-1 w-9 shrink-0 items-center justify-center text-lg font-medium text-black transition hover:bg-black/5 active:bg-black/10 sm:w-10"
+                className="flex h-full w-9 shrink-0 items-center justify-center pt-1 text-lg font-medium text-black transition hover:bg-black/5 active:bg-black/10 sm:w-10"
               >
                 −
               </button>
@@ -384,14 +501,15 @@ const ProductDetails = () => {
                 type="button"
                 onClick={() => setQuantity((prev) => Math.min(10, prev + 1))}
                 aria-label="Increase quantity"
-                className="flex h-full pt-1 w-9 shrink-0 items-center justify-center text-lg font-medium text-black transition hover:bg-black/5 active:bg-black/10 sm:w-10"
+                className="flex h-full w-9 shrink-0 items-center justify-center pt-1 text-lg font-medium text-black transition hover:bg-black/5 active:bg-black/10 sm:w-10"
               >
                 +
               </button>
             </div>
 
-            {/* Add To Bag Button */}
+            {/* Add To Bag CTA */}
             <button
+              ref={addToBagBtnRef}
               type="button"
               onClick={handleAddToBag}
               disabled={isAdding}
@@ -438,7 +556,6 @@ const ProductDetails = () => {
                 active:scale-[0.98]
 
                 disabled:pointer-events-none
-                sm:text-sm
               "
             >
               <div className="relative flex h-5 items-center justify-center overflow-hidden">
@@ -460,8 +577,8 @@ const ProductDetails = () => {
 
               <span className="flex h-6 w-6 sm:h-7 sm:w-7 shrink-0 items-center justify-center rounded-full bg-white text-black will-change-transform transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:translate-x-1 group-hover:bg-black group-hover:text-white">
                 <ShoppingBag
-                  size={14}
-                  strokeWidth={1.8}
+                  size={17}
+                  strokeWidth={2}
                   className={`transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] ${
                     isAdded ? "scale-0 opacity-0 absolute" : "scale-100 opacity-100"
                   }`}
@@ -478,7 +595,7 @@ const ProductDetails = () => {
           </div>
 
           {/* =================================================
-              ORDER NOW BUTTON (Matched color theme with Add to Bag)
+              ORDER NOW BUTTON
           ================================================== */}
 
           <button
@@ -528,7 +645,6 @@ const ProductDetails = () => {
               active:scale-[0.98]
 
               disabled:pointer-events-none
-              sm:text-sm
             "
           >
             {/* Text Label Container */}
@@ -564,7 +680,7 @@ const ProductDetails = () => {
                 group-hover:text-white
               "
             >
-              <span className="text-xs font-bold leading-none sm:text-sm font-sans">
+              <span className="font-sans text-xs font-bold leading-none sm:text-sm">
                 →
               </span>
             </span>

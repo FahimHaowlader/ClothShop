@@ -102,6 +102,8 @@ const CheckOut = () => {
     <div>
       <Hero />
       <FeaturedProduct />
+          <ProductBasic />
+
       <Collection />
       <FeaturedProductSkeleton />
        <div
@@ -134,7 +136,6 @@ const CheckOut = () => {
 
     <BrandStory />
     </div>
-    <ProductBasic />
       
     </div>
   );

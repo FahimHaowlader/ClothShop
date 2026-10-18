@@ -588,36 +588,49 @@ const ProductCard = ({ product }) => {
 
         {/* PRICE */}
 
-        <div
-          className="
-            mt-1.5
-            flex
-            items-center
-            gap-2
-          "
-        >
-          <span
-            className="
-              text-sm
-              font-semibold
-              text-black
-            "
-          >
-            ${product.price}
-          </span>
+  <div
+  className="
+  
+    mt-1.5
+    flex
+    items-center
+    gap-3.5
+  "
+>
+  <span
+    className="
+      text-sm
+      font-semibold
+      text-black
+    "
+  >
+    ${product.price}
+  </span>
 
-          {hasDiscount && (
-            <span
-              className="
-                text-xs
-                text-black/50
-                line-through
-              "
-            >
-              ${product.oldPrice}
-            </span>
-          )}
-        </div>
+  {hasDiscount && (
+    <span
+      className="
+        relative
+        text-xs
+        text-black/50
+      "
+    >
+      ${product.oldPrice}
+      {/* Extended line by 10% on both left and right sides (total 20% longer) */}
+      <span 
+        className="
+          absolute 
+          -left-[25%] 
+          -right-[25%] 
+          top-[40%] 
+          h-[1px] 
+          bg-black/50
+          -translate-y-1/2
+        " 
+      />
+    </span>
+  )}
+</div>
 
         {/* VARIANTS */}
 
@@ -664,7 +677,7 @@ const ProductCard = ({ product }) => {
 
                       ${
                         activeVariant === index
-                          ? "ring-1 ring-gray-300 ring-offset-2"
+                          ? "ring-1 ring-gray-400 ring-offset-2"
                           : ""
                       }
                     `}

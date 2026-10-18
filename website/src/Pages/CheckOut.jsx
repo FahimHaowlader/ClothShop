@@ -21,7 +21,7 @@ const products = [
     id: 1,
     name: "Essential Western Shirt",
     price: 126,
-    oldPrice: 158,          // optional: shows struck-through price and -% pill
+    oldPrice: 148,          // optional: shows struck-through price and -% pill
     soldOut: false,         
     variants: [
       { name: "Olive",  image: image1 },

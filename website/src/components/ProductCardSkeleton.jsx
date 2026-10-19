@@ -53,7 +53,7 @@ const ProductCardSkeleton = () => {
           {/* <span className="block h-px w-5 sm:w-10 bg-neutral-200" /> */}
 
           {/* Text */}
-          <span className="h-4 w-40 xl:w-60 rounded-sm bg-neutral-200" />
+          <span className="h-4 w-full rounded-sm bg-neutral-200" />
 
           {/* Right Line */}
           {/* <span className="block h-px w-5 sm:w-10 bg-neutral-200" /> */}

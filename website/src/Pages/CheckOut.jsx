@@ -13,6 +13,7 @@ import ServiceFeatures from "../components/ServicesFeatures";
 import SocialShowcase from "../components/SocialShowCase";
 import BrandStory from "../components/BrandStory";
 import ProductBasic from "../components/ProductBasic";
+import ProductDetails from "../components/ProductDetails";
 
 
 
@@ -102,7 +103,7 @@ const CheckOut = () => {
     <div>
       <Hero />
       <FeaturedProduct />
-          <ProductBasic />
+        
 
       <Collection />
       <FeaturedProductSkeleton />
@@ -135,6 +136,11 @@ const CheckOut = () => {
     <div className=" py-20">
 
     <BrandStory />
+      <ProductBasic />
+      <div className="w-full p-10 border-black"> 
+
+      <ProductDetails />
+      </div>
     </div>
       
     </div>

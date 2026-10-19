@@ -3,7 +3,7 @@
 
 @theme {
   /* Colors -> bg-brand, text-brand, border-brand, ring-brand, fill-brand, etc. */
-  --color-bg-primary: #ffffff;
+  --color-bg-primary:rgb(249, 250, 251);
   --color-text-primary: #000000;
   --color-text-secondary: #1A1A1A;
 

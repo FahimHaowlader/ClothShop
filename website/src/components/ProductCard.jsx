@@ -368,30 +368,31 @@ const ProductCard = ({ product }) => {
         </div>
 
         {/* DISCOUNT */}
-
-        {hasDiscount && (
+{hasDiscount && (
           <span
             className="
               absolute
-              left-3
-              top-3
-              z-30
+              left-5
+              top-5
+              z-46
+              flex
+              h-8
+              w-14
+              items-center
+              justify-center
               rounded-full
               bg-white
-              px-3
-              py-1.5
-              text-[10px]
+              text-[11px]
               font-semibold
               tracking-wide
               text-black
-              shadow-sm
+              shadow-md
               pointer-events-none
             "
           >
-            -{discountPercentage}%
+            <span className="relative -top-[1px] text-2xl font-medium">-</span>{discountPercentage}%
           </span>
         )}
-
         {/* SOLD OUT */}
 
         {product.soldOut && (
@@ -622,7 +623,7 @@ const ProductCard = ({ product }) => {
           absolute 
           -left-[25%] 
           -right-[25%] 
-          top-[40%] 
+          top-[43%] 
           h-[1px] 
           bg-black/50
           -translate-y-1/2

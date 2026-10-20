@@ -5,7 +5,8 @@ import {
   Pencil,
   Trash2,
   CheckCircle2,
-  Home,
+  House,
+  Building2,
   Briefcase,
   Building,
   Sparkles,
@@ -165,9 +166,9 @@ const Addresses = () => {
   const getTypeIcon = (type) => {
     switch (type) {
       case "home":
-        return <Home size={15} />;
+        return <House size={15} />;
       case "work":
-        return <Briefcase size={15} />;
+        return <Building2 size={15} />;
       default:
         return <Building size={15} />;
     }
@@ -442,8 +443,8 @@ const Addresses = () => {
                 key={address.id}
                 className={`relative flex flex-col justify-between rounded-2xl border p-6 sm:p-8 shadow-2xs transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] hover:border-black/30 ${
                   address.isDefault
-                    ? "border-black/20 bg-white shadow-sm"
-                    : "border-black/10 bg-white"
+                    ? "border-black/30  shadow-sm"
+                    : "border-black/10  "
                 }`}
               >
                 <div>

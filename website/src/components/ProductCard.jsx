@@ -294,7 +294,7 @@ const ProductCard = ({ product }) => {
           w-full
           overflow-hidden
           bg-neutral-100
-
+          rounded-lg
           sm:h-[280px]
           md:h-[300px]
           xl:h-[370px]
@@ -303,7 +303,7 @@ const ProductCard = ({ product }) => {
         {/* CLICKABLE IMAGE CONTAINER */}
         <div
           onClick={handleImageClick}
-          className="absolute inset-0 z-10 cursor-pointer h-full w-full"
+          className="absolute inset-0 z-10 cursor-pointer h-full w-full rounded-lg"
         >
           {/* SLIDER */}
           <div
@@ -352,7 +352,7 @@ const ProductCard = ({ product }) => {
                       w-full
                       select-none
                       object-cover
-
+                      rounded-lg
                       transition-transform
                       duration-[1000ms]
                       ease-out

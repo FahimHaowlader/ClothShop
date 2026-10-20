@@ -18,7 +18,7 @@ const FeaturedProductSkeleton = () => {
             overflow-hidden
             bg-neutral-100
             lg:h-full
-            lg:min-h-0
+            lg:min-h-0          
           "
         >
           {/* Main image */}

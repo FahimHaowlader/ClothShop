@@ -30,7 +30,7 @@ const BrandStory = () => {
             </div>
 
             <h2 className="text-[clamp(2rem,4vw,3.5rem)] font-bold leading-[0.9] tracking-[-0.06em]">
-              More than clothing.
+              More than clothing
             </h2>
           </div>
 

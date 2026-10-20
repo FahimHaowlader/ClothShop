@@ -14,7 +14,7 @@ const ProductCardSkeleton = () => {
           w-full
           overflow-hidden
           bg-neutral-200
-
+          rounded-lg
           sm:h-[280px]
           md:h-[300px]
           xl:h-[370px]

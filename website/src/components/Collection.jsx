@@ -51,7 +51,7 @@ const Collection = ({ onSelectGender }) => {
             </div>
 
             <h2 className="text-[clamp(2rem,4vw,3.5rem)] font-bold leading-[0.9] tracking-[-0.06em]">
-              Shop by style.
+              Shop by style
             </h2>
           </div>
 

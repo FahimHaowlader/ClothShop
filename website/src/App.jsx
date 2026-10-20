@@ -12,7 +12,7 @@ import Shop from './pages/Shop.jsx'
 import Product from './pages/Product.jsx'
 import Profile from './pages/Profile.jsx'
 import Order from './pages/Order.jsx'
-import Cart from './pages/Cart.jsx'
+import Bag from './pages/Bag.jsx'
 import Home from './pages/Home.jsx'
 import About from './pages/About.jsx'
 import Privacy from './pages/Privacy.jsx'
@@ -30,7 +30,7 @@ const router = createBrowserRouter([
       { path: 'product', element: <Product /> },
       { path: 'profile', element: <Profile /> },
       { path: 'order', element: <Order /> },
-      { path: 'cart', element: <Cart /> },
+      { path: 'bag', element: <Bag /> },
       { path: 'about-us', element: <About /> },
       { path: 'privacy-policy', element: <Privacy /> },
       { path: 'size-guide', element: <Size /> },

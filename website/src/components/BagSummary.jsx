@@ -48,7 +48,7 @@ const BagSummary = ({
   // Render Continue Shopping link/button matching editorial component headers
 const renderContinueShopping = () => {
   const className =
-    "group relative inline-flex items-center justify-center gap-1.5 text-[10px] sm:text-[14px] font-bold tracking-wider text-black focus:outline-none hover:cursor-pointer";
+    "group relative inline-flex items-center justify-center gap-1.5 text-[12px] sm:text-[14px] font-bold tracking-wider text-black focus:outline-none hover:cursor-pointer";
 
   const content = (
     <>

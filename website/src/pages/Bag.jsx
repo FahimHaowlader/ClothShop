@@ -8,6 +8,7 @@ import BagItemSkeleton from "../components/BagItemSkeleton";
 
 const Bag = () => {
   // Cart items state with strictly unique IDs
+  // const [items, setItems] = useState([])
   const [items, setItems] = useState([
     {
       id: "cart-item-1",
@@ -39,6 +40,36 @@ const Bag = () => {
     },
     {
       id: "cart-item-3",
+      name: "Heavyweight Boxy Fleece",
+      price: 145,
+      originalPrice: null,
+      selectedColor: "Charcoal",
+      colorValue: "#333333",
+      selectedSize: "L",
+      quantity: 1,
+      image:
+        "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=800&q=80",
+      sku: "YX180-28",
+      slug: "heavyweight-boxy-fleece",
+    },
+    
+    {
+      id: "cart-item-4",
+      name: "Heavyweight Boxy Fleece",
+      price: 145,
+      originalPrice: null,
+      selectedColor: "Charcoal",
+      colorValue: "#333333",
+      selectedSize: "L",
+      quantity: 1,
+      image:
+        "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=800&q=80",
+      sku: "YX180-28",
+      slug: "heavyweight-boxy-fleece",
+    },
+    
+    {
+      id: "cart-item-5",
       name: "Heavyweight Boxy Fleece",
       price: 145,
       originalPrice: null,
@@ -105,13 +136,13 @@ const Bag = () => {
           </section>
 
           {/* RIGHT COLUMN: STICKY BAG SUMMARY SIDEBAR */}
-          <aside className="lg:col-span-5 xl:col-span-4 lg:sticky lg:top-[20%]">
+          <aside className="lg:col-span-5 pt-2 sm:pt-5 xl:col-span-4 lg:sticky lg:top-[20%]">
             <BagSummary items={items} />
           </aside>
 
         </div>
       )}
-      <BagItemSkeleton/>
+      {/* <BagItemSkeleton/> */}
     </div>
   );
 };

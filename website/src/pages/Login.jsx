@@ -388,7 +388,7 @@ const Login = () => {
       {/* Sticky Brand Header: expands at top, shrinks after scrolling */}
       <header
         className={`sticky top-0 z-50 -mx-5 flex w-auto items-center justify-center  bg-white px-5 backdrop-blur-sm transition-all duration-500 ease-in-out sm:-mx-8 sm:px-8 lg:-mx-12 lg:px-12 ${
-          isScrolled ? "mb-8 py-2 lg:py-4" : "mb-5 py-10"
+          isScrolled ? "mb-8 py-2 lg:py-4 shadow-2xl" : "mb-5 py-10 shadow-none"
         }`}
       >
         <Link

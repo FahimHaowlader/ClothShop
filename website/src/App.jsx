@@ -19,6 +19,8 @@ import Privacy from './pages/Privacy.jsx'
 import Size from './pages/Size.jsx'
 import CheckOut from './pages/CheckOut.jsx'
 import Addresses from './pages/Addresses.jsx'
+import Login from './pages/Login.jsx'
+import Register from './pages/Register.jsx'
 
 const router = createBrowserRouter([
   {
@@ -39,7 +41,9 @@ const router = createBrowserRouter([
       { path: 'addresses', element: <Addresses /> },
     ],
   },
-   { path : '*', element: <h2>404 Not Found</h2> },
+  { path: 'login', element: <Login /> },
+  { path : 'register', element: <Register /> },
+  { path : '*', element: <h2>404 Not Found</h2> },
 ])
 
 export default function App() {

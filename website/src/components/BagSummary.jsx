@@ -1,328 +1,407 @@
-import React, { useState } from "react";
-import { ArrowRight, HelpCircle, Tag, Check, X } from "lucide-react";
+import React, { useMemo, useState } from "react";
 import { Link } from "react-router";
+import {
+  ArrowLeft,
+  ArrowRight,
+  CheckCircle2,
+  LockKeyhole,
+  ShoppingBag,
+  Tag,
+  Truck,
+  ShieldCheck,
+  X,
+} from "lucide-react";
+
+const INPUT_CLASS =
+  "w-full rounded-xl border border-black/10 bg-neutral-50/30 px-3.5 py-3 text-xs text-black transition-[border-color,background-color,box-shadow] duration-500 ease-in-out placeholder:text-black/30 focus:border-black focus:bg-white focus:outline-none focus:ring-1 focus:ring-black/5 disabled:opacity-50";
+
+const BUTTON_CLASS =
+  "inline-flex items-center justify-center gap-2 rounded-full border border-black/15 bg-white px-6 py-3.5 text-xs font-semibold text-black shadow-sm transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-black hover:text-white active:scale-[0.98]";
+
+const formatPrice = (amount) =>
+  `৳${Number(amount || 0).toLocaleString("en-BD")}`;
 
 const BagSummary = ({
-  planTitle = "Bag Summary",
-  items = [
-    { name: "Hoodie with embroidered slogan", originalPrice: 180, price: 126 },
-    { name: "Heavyweight Boxy Fleece", originalPrice: null, price: 145 },
-  ],
-  shippingCost = 0,
-  taxes = 0,
-  onCheckout,
-  onContinueShopping,
-  continueShoppingUrl = "/shop",
+  subtotal = 0,
+  shippingCost = 70,
+  discountRate = 25,
+  checkoutLink = "/checkout",
+  returnLink = "/cart",
+  showCheckoutButton = true,
 }) => {
+  const [couponCode, setCouponCode] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState("");
   const [showCouponInput, setShowCouponInput] = useState(false);
-  const [promoCodeInput, setPromoCodeInput] = useState("");
-  const [appliedCoupon, setAppliedCoupon] = useState("BACHELOR10");
-  const [discountValue, setDiscountValue] = useState(27.1);
+  const [couponError, setCouponError] = useState("");
 
-  // Calculations
-  const rawOriginalTotal = items.reduce(
-    (acc, item) => acc + (item.originalPrice ?? item.price),
-    0
+  const safeSubtotal = Math.max(0, Number(subtotal) || 0);
+  const safeShipping = Math.max(0, Number(shippingCost) || 0);
+  const safeDiscountRate = Math.min(
+    100,
+    Math.max(0, Number(discountRate) || 0)
   );
-  const rawSubtotal = items.reduce((acc, item) => acc + item.price, 0);
 
-  const activeDiscount = appliedCoupon ? discountValue : 0;
-  const finalTotal = Math.max(0, rawSubtotal - activeDiscount + shippingCost + taxes).toFixed(2);
-  const originalTotalFormatted = rawOriginalTotal.toFixed(2);
+  const discount = useMemo(
+    () =>
+      appliedCoupon
+        ? Math.round(safeSubtotal * (safeDiscountRate / 100))
+        : 0,
+    [appliedCoupon, safeSubtotal, safeDiscountRate]
+  );
 
-  const handleApplyPromo = (e) => {
-    e.preventDefault();
-    if (promoCodeInput.trim()) {
-      setAppliedCoupon(promoCodeInput.trim().toUpperCase());
-      setDiscountValue(rawSubtotal * 0.1);
-      setShowCouponInput(false);
-      setPromoCodeInput("");
+  const discountedSubtotal = Math.max(0, safeSubtotal - discount);
+  const originalTotal = safeSubtotal + safeShipping;
+  const total = discountedSubtotal + safeShipping;
+
+  const handleApplyCoupon = () => {
+    setCouponError("");
+
+    const normalizedCode = couponCode.trim();
+
+    if (!normalizedCode) {
+      setCouponError("Please enter a coupon code.");
+      return;
     }
+
+    if (safeSubtotal <= 0) {
+      setCouponError("Add products to your bag before applying a coupon.");
+      return;
+    }
+
+    setAppliedCoupon(normalizedCode);
+    setCouponCode("");
+    setShowCouponInput(false);
   };
 
-  const handleRemovePromo = () => {
-    setAppliedCoupon(null);
-    setDiscountValue(0);
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon("");
+    setCouponCode("");
+    setCouponError("");
+    setShowCouponInput(false);
   };
 
-  // Render Continue Shopping link/button matching editorial component headers
-const renderContinueShopping = () => {
-  const className =
-    "group relative inline-flex items-center justify-center gap-1.5 text-[12px] sm:text-[14px] font-bold tracking-wider text-black focus:outline-none hover:cursor-pointer";
+  const toggleCouponInput = () => {
+    setShowCouponInput((previous) => !previous);
+    setCouponError("");
+  };
 
-  const content = (
-    <>
-      {/* Animated Underline Text Wrapper with Baseline Lock */}
-      <span className="relative inline-flex items-center leading-none">
-        <span>Continue Shopping</span>
-        <span className="absolute -bottom-1 left-0 h-[1.5px] w-0 bg-black transition-all duration-300 ease-out group-hover:w-full" />
-      </span>
-
-      {/* Center-aligned Right Arrow with Optical Upward Adjustment */}
-      <ArrowRight
-        size={13}
-        strokeWidth={2.2}
-        className="shrink-0 transition-transform duration-300 ease-out group-hover:translate-x-1"
-      />
-    </>
-  );
-
-  if (onContinueShopping) {
-    return (
-      <button type="button" onClick={onContinueShopping} className={className}>
-        {content}
-      </button>
-    );
-  }
-
-  return (
-    <Link to={continueShoppingUrl} className={className}>
-      {content}
-    </Link>
-  );
-};
-
-  return (
-    <aside className="w-full font-primary antialiased">
-      <div className="sticky top-8 flex flex-col gap-6">
-        
-        {/* HEADER WITH CONTINUOUS NAVIGATION */}
-        <div className="flex items-center justify-between border-b border-black pb-4">
-          <div className="flex items-center gap-2.5">
-            <span className="h-px w-6 bg-black" />
-            <h2 className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.25em] text-black">
-              {planTitle}
-            </h2>
-          </div>
-
-          {/* CONTINUE SHOPPING ACTION */}
-          {renderContinueShopping()}
-        </div>
-
-        {/* ITEMIZED LINE BREAKDOWN */}
-        <div className="flex flex-col gap-3.5 text-xs sm:text-sm">
-          
-          {/* SUBTOTALS ROW */}
-          <div className="flex items-center justify-between text-black/70 transition-colors duration-200 hover:text-black">
-            <span className="font-medium tracking-wide text-xs sm:text-sm text-black/80">
-              Subtotals
-            </span>
-
-            <div className="flex items-center gap-2.5">
-              {items[0].originalPrice !== null && items[0].originalPrice > items[0].price && (
-                <span className="relative text-xs font-medium text-black/40">
-                  ${items[0].originalPrice.toFixed(2)}
-                  {/* Optically centered strikethrough line */}
-                  <span className="absolute inset-x-0 top-[43%] h-[1px] -translate-y-1/2 bg-black/40" />
-                </span>
-              )}
-              <span className="font-bold text-black text-xs sm:text-sm">
-                {items[0].price === 0 ? "FREE" : `$${items[0].price.toFixed(2)}`}
-              </span>
-            </div>
-          </div>
-
-          {/* SHIPPING ROW */}
-          <div className="flex items-center justify-between text-black/70">
-            <span className="font-medium tracking-wide text-xs sm:text-sm text-black/80">
-              Shipping
-            </span>
-            <span className="font-bold text-black text-xs sm:text-sm">
-              {shippingCost === 0 ? "$0.00" : `$${shippingCost.toFixed(2)}`}
-            </span>
-          </div>
-
-          <div className="my-1 h-px w-full bg-black/10" />
-
-          {/* TAXES ROW WITH TOOLTIP */}
-          <div className="flex items-center justify-between text-black/70">
-            <div className="flex items-center gap-1.5">
-              <span className="font-medium tracking-wide text-xs sm:text-sm text-black/80">
-                Taxes
-              </span>
-              <button
-                type="button"
-                className="text-black/40 transition-colors duration-200 hover:text-black focus:outline-none hover:cursor-pointer"
-                title="Taxes calculated at checkout"
-              >
-                <HelpCircle size={14} strokeWidth={1.8} />
-              </button>
-            </div>
-            <span className="font-bold text-black text-xs sm:text-sm">
-              {taxes === 0 ? "$0.00" : `$${taxes.toFixed(2)}`}
-            </span>
-          </div>
-
-          {/* COUPON SAVINGS ITEM */}
-          {appliedCoupon && (
-            <div className="flex items-center justify-between text-black transition-all duration-300">
-              <span className="font-medium tracking-wide text-xs sm:text-sm text-black">
-                Coupon savings applied
-              </span>
-              <span className="font-bold text-xs sm:text-sm">-${discountValue.toFixed(2)}</span>
-            </div>
-          )}
-
-          <div className="my-1 h-px w-full bg-black/10" />
-
-          {/* TOTAL READOUT */}
-          <div className="flex items-baseline justify-between pt-1">
-            <div className="flex flex-col">
-              <span className="text-xs sm:text-sm font-bold tracking-[0.18em] text-black">
-                Total
-              </span>
-            </div>
-
-            <div className="flex items-baseline gap-2.5">
-              {rawOriginalTotal > Number(finalTotal) && (
-                <span className="relative text-xs font-semibold text-black/40 sm:text-sm">
-                  ${originalTotalFormatted}
-                  {/* Optically centered strikethrough line */}
-                  <span className="absolute inset-x-0 top-[43%] h-[1px] -translate-y-1/2 bg-black/40" />
-                </span>
-              )}
-              <span className="text-lg font-black tracking-tight text-black sm:text-xl">
-                ${finalTotal}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* COUPON INPUT / BADGE */}
-        <div className="mt-1 transition-all duration-300">
-          {appliedCoupon ? (
-            <div className="flex items-center justify-between rounded-full border border-black bg-white px-4 py-3 text-xs font-medium text-black transition-all duration-300 shadow-xs">
-              <div className="flex items-center gap-2">
-                <span className="flex h-4 w-4 items-center justify-center rounded-full bg-black text-white">
-                  <Check size={12} strokeWidth={3} />
-                </span>
-                <span className="font-bold tracking-wider text-black text-xs">
-                  {appliedCoupon}
-                </span>
-                <span className="text-[10px] font-semibold text-black/60">
-                  (Applied)
-                </span>
-              </div>
-
-              <button
-                type="button"
-                onClick={handleRemovePromo}
-                className="flex items-center gap-1 text-[10px] font-bold tracking-wider text-black/80 transition-opacity duration-200 hover:text-black hover:underline hover:cursor-pointer"
-              >
-                <X size={12} />
-                <span>Remove</span>
-              </button>
-            </div>
-          ) : !showCouponInput ? (
+  const renderCouponSection = () => (
+    <div>
+      {!appliedCoupon ? (
+        <>
+          {!showCouponInput ? (
             <button
               type="button"
-              onClick={() => setShowCouponInput(true)}
-              className="group relative text-xs font-bold tracking-wider text-black focus:outline-none hover:cursor-pointer"
+              onClick={toggleCouponInput}
+              className="group flex w-full cursor-pointer h-7 items-center justify-between gap-3 text-left transition-opacity duration-500 ease-in-out hover:opacity-75"
             >
-              <span className="relative">
-                Have a coupon code?
-                <span className="absolute -bottom-0.5 left-0 h-[1.5px] w-full bg-black transition-all duration-300 group-hover:bg-black/50" />
+              <span className="flex items-center gap-2">
+               
+
+                <span className="relative pb-0.5 text-xs font-bold text-black after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:bg-black/80 after:transition-all after:duration-500 after:ease-in-out group-hover:after:bg-black/40">
+                  Have a coupon code?
+                </span>
               </span>
+
+              <ArrowRight
+                size={15}
+                className="shrink-0 text-black/40 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-1 group-hover:text-black"
+              />
             </button>
           ) : (
-            <form
-              onSubmit={handleApplyPromo}
-              className="flex h-11 w-full items-center overflow-hidden rounded-full border border-black bg-white p-1 transition-all duration-300 focus-within:border-black focus-within:ring-1 focus-within:ring-black"
-            >
-              <div className="flex items-center pl-3 text-black">
-                <Tag size={15} strokeWidth={2} />
+            <div className="animate-in fade-in slide-in-from-top-1 space-y-3 duration-500 ease-out">
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-xs font-bold tracking-tight text-black">
+                  Coupon code
+                </p>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowCouponInput(false);
+                    setCouponCode("");
+                    setCouponError("");
+                  }}
+                  aria-label="Close coupon input"
+                  className="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-full text-black/45 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:rotate-90 hover:bg-black/5 hover:text-black active:scale-95"
+                >
+                  <X size={15} />
+                </button>
               </div>
 
-              <input
-                type="text"
-                placeholder="Enter code"
-                value={promoCodeInput}
-                onChange={(e) => setPromoCodeInput(e.target.value)}
-                className="w-full bg-transparent px-2.5 uppercase text-xs font-bold tracking-wider text-black placeholder:text-black/50 focus:outline-none"
-                autoFocus
-              />
-
-              <button
-                type="submit"
-                disabled={!promoCodeInput.trim()}
-                className="h-full rounded-full border border-black bg-black px-5 text-[10px] font-bold tracking-widest text-white transition-all duration-300 hover:bg-white hover:text-black active:scale-95 disabled:cursor-not-allowed disabled:border-transparent disabled:bg-black/60 disabled:text-white hover:cursor-pointer"
+              <form
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  handleApplyCoupon();
+                }}
+                className="flex gap-2"
               >
-                Apply
-              </button>
-            </form>
+                <input
+                  type="text"
+                  value={couponCode}
+                  onChange={(event) => {
+                    setCouponCode(event.target.value);
+                    setCouponError("");
+                  }}
+                  placeholder="Enter coupon code"
+                  aria-label="Coupon code"
+                  className={`${INPUT_CLASS} min-w-0 flex-1`}
+                />
+
+                <button
+                  type="submit"
+                  disabled={!couponCode.trim()}
+                  className="inline-flex shrink-0 cursor-pointer items-center justify-center rounded-xl border border-black/10 bg-white px-4 py-3 text-xs font-semibold text-black transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-black hover:text-white active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Apply
+                </button>
+              </form>
+
+              {couponError && (
+                <p
+                  role="alert"
+                  className="animate-in fade-in slide-in-from-top-1 text-[10px] leading-relaxed text-red-600 duration-300 ease-out"
+                >
+                  {couponError}
+                </p>
+              )}
+            </div>
           )}
+        </>
+      ) : (
+        <div className="flex items-center justify-between gap-3 rounded-xl border border-black/10 bg-neutral-50/50 p-3 transition-colors duration-500 ease-in-out sm:p-4">
+          <div className="flex min-w-0 items-center gap-2.5">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-black text-white transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]">
+              <CheckCircle2 size={15} strokeWidth={1.7} />
+            </div>
+
+            <div className="min-w-0">
+              <p className="break-words text-xs font-bold tracking-tight text-black">
+                <span className="uppercase">{appliedCoupon}</span> Applied
+              </p>
+
+              <p className="mt-1 text-[10px] text-black/45">
+                {safeDiscountRate}% discount applied.
+              </p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={handleRemoveCoupon}
+            className="inline-flex shrink-0 cursor-pointer items-center gap-1 rounded-lg border border-black/10 bg-white px-2.5 py-2 text-[10px] font-semibold text-black transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-black hover:bg-black hover:text-white active:scale-95"
+          >
+            <X size={12} />
+            Remove
+          </button>
+        </div>
+      )}
+    </div>
+  );
+
+  const renderPriceBreakdown = (compact = false) => (
+    <div className={compact ? "space-y-2.5" : "space-y-4"}>
+      {!compact && (
+        <>
+          <div className="flex items-center justify-between gap-3 text-xs">
+            <span className="text-black/50">Subtotal</span>
+
+            <span className="flex flex-wrap items-center justify-end gap-2 font-medium text-black">
+              {discount > 0 && (
+                <span className="text-[10px] text-black/35 line-through">
+                  {formatPrice(safeSubtotal)}
+                </span>
+              )}
+
+              <span>{formatPrice(discountedSubtotal)}</span>
+            </span>
+          </div>
+
+          <div className="flex items-center justify-between gap-3 text-xs">
+            <span className="text-black/50">Shipping</span>
+
+            <span className="font-medium text-black">
+              {safeShipping === 0 ? "Free" : formatPrice(safeShipping)}
+            </span>
+          </div>
+
+          {discount > 0 && (
+            <div className="flex items-center justify-between gap-3 text-xs">
+              <span className="text-black/50">
+                Coupon discount ({safeDiscountRate}%)
+              </span>
+
+              <span className="font-medium text-black">
+                -{formatPrice(discount)}
+              </span>
+            </div>
+          )}
+        </>
+      )}
+
+      {compact && discount > 0 && (
+        <div className="flex items-center justify-between gap-3 text-xs">
+          <span className="text-black/50">
+            Coupon discount ({safeDiscountRate}%)
+          </span>
+
+          <span className="font-medium text-black">
+            -{formatPrice(discount)}
+          </span>
+        </div>
+      )}
+
+      <div
+        className={`flex items-center justify-between gap-3 ${
+          compact ? "" : "border-t border-black/10 pt-4"
+        }`}
+      >
+        <div>
+          <p className="text-sm font-bold text-black">Total</p>
+
+          <p className="mt-1 text-[10px] text-black/40">
+            Including shipping
+          </p>
         </div>
 
-        {/* PRIMARY CHECKOUT BUTTON */}
-        <button
-          type="button"
-          onClick={onCheckout}
-          className="
-            group
-            relative
-            mt-2
-            inline-flex
-            h-13
-            w-full
-            items-center
-            justify-center
-            gap-3
-            overflow-hidden
-            rounded-full
-            hover:cursor-pointer
-            border
-            hover:border-black/10
-            bg-black
-            px-8
-            text-xs
-            font-bold
-            tracking-[0.18em]
-            text-white
-            shadow-lg
-            shadow-black/10
-            will-change-transform
-            transition-all
-            duration-500
-            ease-[cubic-bezier(0.25,1,0.5,1)]
-            hover:-translate-y-0.5
-            hover:bg-white
-            hover:text-black
-            hover:shadow-xl
-            hover:shadow-black/20
-            active:translate-y-0
-            active:scale-[0.98]
-            sm:h-14
-            sm:text-sm
-          "
-        >
-          <span className="font-primary">Checkout</span>
+        <div className="flex flex-wrap items-center justify-end gap-2">
+          {discount > 0 && (
+            <span className="text-xs text-black/35 line-through">
+              {formatPrice(originalTotal)}
+            </span>
+          )}
 
-          <span
-            className="
-              flex
-              h-6
-              w-6
-              items-center
-              justify-center
-              rounded-full
-              bg-white
-              text-black
-              transition-all
-              duration-500
-              ease-[cubic-bezier(0.25,1,0.5,1)]
-              group-hover:translate-x-1
-              group-hover:bg-black
-              group-hover:text-white
-              sm:h-7
-              sm:w-7
-            "
-          >
-            <ArrowRight size={14} strokeWidth={2.2} />
-          </span>
-        </button>
-
+          <p className="text-xl font-bold tracking-tight text-black">
+            {formatPrice(total)}
+          </p>
+        </div>
       </div>
-    </aside>
+    </div>
+  );
+
+  const renderSecurityNotice = () => (
+    <div className="flex items-start gap-2">
+      <ShieldCheck
+        size={15}
+        className="mt-0.5 shrink-0 text-black/40"
+      />
+
+      <p className="text-[10px] leading-relaxed text-black/40">
+        Your personal information is handled securely.
+      </p>
+    </div>
+  );
+
+  const renderTrustIndicators = () => (
+    <div className="flex items-center justify-center gap-5 text-[10px] text-black/35 sm:gap-6">
+      <span className="flex items-center gap-1.5 transition-colors duration-500">
+        <LockKeyhole size={12} />
+        Secure checkout
+      </span>
+
+      <span className="flex items-center gap-1.5 transition-colors duration-500">
+        <Truck size={13} />
+        Reliable delivery
+      </span>
+    </div>
+  );
+
+  const renderCheckoutButton = (mobile = false) =>
+    showCheckoutButton ? (
+      <Link
+        to={checkoutLink}
+        className={
+          mobile
+            ? "inline-flex w-full items-center justify-center gap-2 rounded-full bg-black px-6 py-4 text-xs font-semibold text-white shadow-sm transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-black/80 active:scale-[0.98]"
+            : `${BUTTON_CLASS} mt-6 w-full`
+        }
+      >
+        Proceed to Checkout
+        <ArrowRight
+          size={14}
+          className="transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-1"
+        />
+      </Link>
+    ) : null;
+
+  return (
+    <>
+      {/* Desktop Summary */}
+      <aside className="hidden min-w-0 lg:block">
+        <div className="rounded-2xl border border-black/10 bg-white p-5 shadow-sm transition-shadow duration-500 ease-in-out hover:shadow-md sm:p-7">
+          <div className="mb-6 flex items-center justify-between border-b border-black/10 pb-5">
+            <div>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-black/40">
+                Your Selection
+              </p>
+
+              <h2 className="mt-2 text-lg font-bold tracking-tight text-black">
+                Bag Summary
+              </h2>
+            </div>
+
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-neutral-50 text-black transition-colors duration-500 ease-in-out hover:bg-black hover:text-white">
+              <ShoppingBag size={18} strokeWidth={1.7} />
+            </div>
+          </div>
+
+          {renderPriceBreakdown()}
+
+          <div className="mt-5 border-t border-black/10 pt-5">
+            {renderCouponSection()}
+          </div>
+
+          {renderCheckoutButton()}
+
+          <Link
+            to={returnLink}
+            className={`group flex items-center justify-center gap-2 border-t border-black/10 pt-5 text-[11px] font-semibold text-black/50 transition-colors duration-500 ease-in-out hover:text-black ${
+              showCheckoutButton ? "mt-5" : "mt-6"
+            }`}
+          >
+            <ArrowLeft
+              size={13}
+              className="transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:-translate-x-1"
+            />
+            Return to Shopping Bag
+          </Link>
+        </div>
+
+        <div className="mt-5">
+          {renderTrustIndicators()}
+        </div>
+      </aside>
+
+      {/* Mobile and Tablet Sticky Summary — No Expand/Collapse */}
+      <div className="lg:hidden">
+        {/* Space reserved so page content is not hidden behind the fixed bar */}
+        <div
+          aria-hidden="true"
+          className="h-[235px] sm:h-[250px]"
+        />
+
+        <aside
+          aria-label="Shopping bag summary"
+          className="fixed inset-x-0 bottom-0 z-50 border-t border-black/10 bg-white/95 shadow-[0_-8px_35px_rgba(0,0,0,0.08)] backdrop-blur-xl transition-[background-color,box-shadow] duration-500 ease-in-out"
+        >
+          <div className="mx-auto max-w-3xl space-y-3 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-4 sm:px-8 sm:pb-5">
+            {/* Compact price breakdown — always visible */}
+            <div className="border-b border-black/10 pb-3">
+              {renderPriceBreakdown(true)}
+            </div>
+
+            {/* Coupon section */}
+            {renderCouponSection()}
+
+            {/* Checkout action */}
+            {renderCheckoutButton(true)}
+
+            {/* Trust indicators */}
+            {renderTrustIndicators()}
+          </div>
+        </aside>
+      </div>
+    </>
   );
 };
 

@@ -1,7 +1,7 @@
 const BagHeader = () => {
   return (
    <div> 
-       <header className="w-full  font-primary py-3 sm:py-5">
+       <header className="w-full font-primary  py-5">
       <div className="px-5 sm:px-8">
         <div className="flex flex-col sm:flex-row sm:items-end items-start justify-between gap-4">
           {/* Left Title & Tag */}

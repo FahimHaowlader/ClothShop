@@ -5,6 +5,8 @@ import {
   ArrowLeft,
   ArrowRight,
   CheckCircle2,
+  ChevronDown,
+  ChevronUp,
   CreditCard,
   LockKeyhole,
   MapPin,
@@ -111,6 +113,7 @@ const formatPrice = (amount) =>
 const CheckOut = ({ cartItems = DEFAULT_ITEMS, onPlaceOrder, onPayNow }) => {
   const [couponCode, setCouponCode] = useState("");
   const [showCouponInput, setShowCouponInput] = useState(false);
+  const [isSummaryExpanded, setIsSummaryExpanded] = useState(false);
   const [step, setStep] = useState("checkout");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -384,7 +387,7 @@ const CheckOut = ({ cartItems = DEFAULT_ITEMS, onPlaceOrder, onPayNow }) => {
   }
 
   return (
-    <section className="w-full bg-bg-primary px-5 pb-16 pt-0 font-primary sm:px-8 lg:px-12">
+    <section className="w-full bg-bg-primary px-5 pb-72 pt-0 font-primary sm:px-8 sm:pb-80 lg:px-12 lg:pb-16">
       {/* Page Heading */}
       <div className="mb-10 flex w-full flex-col justify-between gap-5 md:flex-row md:items-end md:gap-10 pt-5">
         <div>
@@ -773,9 +776,24 @@ const CheckOut = ({ cartItems = DEFAULT_ITEMS, onPlaceOrder, onPayNow }) => {
         </div>
 
         {/* Right: Order Summary */}
-        <aside className="min-w-0 lg:sticky lg:top-24">
-          <div className="rounded-2xl border border-black/10 bg-white p-5 shadow-sm sm:p-7">
-            <div className="mb-6 flex items-center justify-between border-b border-black/10 pb-5">
+        <aside className="fixed inset-x-0 bottom-0 z-50 min-w-0 lg:sticky lg:top-24 lg:z-auto">
+          <div className={`relative rounded-t-2xl border border-black/10 bg-white px-5 pb-4 pt-8 shadow-[0_-8px_30px_rgba(0,0,0,0.10)] transition-all duration-300 sm:px-7 sm:pb-5 lg:rounded-2xl lg:p-7 lg:shadow-sm ${
+            isSummaryExpanded ? "max-h-[82vh] overflow-y-auto" : "max-h-[45vh] overflow-y-auto"
+          } lg:max-h-none lg:overflow-visible`}>
+            <button
+              type="button"
+              onClick={() => setIsSummaryExpanded((expanded) => !expanded)}
+              aria-expanded={isSummaryExpanded}
+              aria-label={isSummaryExpanded ? "Collapse order summary" : "Expand order summary"}
+              className="absolute left-1/2 top-2 z-10 flex h-6 w-12 -translate-x-1/2 items-center justify-center rounded-full text-black/55 transition-colors hover:bg-black/5 hover:text-black lg:hidden"
+            >
+              {isSummaryExpanded ? (
+                <ChevronDown size={20} strokeWidth={1.8} />
+              ) : (
+                <ChevronUp size={20} strokeWidth={1.8} />
+              )}
+            </button>
+            <div className={`${isSummaryExpanded ? "flex" : "hidden"} mb-6 items-center justify-between border-b border-black/10 pb-5 lg:flex`}>
               <div>
                 <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-black/40">
                   Your Selection
@@ -792,7 +810,9 @@ const CheckOut = ({ cartItems = DEFAULT_ITEMS, onPlaceOrder, onPayNow }) => {
             </div>
 
             {/* Scrollable cart items */}
-            <div className="mb-6 max-h-44 space-y-5 overflow-y-auto overscroll-contain pr-2 [scrollbar-color:rgba(0,0,0,0.2)_transparent] [scrollbar-width:thin]">
+            <div
+              className={`${isSummaryExpanded ? "block" : "hidden"} mb-6 max-h-44 space-y-5 overflow-y-auto overscroll-contain pr-2 [scrollbar-color:rgba(0,0,0,0.2)_transparent] [scrollbar-width:thin] lg:block`}
+            >
               {items.map((item, index) => (
                 <div
                   key={`${item.id}-${index}`}
@@ -846,7 +866,7 @@ const CheckOut = ({ cartItems = DEFAULT_ITEMS, onPlaceOrder, onPayNow }) => {
             {/* Price Breakdown */}
             <div className="space-y-4">
               {/* Subtotal */}
-              <div className="flex items-center justify-between gap-3 text-xs">
+              <div className={`${isSummaryExpanded ? "flex" : "hidden"} items-center justify-between gap-3 text-xs lg:flex`}>
                 <span className="text-black/50">
                   Subtotal (
                   {items.reduce(
@@ -868,7 +888,7 @@ const CheckOut = ({ cartItems = DEFAULT_ITEMS, onPlaceOrder, onPayNow }) => {
               </div>
 
               {/* Shipping */}
-              <div className="flex items-center justify-between text-xs">
+              <div className={`${isSummaryExpanded ? "flex" : "hidden"} items-center justify-between text-xs lg:flex`}>
                 <span className="text-black/50">Shipping</span>
 
                 <span className="font-medium text-black">
@@ -878,7 +898,7 @@ const CheckOut = ({ cartItems = DEFAULT_ITEMS, onPlaceOrder, onPayNow }) => {
 
               {/* Discount */}
               {discount > 0 && (
-                <div className="flex items-center justify-between text-xs">
+                <div className={`${isSummaryExpanded ? "flex" : "hidden"} items-center justify-between text-xs lg:flex`}>
                   <span className="text-black/50">
                     Coupon discount (25%)
                   </span>
@@ -914,7 +934,7 @@ const CheckOut = ({ cartItems = DEFAULT_ITEMS, onPlaceOrder, onPayNow }) => {
 
               {/* Coupon Section */}
               
-<div className="border-t border-black/10 pt-5">
+<div className={`${isSummaryExpanded ? "mt-5" : "mt-3"} border-t border-black/10 pt-4 lg:mt-0 lg:pt-5`}>
   {!appliedCoupon ? (
   <>
   {!showCouponInput ? (
@@ -1040,7 +1060,7 @@ const CheckOut = ({ cartItems = DEFAULT_ITEMS, onPlaceOrder, onPayNow }) => {
             </div>
 
             {/* Security Notice */}
-            <div className="mt-5 flex items-start gap-2">
+            <div className={`${isSummaryExpanded ? "flex" : "hidden"} mt-5 items-start gap-2 lg:flex`}>
               <ShieldCheck
                 size={15}
                 className="mt-0.5 shrink-0 text-black/40"
@@ -1053,14 +1073,14 @@ const CheckOut = ({ cartItems = DEFAULT_ITEMS, onPlaceOrder, onPayNow }) => {
 
             <Link
               to="/cart"
-              className="mt-6 flex items-center justify-center gap-2 border-t border-black/10 pt-5 text-[11px] font-semibold text-black/50 transition-colors hover:text-black"
+              className={`${isSummaryExpanded ? "flex" : "hidden"} mt-6 items-center justify-center gap-2 border-t border-black/10 pt-5 text-[11px] font-semibold text-black/50 transition-colors hover:text-black lg:flex`}
             >
               <ArrowLeft size={13} />
               Return to Shopping Bag
             </Link>
           </div>
 
-          <div className="mt-5 flex items-center justify-center gap-6 text-[10px] text-black/35">
+          <div className={`${isSummaryExpanded ? "flex" : "hidden"} mt-5 items-center justify-center gap-6 text-[10px] text-black/35 lg:flex`}>
             <span className="flex items-center gap-1.5">
               <LockKeyhole size={12} />
               Secure checkout
@@ -1073,7 +1093,7 @@ const CheckOut = ({ cartItems = DEFAULT_ITEMS, onPlaceOrder, onPayNow }) => {
           </div>
         </aside>
       </form>
-    </section>
+    </section> 
   );
 };
 

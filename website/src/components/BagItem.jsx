@@ -76,7 +76,7 @@ const BagItem = ({
       aria-label={item.name}
     >
       <div
-        className={`group/item relative grid grid-cols-1 gap-4 border-b border-black/10 py-6 transition-all duration-350 ease-[cubic-bezier(0.25,1,0.5,1)] sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center sm:gap-6 sm:py-7 ${
+        className={`group/item relative grid grid-cols-1 gap-4 border-b border-black/10 py-6 transition-all duration-350 ease-[cubic-bezier(0.25,1,0.5,1)] sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center sm:gap-6  ${
           isRemoving
             ? "translate-x-6 border-transparent"
             : "translate-x-0"
@@ -88,7 +88,7 @@ const BagItem = ({
           <Link
             to={productLink}
             aria-label={`View ${item.name}`}
-            className="group/image relative h-32 w-24 shrink-0 overflow-hidden rounded-xl bg-neutral-100 sm:h-36 sm:w-28"
+            className="group/image relative h-32 w-24 shrink-0 overflow-hidden rounded-xl bg-neutral-100 sm:h-32 sm:w-28"
           >
             {item.image && (
               <img
@@ -177,7 +177,7 @@ const BagItem = ({
               </span>
             </div>
 
-            <Link
+            {/* <Link
               to={productLink}
               className="mt-3 inline-flex items-center gap-1 text-[10px] font-semibold text-black/45 transition-colors hover:text-black"
             >
@@ -186,7 +186,7 @@ const BagItem = ({
                 size={12}
                 className="transition-transform duration-300 group-hover/item:translate-x-0.5 group-hover/item:-translate-y-0.5"
               />
-            </Link>
+            </Link> */}
           </div>
         </div>
 

@@ -340,7 +340,7 @@ const BagSummary = ({
               </h2>
             </div>
 
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-neutral-50 text-black transition-colors duration-500 ease-in-out hover:bg-black hover:text-white">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-neutral-100 text-black transition-colors duration-500 ease-in-out ">
               <ShoppingBag size={18} strokeWidth={1.7} />
             </div>
           </div>
@@ -382,7 +382,7 @@ const BagSummary = ({
 
         <aside
           aria-label="Shopping bag summary"
-          className="fixed inset-x-0 bottom-0 z-50 border-t border-black/10 bg-white/95 shadow-[0_-8px_35px_rgba(0,0,0,0.08)] backdrop-blur-xl transition-[background-color,box-shadow] duration-500 ease-in-out"
+          className="fixed inset-x-0 bottom-0 z-50 border-t border-black/10 bg-white/95 shadow-[0_-8px_35px_rgba(0,0,0,0.08)] backdrop-blur-xl transition-[background-color,box-shadow] rounded-t-2xl duration-500 ease-in-out"
         >
           <div className="mx-auto max-w-3xl space-y-3 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-4 sm:px-8 sm:pb-5">
             {/* Compact price breakdown — always visible */}

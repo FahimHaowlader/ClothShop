@@ -136,7 +136,7 @@ const Bag = () => {
           </section>
 
           {/* RIGHT COLUMN: STICKY BAG SUMMARY SIDEBAR */}
-          <aside className="lg:col-span-5 pt-2 sm:pt-5 xl:col-span-4 lg:sticky lg:top-[15%]">
+          <aside className="lg:col-span-5 pt-2 sm:pt-5 xl:col-span-4 lg:sticky lg:top-[13%]">
             <BagSummary items={items} />
           </aside>
 

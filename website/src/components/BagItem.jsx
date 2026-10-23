@@ -166,12 +166,12 @@ const BagItem = ({
                 {formatPrice(item.price)}
               </span>
 
-              {item.originalPrice > item.price && (
-                <span className="text-xs text-black/35 line-through">
-                  {formatPrice(item.originalPrice)}
-                </span>
-              )}
-
+             {item.originalPrice > item.price && (
+  <span className="relative inline-block text-xs text-black/35">
+    {formatPrice(item.originalPrice)}
+    <span className="absolute -left-[10%] top-[43%] h-px w-[120%] -translate-y-1/2 bg-black/35" />
+  </span>
+)}
               <span className="text-[9px] text-black/40">
                 / unit
               </span>

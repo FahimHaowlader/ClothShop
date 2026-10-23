@@ -21,6 +21,8 @@ import CheckOut from './pages/CheckOut.jsx'
 import Addresses from './pages/Addresses.jsx'
 import Login from './pages/Login.jsx'
 import Register from './pages/Register.jsx'
+import Men from './pages/Men.jsx'
+import Women from './pages/Women.jsx'
 
 const router = createBrowserRouter([
   {
@@ -39,6 +41,8 @@ const router = createBrowserRouter([
       { path: 'size-guide', element: <Size /> },
       { path: 'checkout', element: <CheckOut /> },
       { path: 'addresses', element: <Addresses /> },
+      { path:'men', element: <Men />},
+      { path:'women', element: <Women />},
     ],
   },
   { path: 'login', element: <Login /> },

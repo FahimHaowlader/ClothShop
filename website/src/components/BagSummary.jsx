@@ -11,15 +11,19 @@ import {
   ShieldCheck,
   X,
 } from "lucide-react";
-
+ 
 const INPUT_CLASS =
   "w-full rounded-xl border border-black/10 bg-neutral-50/30 px-3.5 py-3 text-xs text-black transition-[border-color,background-color,box-shadow] duration-500 ease-in-out placeholder:text-black/30 focus:border-black focus:bg-white focus:outline-none focus:ring-1 focus:ring-black/5 disabled:opacity-50";
 
 const BUTTON_CLASS =
   "inline-flex items-center justify-center gap-2 rounded-full border border-black/15 bg-white px-6 py-3.5 text-xs font-semibold text-black shadow-sm transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-black hover:text-white active:scale-[0.98]";
 
-const formatPrice = (amount) =>
-  `৳${Number(amount || 0).toLocaleString("en-BD")}`;
+const formatPrice = (amount) => (
+  <span>
+    <span className="text-[1.25em] font-semibold">৳{" "}</span>
+    {Number(amount || 0).toLocaleString("en-BD")}
+  </span>
+);
 
 const BagSummary = ({
   subtotal = 0,
@@ -151,7 +155,7 @@ const BagSummary = ({
                 <button
                   type="submit"
                   disabled={!couponCode.trim()}
-                  className="inline-flex shrink-0 cursor-pointer items-center justify-center rounded-xl border border-black/10 bg-white px-4 py-3 text-xs font-semibold text-black transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-black hover:text-white active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-50"
+                  className="inline-flex shrink-0 cursor-pointer items-center justify-center rounded-xl border border-black/10 bg-white px-4 py-3 text-xs font-semibold text-black transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-black hover:text-white active:scale-[0.97] disabled:cursor-not-allowed  hover:cursor-pointer"
                 >
                   Apply
                 </button>
@@ -208,9 +212,13 @@ const BagSummary = ({
 
             <span className="flex flex-wrap items-center justify-end gap-2 font-medium text-black">
               {discount > 0 && (
-                <span className="text-[10px] text-black/35 line-through">
-                  {formatPrice(safeSubtotal)}
-                </span>
+                // <span className="text-[10px] text-black/35 line-through">
+                //   {formatPrice(safeSubtotal)}
+                // </span>
+                <span className="relative inline-block text-xs text-black/35">
+    {formatPrice(safeSubtotal)}
+    <span className="absolute -left-[10%] top-[43%] h-px w-[120%] -translate-y-1/2 bg-black/35" />
+  </span>
               )}
 
               <span>{formatPrice(discountedSubtotal)}</span>
@@ -266,9 +274,14 @@ const BagSummary = ({
 
         <div className="flex flex-wrap items-center justify-end gap-2">
           {discount > 0 && (
-            <span className="text-xs text-black/35 line-through">
-              {formatPrice(originalTotal)}
-            </span>
+            // <span className="text-xs text-black/35 line-through">
+            //   {formatPrice(originalTotal)}
+            // </span>
+          <span className="relative inline-block text-xs text-black/35">
+    {formatPrice(originalTotal)}
+    <span className="absolute -left-[10%] top-[43%] h-px w-[120%] -translate-y-1/2 bg-black/35" />
+  </span>
+
           )}
 
           <p className="text-xl font-bold tracking-tight text-black">

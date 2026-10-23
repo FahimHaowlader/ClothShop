@@ -36,6 +36,7 @@ const DEFAULT_ITEMS = [
     price: 1260,
     quantity: 1,
     image: "",
+    originalPrice: 1800,
   },
   {
     id: "product-1-2",
@@ -107,9 +108,12 @@ const PAYMENT_OPTIONS = [
   },
 ];
 
-const formatPrice = (amount) =>
-  `৳${Number(amount || 0).toLocaleString("en-BD")}`;
-
+const formatPrice = (amount) => (
+  <span>
+    <span className="text-[1.25em] font-semibold">৳{" "}</span>
+    {Number(amount || 0).toLocaleString("en-BD")}
+  </span>
+);
 const CheckOut = ({ cartItems = DEFAULT_ITEMS, onPlaceOrder, onPayNow }) => {
   const [couponCode, setCouponCode] = useState("");
   const [showCouponInput, setShowCouponInput] = useState(false);
@@ -400,7 +404,7 @@ const CheckOut = ({ cartItems = DEFAULT_ITEMS, onPlaceOrder, onPayNow }) => {
           </div>
 
           <h1 className="text-[clamp(2rem,4.5vw,3.5rem)] font-bold leading-[0.98] tracking-[-0.055em] text-black">
-            Checkout.
+            Checkout
           </h1>
         </div>
 
@@ -804,7 +808,7 @@ const CheckOut = ({ cartItems = DEFAULT_ITEMS, onPlaceOrder, onPayNow }) => {
                 </h2>
               </div>
 
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-neutral-50 text-black">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-neutral-100 text-black">
                 <ShoppingBag size={18} />
               </div>
             </div>
@@ -849,9 +853,25 @@ const CheckOut = ({ cartItems = DEFAULT_ITEMS, onPlaceOrder, onPayNow }) => {
                       </p>
                     )}
 
-                    <p className="mt-2 text-xs font-semibold text-black">
+                    {/* <p className="mt-2 text-xs font-semibold text-black">
                       {formatPrice(item.price * item.quantity)}
-                    </p>
+                    </p> */}
+
+
+<div className="mt-2 text-xs flex flex-wrap items-center gap-2">
+              <span className="font-semibold text-black">
+                {formatPrice(item.price)}
+              </span>
+
+            {item.originalPrice > item.price && (
+  <span className="relative inline-block text-xs text-black/35">
+    {formatPrice(item.originalPrice)}
+    <span className="absolute -left-[10%] top-[43%] h-px w-[120%] -translate-y-1/2 bg-black/35" />
+  </span>
+)}
+
+            </div>
+
                   </div>
                 </div>
               ))}
@@ -878,9 +898,14 @@ const CheckOut = ({ cartItems = DEFAULT_ITEMS, onPlaceOrder, onPayNow }) => {
 
                 <span className="flex flex-wrap items-center justify-end gap-2 font-medium text-black">
                   {discount > 0 && (
-                    <span className="text-[10px] text-black/35 line-through">
-                      {formatPrice(subtotal)}
-                    </span>
+                    // <span className="text-[10px] text-black/35 line-through">
+                    //   {formatPrice(subtotal)}
+                    // </span>
+                       <span className="relative inline-block text-xs text-black/35">
+    {formatPrice(subtotal)}
+    <span className="absolute -left-[10%] top-[43%] h-px w-[120%] -translate-y-1/2 bg-black/35" />
+  </span>
+
                   )}
 
                   <span>{formatPrice(discountedSubtotal)}</span>
@@ -921,9 +946,14 @@ const CheckOut = ({ cartItems = DEFAULT_ITEMS, onPlaceOrder, onPayNow }) => {
 
                 <div className="flex flex-wrap items-center justify-end gap-2">
                   {discount > 0 && (
-                    <span className="text-xs text-black/35 line-through">
-                      {formatPrice(originalTotal)}
-                    </span>
+                    // <span className="text-xs text-black/35 line-through">
+                    //   {formatPrice(originalTotal)}
+                    // </span>
+                      <span className="relative inline-block text-xs text-black/35">
+    {formatPrice(originalTotal)}
+    <span className="absolute -left-[10%] top-[43%] h-px w-[120%] -translate-y-1/2 bg-black/35" />
+  </span>
+
                   )}
 
                   <p className="text-xl font-bold tracking-tight text-black">

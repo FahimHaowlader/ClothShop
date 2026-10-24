@@ -19,7 +19,7 @@ const SIZES = ["XS", "S", "M", "L", "XL"];
 const PRICE_MIN = 0;
 const PRICE_MAX = 3000;
 
-const FILTER_DURATION = 750;
+const FILTER_DURATION = 1000;
 const FILTER_EASING = "cubic-bezier(0.22, 1, 0.36, 1)";
 
 const SHIRT = {
@@ -232,6 +232,8 @@ const Shop = () => {
   const [showDesktopFilters, setShowDesktopFilters] = useState(true);
   const [desktopFilterClosing, setDesktopFilterClosing] = useState(false);
   const [desktopFilterOpening, setDesktopFilterOpening] = useState(false);
+  const [showDesktopFilterHeader, setShowDesktopFilterHeader] =
+    useState(true);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(8);
@@ -363,11 +365,11 @@ const Shop = () => {
     setSearchFocused(true);
   };
 
-  // Keep the Search and clear actions mutually exclusive.
   const showSearchButton =
     searchFocused &&
-    (search.trim() !== submittedSearch.trim()) &&
+    search.trim() !== submittedSearch.trim() &&
     (!submittedSearch || Boolean(search.trim()));
+
   const showClearButton =
     !showSearchButton && Boolean(search || submittedSearch);
 
@@ -409,10 +411,10 @@ const Shop = () => {
 
     setDesktopFilterClosing(false);
     setShowDesktopFilters(true);
+    setShowDesktopFilterHeader(true);
     setDesktopFilterOpening(true);
   };
 
-  // Start the opening transition from the clipped state.
   useEffect(() => {
     if (!desktopFilterOpening) return;
 
@@ -433,39 +435,32 @@ const Shop = () => {
 
     if (desktopFilterClosing) {
       setShowDesktopFilters(false);
+      setShowDesktopFilterHeader(false);
       setDesktopFilterClosing(false);
     }
   };
 
   const renderFilters = (mobile = false) => (
     <div className="space-y-0">
-      {(mobile || desktopFiltersExpanded) && (
+      {(mobile || showDesktopFilters) && (
         <div
           className={`flex items-center lg:pb-2 ${
             mobile ? "justify-between" : "justify-end pl-[76px]"
           }`}
         >
-          {/* { !mobile && (
+          {!mobile && (
             <button
               type="button"
-              onClick={closeMobileFilters}
-              aria-label="Close filters"
-              aria-expanded={filtersOpen}
-              className="flex items-center text-sm font-bold tracking-tight text-black transition-colors hover:text-black/60"
+              onClick={resetFilters}
+              className={`flex pt-1 items-center gap-1.5 text-[10px] font-semibold text-black/45 transition-[opacity,transform,color] duration-[1000ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:text-black ${
+                desktopFilterClosing
+                  ? "translate-x-[-8px] opacity-0 pointer-events-none"
+                  : "translate-x-0 opacity-100"
+              }`}
             >
-              <SlidersHorizontal size={18} strokeWidth={2} />
+              <RotateCcw size={12} />
+              Clear all
             </button>
-          )} */}
-
-          {!mobile && (
-          <button
-            type="button"
-            onClick={resetFilters}
-            className="flex items-center gap-1.5 text-[10px] font-semibold text-black/45 transition-colors hover:text-black"
-          >
-            <RotateCcw size={12} />
-            Clear all
-          </button>
           )}
         </div>
       )}
@@ -547,7 +542,7 @@ const Shop = () => {
         </div>
       </FilterGroup>
 
-      <FilterGroup title="Color">
+      {/* <FilterGroup title="Color">
         <div className="flex flex-wrap gap-3">
           {[
             { name: "Olive", value: "#58732f" },
@@ -596,9 +591,9 @@ const Shop = () => {
             );
           })}
         </div>
-      </FilterGroup>
+      </FilterGroup> */}
 
-      <FilterGroup title="Price range">
+      {/* <FilterGroup title="Price range">
         <div className="space-y-4">
           <div className="flex items-center justify-between gap-3">
             <label className="min-w-0 flex-1">
@@ -678,13 +673,12 @@ const Shop = () => {
             </button>
           </div>
         </div>
-      </FilterGroup>
+      </FilterGroup> */}
     </div>
   );
 
   return (
     <main className="min-h-screen bg-bg-primary font-primary text-black">
-      {/* Page heading */}
       <section className="px-5 py-5 sm:px-8 lg:px-12">
         <div className="mb-2 flex items-center gap-2.5">
           <span className="h-px w-8 bg-black" />
@@ -704,9 +698,8 @@ const Shop = () => {
         </div>
       </section>
 
-      {/* Search and toolbar */}
       <section className="border-b border-black/10 px-5 sm:px-8 lg:px-12">
-        <div className="flex flex-col gap-4 py-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-4 pt-2 pb-4 sm:flex-row sm:items-center sm:justify-between">
           <form onSubmit={handleSearchSubmit} className="w-full sm:max-w-xs">
             <div
               className={`flex w-full items-center gap-3 border-b transition-colors duration-300 ${
@@ -747,21 +740,21 @@ const Shop = () => {
                 </span>
               </button>
 
-         <button
-  type="button"
-  onMouseDown={(event) => event.preventDefault()}
-  onClick={clearSearch}
-  tabIndex={showClearButton ? 0 : -1}
-  aria-hidden={!showClearButton}
-  aria-label="Clear search"
-  className={`flex shrink-0 items-center justify-center overflow-hidden rounded-full transition-[width,opacity,transform,background-color] duration-300 ease-out hover:bg-neutral-200 ${
-    showClearButton
-      ? "w-5 h-5 p-1 translate-x-0 opacity-100"
-      : "pointer-events-none w-0 translate-x-1 opacity-0"
-  }`}
->
-  <X size={15} strokeWidth={1.8} />
-</button>
+              <button
+                type="button"
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={clearSearch}
+                tabIndex={showClearButton ? 0 : -1}
+                aria-hidden={!showClearButton}
+                aria-label="Clear search"
+                className={`flex shrink-0 items-center justify-center overflow-hidden rounded-full transition-[width,opacity,transform,background-color] duration-300 ease-out hover:bg-neutral-200 ${
+                  showClearButton
+                    ? "w-5 h-5 p-1 translate-x-0 opacity-100"
+                    : "pointer-events-none w-0 translate-x-1 opacity-0"
+                }`}
+              >
+                <X size={15} strokeWidth={1.8} />
+              </button>
             </div>
           </form>
 
@@ -809,7 +802,6 @@ const Shop = () => {
         </div>
       </section>
 
-      {/* Shop content */}
       <section className="px-5 py-8 sm:px-8 sm:py-10 lg:px-12">
         <div className="mb-5 flex items-center justify-between lg:hidden">
           <p className="text-xs text-black/50">
@@ -838,23 +830,31 @@ const Shop = () => {
               : "gap-8 lg:grid-cols-[0px_minmax(0,1fr)] lg:gap-0"
           }`}
           style={{
-            transition: `grid-template-columns ${FILTER_DURATION}ms ${FILTER_EASING}, column-gap ${FILTER_DURATION}ms ${FILTER_EASING}`,
+            transition: `
+              grid-template-columns ${FILTER_DURATION}ms ${FILTER_EASING},
+              column-gap ${FILTER_DURATION}ms ${FILTER_EASING}
+            `,
+            willChange: "grid-template-columns, column-gap",
           }}
         >
-          {/* Desktop sidebar */}
           <aside className="relative hidden min-w-0 overflow-hidden lg:block">
-            {desktopFiltersExpanded && (
+            {showDesktopFilterHeader && (
               <button
                 type="button"
                 onClick={closeDesktopFilters}
                 aria-label="Collapse filters"
                 aria-expanded={desktopFiltersExpanded}
-                className="absolute left-0 top-0 z-10 flex items-center text-sm font-bold tracking-tight text-black transition-colors hover:text-black/60"
+                className={`absolute left-0 top-0 z-10 flex items-center text-sm font-bold tracking-tight text-black transition-[opacity,transform] duration-[1000ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:text-black/60 ${
+                  desktopFilterClosing
+                    ? "translate-x-[-8px] opacity-0 pointer-events-none"
+                    : "translate-x-0 opacity-100"
+                }`}
               >
                 <SlidersHorizontal size={18} strokeWidth={2} />
                 <span className="inline-block pl-2">Filters</span>
               </button>
             )}
+
             <div
               inert={!showDesktopFilters || desktopFilterClosing}
               onTransitionEnd={handleDesktopFilterTransitionEnd}
@@ -872,7 +872,6 @@ const Shop = () => {
             </div>
           </aside>
 
-          {/* Product listing */}
           <div className="min-w-0">
             <div className="mb-5 hidden w-full items-center justify-between gap-6 lg:flex">
               <div className="flex min-w-0 shrink-0 items-center justify-start gap-3">
@@ -895,17 +894,18 @@ const Shop = () => {
                   </span>{" "}
                   products
                 </p>
-              </div> 
+              </div>
 
-              {(activeFilterCount > 0 || submittedSearch) && !showDesktopFilters &&  (
-                 <button
-              type="button"
-              onClick={resetFilters}
-              className="text-[10px] font-semibold text-black underline underline-offset-4"
-            >
-              Clear filters
-            </button>
-              )}
+              {(activeFilterCount > 0 || submittedSearch) &&
+                !showDesktopFilters && (
+                  <button
+                    type="button"
+                    onClick={resetFilters}
+                    className="text-[10px] font-semibold text-black underline underline-offset-4"
+                  >
+                    Clear filters
+                  </button>
+                )}
             </div>
 
             {filteredProducts.length > 0 ? (
@@ -920,7 +920,7 @@ const Shop = () => {
                   {paginatedProducts.map((product) => (
                     <article
                       key={product.id}
-                      className="group min-w-0 animate-[shopFadeIn_450ms_cubic-bezier(0.16,1,0.3,1)_both]"
+                      className="group min-w-0 animate-[shopFadeIn_600ms_cubic-bezier(0.22,1,0.36,1)_both]"
                     >
                       <div className="relative aspect-[3/4] overflow-hidden bg-neutral-100">
                         <Link
@@ -932,7 +932,7 @@ const Shop = () => {
                             src={product.image}
                             alt={product.name}
                             loading="lazy"
-                            className="h-full w-full object-cover transition-transform duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.045]"
+                            className="h-full w-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.045]"
                           />
                         </Link>
 
@@ -945,7 +945,7 @@ const Shop = () => {
                         <Link
                           to={`/products/${product.id}`}
                           aria-label={`View details for ${product.name}`}
-                          className="absolute bottom-0 left-0 right-0 flex translate-y-full items-center justify-between bg-white/95 px-3 py-3 text-[10px] font-semibold text-black backdrop-blur-sm transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-y-0"
+                          className="absolute bottom-0 left-0 right-0 flex translate-y-full items-center justify-between bg-white/95 px-3 py-3 text-[10px] font-semibold text-black backdrop-blur-sm transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0"
                         >
                           <span>View Details</span>
                           <ArrowRight
@@ -1040,7 +1040,6 @@ const Shop = () => {
         </div>
       </section>
 
-      {/* Mobile and tablet filter drawer */}
       {filtersMounted && (
         <div className="fixed inset-0 z-[100] lg:hidden">
           <button
@@ -1062,7 +1061,7 @@ const Shop = () => {
                 setFiltersMounted(false);
               }
             }}
-            className={`absolute inset-y-0 right-0 flex w-full max-w-[390px] flex-col bg-white shadow-2xl transition-transform duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
+            className={`absolute inset-y-0 right-0 flex w-full max-w-[390px] flex-col bg-white shadow-2xl transition-transform duration-[650ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
               filtersOpen ? "translate-x-0" : "translate-x-full"
             }`}
           >
@@ -1164,3 +1163,4 @@ const Shop = () => {
 };
 
 export default Shop;
+

@@ -174,8 +174,8 @@ const formatPrice = (amount) => (
   </span>
 );
 
-const FilterGroup = ({ title, children, defaultOpen = true }) => {
-  const [open, setOpen] = useState(defaultOpen);
+const FilterGroup = ({ title, children, }) => {
+  const [open, setOpen] = useState(false);
 
   return (
     <section className="border-b border-black/10 py-5">
@@ -191,7 +191,7 @@ const FilterGroup = ({ title, children, defaultOpen = true }) => {
 
         <span
           className={`transition-transform duration-500 ${
-            open ? "rotate-0" : "rotate-180"
+            open ? "rotate-180" : "rotate-0"
           }`}
         >
           <ChevronDown size={15} className="text-black/45" />
@@ -465,7 +465,28 @@ const Shop = () => {
         </div>
       )}
 
-      <FilterGroup title="Collection">
+     
+
+      <FilterGroup title="Gender">
+        <div className="flex flex-wrap gap-2">
+          {["All", "Men", "Women"].map((item) => (
+            <button
+              key={item}
+              type="button"
+              onClick={() => setGender(item)}
+              className={`rounded-full border px-4 py-2 text-[10px] font-semibold transition-all duration-300 ${
+                gender === item
+                  ? "border-black bg-black text-white"
+                  : "border-black/10 text-black/55 hover:border-black/40"
+              }`}
+            >
+              {item}
+            </button>
+          ))}
+        </div>
+      </FilterGroup>
+
+ <FilterGroup title="Collection">
         <div className="space-y-3">
           {CATEGORIES.map((item) => (
             <button
@@ -488,25 +509,6 @@ const Shop = () => {
               >
                 <Check size={14} strokeWidth={2} />
               </span>
-            </button>
-          ))}
-        </div>
-      </FilterGroup>
-
-      <FilterGroup title="Gender">
-        <div className="flex flex-wrap gap-2">
-          {["All", "Men", "Women"].map((item) => (
-            <button
-              key={item}
-              type="button"
-              onClick={() => setGender(item)}
-              className={`rounded-full border px-4 py-2 text-[10px] font-semibold transition-all duration-300 ${
-                gender === item
-                  ? "border-black bg-black text-white"
-                  : "border-black/10 text-black/55 hover:border-black/40"
-              }`}
-            >
-              {item}
             </button>
           ))}
         </div>
@@ -683,7 +685,7 @@ const Shop = () => {
         <div className="mb-2 flex items-center gap-2.5">
           <span className="h-px w-8 bg-black" />
           <span className="text-[10px] font-semibold uppercase tracking-[0.3em] text-black/45">
-            The BachelorShop Edit
+            The BachelorShop Edition
           </span>
         </div>
 
@@ -773,15 +775,15 @@ const Shop = () => {
               )}
             </button>
 
-            <p className="hidden text-[11px] text-black/45 sm:block">
+           {/*  <p className="hidden text-[11px] text-black/45 sm:block">
               <span className="font-semibold text-black">
                 {filteredProducts.length}
               </span>{" "}
               products
-            </p>
+            </p> */}
 
-            <div className="flex items-center gap-2">
-              <ArrowUpDown size={14} className="shrink-0 text-black/45" />
+            <div className="flex items-center gap-2 ">
+              {/* <ArrowUpDown size={14} className="shrink-0 text-black/45" /> */}
               <label htmlFor="shop-sort" className="sr-only">
                 Sort products
               </label>
@@ -793,9 +795,9 @@ const Shop = () => {
               >
                 <option value="featured">Featured</option>
                 <option value="newest">Newest arrivals</option>
-                <option value="price-low">Price: Low to high</option>
-                <option value="price-high">Price: High to low</option>
-                <option value="name">Name: A to Z</option>
+                <option value="price-low">Low to high</option>
+                <option value="price-high">High to low</option>
+                <option value="name">Name: a to z</option>
               </select>
             </div>
           </div>

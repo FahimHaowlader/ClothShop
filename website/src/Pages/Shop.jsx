@@ -1,11 +1,9 @@
 
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router";
 import {
   Search,
   SlidersHorizontal,
-  ChevronLeft,
-  ChevronRight,
   X,
   ChevronDown,
   ArrowUpDown,
@@ -14,27 +12,56 @@ import {
   RotateCcw,
   Package,
 } from "lucide-react";
+import Pagenation from "../components/Pagenation.jsx";
+
+const CATEGORIES = ["All", "Shirts", "T-Shirts", "Tops", "Jeans", "Hoodies"];
+const SIZES = ["XS", "S", "M", "L", "XL"];
+const PRICE_MIN = 0;
+const PRICE_MAX = 3000;
+
+const FILTER_DURATION = 750;
+const FILTER_EASING = "cubic-bezier(0.22, 1, 0.36, 1)";
+
+const SHIRT = {
+  name: "Essential Everyday Shirt",
+  category: "Shirts",
+  gender: "Men",
+  price: 1260,
+  originalPrice: 1800,
+  colors: [
+    { name: "Olive", value: "#58732f" },
+    { name: "Black", value: "#171717" },
+    { name: "White", value: "#f5f5f5" },
+  ],
+  sizes: ["S", "M", "L", "XL"],
+  image:
+    "https://images.unsplash.com/photo-1603252110481-7ba873bf42ab?auto=format&fit=crop&w=900&q=85",
+  badge: "Bestseller",
+};
+
+const DENIM = {
+  name: "Relaxed Fit Denim",
+  category: "Jeans",
+  gender: "Men",
+  price: 1890,
+  originalPrice: 2400,
+  colors: [
+    { name: "Blue", value: "#536d91" },
+    { name: "Black", value: "#252525" },
+  ],
+  sizes: ["S", "M", "L", "XL"],
+  image:
+    "https://images.unsplash.com/photo-1542272604-787c3835535d?auto=format&fit=crop&w=900&q=85",
+  badge: "Sale",
+};
 
 const PRODUCTS = [
+  ...Array.from({ length: 20 }, (_, index) => ({
+    ...SHIRT,
+    id: `shirt-${index + 1}`,
+  })),
   {
-    id: "1",
-    name: "Essential Everyday Shirt",
-    category: "Shirts",
-    gender: "Men",
-    price: 1260,
-    originalPrice: 1800,
-    colors: [
-      { name: "Olive", value: "#58732f" },
-      { name: "Black", value: "#171717" },
-      { name: "White", value: "#f5f5f5" },
-    ],
-    sizes: ["S", "M", "L", "XL"],
-    image:
-      "https://images.unsplash.com/photo-1603252110481-7ba873bf42ab?auto=format&fit=crop&w=900&q=85",
-    badge: "Bestseller",
-  },
-  {
-    id: "2",
+    id: "tshirt-1",
     name: "Classic Cotton T-Shirt",
     category: "T-Shirts",
     gender: "Men",
@@ -50,24 +77,12 @@ const PRODUCTS = [
       "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=900&q=85",
     badge: "",
   },
+  ...Array.from({ length: 5 }, (_, index) => ({
+    ...DENIM,
+    id: `denim-${index + 1}`,
+  })),
   {
-    id: "3",
-    name: "Relaxed Fit Denim",
-    category: "Jeans",
-    gender: "Men",
-    price: 1890,
-    originalPrice: 2400,
-    colors: [
-      { name: "Blue", value: "#536d91" },
-      { name: "Black", value: "#252525" },
-    ],
-    sizes: ["S", "M", "L", "XL"],
-    image:
-      "https://images.unsplash.com/photo-1542272604-787c3835535d?auto=format&fit=crop&w=900&q=85",
-    badge: "Sale",
-  },
-  {
-    id: "4",
+    id: "hoodie-men",
     name: "Minimal Everyday Hoodie",
     category: "Hoodies",
     gender: "Men",
@@ -84,7 +99,7 @@ const PRODUCTS = [
     badge: "",
   },
   {
-    id: "5",
+    id: "top-women",
     name: "Contemporary Women's Top",
     category: "Tops",
     gender: "Women",
@@ -101,7 +116,7 @@ const PRODUCTS = [
     badge: "New",
   },
   {
-    id: "6",
+    id: "jeans-women",
     name: "Classic Women's Denim",
     category: "Jeans",
     gender: "Women",
@@ -117,7 +132,7 @@ const PRODUCTS = [
     badge: "",
   },
   {
-    id: "7",
+    id: "shirt-women",
     name: "Everyday Casual Shirt",
     category: "Shirts",
     gender: "Women",
@@ -134,7 +149,7 @@ const PRODUCTS = [
     badge: "",
   },
   {
-    id: "8",
+    id: "hoodie-women",
     name: "Essential Streetwear Hoodie",
     category: "Hoodies",
     gender: "Women",
@@ -152,24 +167,9 @@ const PRODUCTS = [
   },
 ];
 
-const CATEGORIES = [
-  "All",
-  "Shirts",
-  "T-Shirts",
-  "Tops",
-  "Jeans",
-  "Hoodies",
-];
-
-const SIZES = ["XS", "S", "M", "L", "XL"];
-const PRICE_MIN = 0;
-const PRICE_MAX = 3000;
-
-const SMOOTH = "duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]";
-
 const formatPrice = (amount) => (
   <span>
-    <span className="text-[1.25em] font-semibold">৳{" "}</span>
+    <span className="text-[1.25em] font-semibold">৳ </span>
     {Number(amount || 0).toLocaleString("en-BD")}
   </span>
 );
@@ -190,7 +190,7 @@ const FilterGroup = ({ title, children, defaultOpen = true }) => {
         </span>
 
         <span
-          className={`transition-transform ${SMOOTH} ${
+          className={`transition-transform duration-500 ${
             open ? "rotate-0" : "rotate-180"
           }`}
         >
@@ -199,7 +199,7 @@ const FilterGroup = ({ title, children, defaultOpen = true }) => {
       </button>
 
       <div
-        className={`grid transition-[grid-template-rows,opacity] ${SMOOTH} ${
+        className={`grid transition-[grid-template-rows,opacity] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
           open
             ? "grid-rows-[1fr] opacity-100"
             : "grid-rows-[0fr] opacity-0"
@@ -228,34 +228,28 @@ const Shop = () => {
 
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [filtersMounted, setFiltersMounted] = useState(false);
+
   const [showDesktopFilters, setShowDesktopFilters] = useState(true);
+  const [desktopFilterClosing, setDesktopFilterClosing] = useState(false);
+  const [desktopFilterOpening, setDesktopFilterOpening] = useState(false);
 
-  // const availableColors = useMemo(() => {
-  //   const colorMap = new Map();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(8);
 
-  //   PRODUCTS.forEach((product) => {
-  //     product.colors.forEach((color) => {
-  //       if (!colorMap.has(color.name)) {
-  //         colorMap.set(color.name, color);
-  //       }
-  //     });
-  //   });
-
-  //   return Array.from(colorMap.values());
-  // }, []);
+  const desktopFiltersExpanded =
+    showDesktopFilters && !desktopFilterClosing;
 
   const filteredProducts = useMemo(() => {
-    const result = PRODUCTS.filter((product) => {
-      const matchesSearch = `${product.name} ${product.category} ${product.gender}`
-        .toLowerCase()
-        .includes(submittedSearch.trim().toLowerCase());
+    const query = submittedSearch.trim().toLowerCase();
 
+    const result = PRODUCTS.filter((product) => {
+      const searchableText =
+        `${product.name} ${product.category} ${product.gender}`.toLowerCase();
+
+      const matchesSearch = !query || searchableText.includes(query);
       const matchesCategory =
         category === "All" || product.category === category;
-
-      const matchesGender =
-        gender === "All" || product.gender === gender;
-
+      const matchesGender = gender === "All" || product.gender === gender;
       const matchesPrice =
         product.price >= minPrice && product.price <= maxPrice;
 
@@ -303,6 +297,44 @@ const Shop = () => {
     sortBy,
   ]);
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [
+    submittedSearch,
+    category,
+    gender,
+    selectedSizes,
+    selectedColors,
+    minPrice,
+    maxPrice,
+    sortBy,
+    itemsPerPage,
+  ]);
+
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredProducts.length / itemsPerPage),
+  );
+
+  useEffect(() => {
+    setCurrentPage((page) => Math.min(page, totalPages));
+  }, [totalPages]);
+
+  const paginatedProducts = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return filteredProducts.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredProducts, currentPage, itemsPerPage]);
+
+  const firstProduct =
+    filteredProducts.length === 0
+      ? 0
+      : (currentPage - 1) * itemsPerPage + 1;
+
+  const lastProduct = Math.min(
+    currentPage * itemsPerPage,
+    filteredProducts.length,
+  );
+
   const activeFilterCount =
     Number(category !== "All") +
     Number(gender !== "All") +
@@ -321,63 +353,121 @@ const Shop = () => {
     setMinPrice(PRICE_MIN);
     setMaxPrice(PRICE_MAX);
     setSortBy("featured");
+    setCurrentPage(1);
   };
 
   const clearSearch = () => {
     setSearch("");
     setSubmittedSearch("");
+    setCurrentPage(1);
+    setSearchFocused(true);
+  };
+
+  // Keep the Search and clear actions mutually exclusive.
+  const showSearchButton =
+    searchFocused &&
+    (search.trim() !== submittedSearch.trim()) &&
+    (!submittedSearch || Boolean(search.trim()));
+  const showClearButton =
+    !showSearchButton && Boolean(search || submittedSearch);
+
+  const handleSearchChange = (event) => {
+    const value = event.target.value;
+    setSearch(value);
+
+    if (!value.trim()) {
+      setSubmittedSearch("");
+      setCurrentPage(1);
+    }
+  };
+
+  const handleSearchSubmit = (event) => {
+    event.preventDefault();
+    setSubmittedSearch(search.trim());
     setSearchFocused(false);
+    setCurrentPage(1);
   };
 
   const openMobileFilters = () => {
     setFiltersMounted(true);
-
-    requestAnimationFrame(() => {
-      setFiltersOpen(true);
-    });
+    requestAnimationFrame(() => setFiltersOpen(true));
   };
 
   const closeMobileFilters = () => {
     setFiltersOpen(false);
   };
 
+  const closeDesktopFilters = () => {
+    if (!showDesktopFilters || desktopFilterClosing) return;
 
+    setDesktopFilterClosing(true);
+    setDesktopFilterOpening(false);
+  };
+
+  const openDesktopFilters = () => {
+    if (showDesktopFilters && !desktopFilterClosing) return;
+
+    setDesktopFilterClosing(false);
+    setShowDesktopFilters(true);
+    setDesktopFilterOpening(true);
+  };
+
+  // Start the opening transition from the clipped state.
+  useEffect(() => {
+    if (!desktopFilterOpening) return;
+
+    const frame = requestAnimationFrame(() => {
+      setDesktopFilterOpening(false);
+    });
+
+    return () => cancelAnimationFrame(frame);
+  }, [desktopFilterOpening]);
+
+  const handleDesktopFilterTransitionEnd = (event) => {
+    if (
+      event.target !== event.currentTarget ||
+      event.propertyName !== "clip-path"
+    ) {
+      return;
+    }
+
+    if (desktopFilterClosing) {
+      setShowDesktopFilters(false);
+      setDesktopFilterClosing(false);
+    }
+  };
 
   const renderFilters = (mobile = false) => (
     <div className="space-y-0">
-      {!mobile && (
-      <div className="flex items-center justify-between pb-4">
-        <button
-          type="button"
-          onClick={() => {
-            if (mobile) {
-              closeMobileFilters();
-            } else {
-              setShowDesktopFilters(false);
-            }
-          }}
-          aria-label={mobile ? "Close filters" : "Collapse filters"}
-          className="flex items-center gap-2 text-sm font-bold tracking-tight text-black transition-colors hover:text-black/60"
+      {(mobile || desktopFiltersExpanded) && (
+        <div
+          className={`flex items-center lg:pb-2 ${
+            mobile ? "justify-between" : "justify-end pl-[76px]"
+          }`}
         >
-        
-         <> 
-            <ChevronLeft size={17} strokeWidth={1.9} />
-          <SlidersHorizontal size={15} strokeWidth={1.7} />
-          Filters
-          </>
-        
-        </button>
-        
+          {/* { !mobile && (
+            <button
+              type="button"
+              onClick={closeMobileFilters}
+              aria-label="Close filters"
+              aria-expanded={filtersOpen}
+              className="flex items-center text-sm font-bold tracking-tight text-black transition-colors hover:text-black/60"
+            >
+              <SlidersHorizontal size={18} strokeWidth={2} />
+            </button>
+          )} */}
 
-        <button
-          type="button"
-          onClick={resetFilters}
-          className="flex items-center gap-1.5 text-[10px] font-semibold text-black/45 transition-colors hover:text-black hover:cursor-pointer active:scale-97"
-        >
-          <RotateCcw size={12} />
-          Clear all
-        </button>
-      </div>
+          {!mobile && (
+          <button
+            type="button"
+            onClick={resetFilters}
+            className="flex items-center gap-1.5 text-[10px] font-semibold text-black/45 transition-colors hover:text-black"
+          >
+            <RotateCcw size={12} />
+            Clear all
+          </button>
+          )}
+        </div>
       )}
 
       <FilterGroup title="Collection">
@@ -394,9 +484,8 @@ const Shop = () => {
               }`}
             >
               <span>{item}</span>
-
               <span
-                className={`transition-all ${SMOOTH} ${
+                className={`transition-all duration-300 ${
                   category === item
                     ? "translate-x-0 opacity-100"
                     : "-translate-x-1 opacity-0"
@@ -416,7 +505,7 @@ const Shop = () => {
               key={item}
               type="button"
               onClick={() => setGender(item)}
-              className={`rounded-full border px-4 py-2 text-[10px] font-semibold transition-all ${SMOOTH} ${
+              className={`rounded-full border px-4 py-2 text-[10px] font-semibold transition-all duration-300 ${
                 gender === item
                   ? "border-black bg-black text-white"
                   : "border-black/10 text-black/55 hover:border-black/40"
@@ -428,16 +517,94 @@ const Shop = () => {
         </div>
       </FilterGroup>
 
-      {/* <FilterGroup title="Price range">
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex-1 rounded-lg border border-black/10 px-3 py-2.5">
-            <p className="mb-1 text-[9px] uppercase tracking-wider text-black/40">
-              Minimum
-            </p>
+      <FilterGroup title="Size">
+        <div className="flex flex-wrap gap-2">
+          {SIZES.map((size) => {
+            const selected = selectedSizes.includes(size);
 
-            <div className="flex items-center gap-1">
-              <span className="text-xs text-black/50">৳</span>
+            return (
+              <button
+                key={size}
+                type="button"
+                aria-pressed={selected}
+                onClick={() =>
+                  setSelectedSizes((previous) =>
+                    selected
+                      ? previous.filter((item) => item !== size)
+                      : [...previous, size],
+                  )
+                }
+                className={`flex h-9 min-w-9 items-center justify-center rounded-full border px-3 text-[10px] font-semibold transition-all duration-300 ${
+                  selected
+                    ? "border-black bg-black text-white"
+                    : "border-black/10 text-black/55 hover:border-black"
+                }`}
+              >
+                {size}
+              </button>
+            );
+          })}
+        </div>
+      </FilterGroup>
 
+      <FilterGroup title="Color">
+        <div className="flex flex-wrap gap-3">
+          {[
+            { name: "Olive", value: "#58732f" },
+            { name: "Black", value: "#171717" },
+            { name: "White", value: "#f5f5f5" },
+            { name: "Brown", value: "#80624e" },
+            { name: "Blue", value: "#536d91" },
+            { name: "Gray", value: "#aaa9a6" },
+            { name: "Cream", value: "#e8dfd0" },
+            { name: "Pink", value: "#d9a2ad" },
+          ].map((color) => {
+            const selected = selectedColors.includes(color.name);
+
+            return (
+              <button
+                key={color.name}
+                type="button"
+                title={color.name}
+                aria-label={color.name}
+                aria-pressed={selected}
+                onClick={() =>
+                  setSelectedColors((previous) =>
+                    selected
+                      ? previous.filter((item) => item !== color.name)
+                      : [...previous, color.name],
+                  )
+                }
+                className={`grid h-7 w-7 place-items-center rounded-full border transition-all duration-300 ${
+                  selected
+                    ? "border-black ring-2 ring-black ring-offset-2"
+                    : "border-black/10 hover:scale-110"
+                }`}
+                style={{ backgroundColor: color.value }}
+              >
+                {selected && (
+                  <Check
+                    size={13}
+                    className={
+                      ["Black", "Blue", "Olive", "Brown"].includes(color.name)
+                        ? "text-white"
+                        : "text-black"
+                    }
+                  />
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </FilterGroup>
+
+      <FilterGroup title="Price range">
+        <div className="space-y-4">
+          <div className="flex items-center justify-between gap-3">
+            <label className="min-w-0 flex-1">
+              <span className="mb-1 block text-[10px] text-black/45">
+                Minimum
+              </span>
               <input
                 type="number"
                 min={PRICE_MIN}
@@ -447,26 +614,21 @@ const Shop = () => {
                   setMinPrice(
                     Math.max(
                       PRICE_MIN,
-                      Math.min(Number(event.target.value) || 0, maxPrice),
+                      Math.min(
+                        maxPrice,
+                        Number(event.target.value) || PRICE_MIN,
+                      ),
                     ),
                   )
                 }
-                className="w-full min-w-0 bg-transparent text-xs font-semibold text-black outline-none"
-                aria-label="Minimum price"
+                className="w-full rounded-lg border border-black/10 px-3 py-2 text-xs outline-none focus:border-black"
               />
-            </div>
-          </div>
+            </label>
 
-          <span className="text-xs text-black/30">—</span>
-
-          <div className="flex-1 rounded-lg border border-black/10 px-3 py-2.5">
-            <p className="mb-1 text-[9px] uppercase tracking-wider text-black/40">
-              Maximum
-            </p>
-
-            <div className="flex items-center gap-1">
-              <span className="text-xs text-black/50">৳</span>
-
+            <label className="min-w-0 flex-1">
+              <span className="mb-1 block text-[10px] text-black/45">
+                Maximum
+              </span>
               <input
                 type="number"
                 min={minPrice}
@@ -476,154 +638,76 @@ const Shop = () => {
                   setMaxPrice(
                     Math.max(
                       minPrice,
-                      Math.min(Number(event.target.value) || 0, PRICE_MAX),
+                      Math.min(
+                        PRICE_MAX,
+                        Number(event.target.value) || PRICE_MIN,
+                      ),
                     ),
                   )
                 }
-                className="w-full min-w-0 bg-transparent text-xs font-semibold text-black outline-none"
-                aria-label="Maximum price"
+                className="w-full rounded-lg border border-black/10 px-3 py-2 text-xs outline-none focus:border-black"
               />
-            </div>
+            </label>
+          </div>
+
+          <div className="flex items-center justify-between text-[10px] text-black/50">
+            <span>৳{minPrice.toLocaleString("en-BD")}</span>
+            <span>৳{maxPrice.toLocaleString("en-BD")}</span>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                setMinPrice(PRICE_MIN);
+                setMaxPrice(1500);
+              }}
+              className="rounded-full border border-black/10 px-3 py-2 text-[10px] transition-colors hover:border-black"
+            >
+              Under ৳1,500
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setMinPrice(1500);
+                setMaxPrice(PRICE_MAX);
+              }}
+              className="rounded-full border border-black/10 px-3 py-2 text-[10px] transition-colors hover:border-black"
+            >
+              ৳1,500+
+            </button>
           </div>
         </div>
-
-        <div className="mt-4 flex items-center justify-between text-[10px] text-black/40">
-          <span>{formatPrice(minPrice)}</span>
-          <span>{formatPrice(maxPrice)}</span>
-        </div>
-
-        <div className="mt-2 flex gap-2">
-          <input
-            type="range"
-            min={PRICE_MIN}
-            max={PRICE_MAX}
-            step={50}
-            value={minPrice}
-            onChange={(event) =>
-              setMinPrice(Math.min(Number(event.target.value), maxPrice))
-            }
-            aria-label="Minimum price slider"
-            className="min-w-0 flex-1 accent-black"
-          />
-
-          <input
-            type="range"
-            min={PRICE_MIN}
-            max={PRICE_MAX}
-            step={50}
-            value={maxPrice}
-            onChange={(event) =>
-              setMaxPrice(Math.max(Number(event.target.value), minPrice))
-            }
-            aria-label="Maximum price slider"
-            className="min-w-0 flex-1 accent-black"
-          />
-        </div>
-      </FilterGroup> */}
-
-      {/* <FilterGroup title="Size">
-        <div className="flex flex-wrap gap-2">
-          {SIZES.map((size) => {
-            const isSelected = selectedSizes.includes(size);
-
-            return (
-              <button
-                key={size}
-                type="button"
-                onClick={() => toggleSize(size)}
-                aria-pressed={isSelected}
-                className={`flex h-10 min-w-10 items-center justify-center rounded-lg border px-3 text-[10px] font-semibold transition-all ${SMOOTH} ${
-                  isSelected
-                    ? "border-black bg-black text-white"
-                    : "border-black/10 text-black/60 hover:border-black/50"
-                }`}
-              >
-                {size}
-              </button>
-            );
-          })}
-        </div>
-      </FilterGroup> */}
-
-      {/* <FilterGroup title="Color">
-        <div className="grid grid-cols-4 gap-x-2 gap-y-4">
-          {availableColors.map((color) => {
-            const isSelected = selectedColors.includes(color.name);
-
-            return (
-              <button
-                key={color.name}
-                type="button"
-                onClick={() => toggleColor(color.name)}
-                aria-label={color.name}
-                aria-pressed={isSelected}
-                className="group flex flex-col items-center gap-2"
-              >
-                <span
-                  className={`flex h-8 w-8 items-center justify-center rounded-full border transition-all ${SMOOTH} ${
-                    isSelected
-                      ? "scale-105 border-black p-1"
-                      : "border-black/10 p-0.5 group-hover:border-black/40"
-                  }`}
-                >
-                  <span
-                    className="h-full w-full rounded-full border border-black/5"
-                    style={{ backgroundColor: color.value }}
-                  />
-                </span>
-
-                <span className="text-center text-[9px] text-black/50">
-                  {color.name}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-      </FilterGroup> */}
+      </FilterGroup>
     </div>
   );
 
   return (
     <main className="min-h-screen bg-bg-primary font-primary text-black">
       {/* Page heading */}
-      <section className="px-5 py-5 sm:px-8 lg:px-12 ">
+      <section className="px-5 py-5 sm:px-8 lg:px-12">
         <div className="mb-2 flex items-center gap-2.5">
           <span className="h-px w-8 bg-black" />
-
           <span className="text-[10px] font-semibold uppercase tracking-[0.3em] text-black/45">
             The BachelorShop Edit
           </span>
         </div>
 
         <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
-          <div>
-            <h1 className="text-[clamp(2.5rem,6vw,5rem)] font-bold leading-[0.95] tracking-[-0.065em]">
-              Shop all
-            </h1>
-
-          </div>
-            <p className=" max-w-md text-xs leading-relaxed sm:text-right text-black/50 sm:text-sm">
-              Thoughtfully selected essentials. Discover everyday 
-              pieces that make getting dressed effortless.
-            </p>
-
-          {/* <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-black/40 md:pb-1">
-            New season · Everyday essentials
-          </p> */}
+          <h1 className="text-[clamp(2.5rem,6vw,5rem)] font-bold leading-[0.95] tracking-[-0.065em]">
+            Shop all
+          </h1>
+          <p className="max-w-md text-xs leading-relaxed text-black/50 sm:text-right sm:text-sm">
+            Thoughtfully selected essentials. Discover everyday pieces that
+            make getting dressed effortless.
+          </p>
         </div>
       </section>
 
       {/* Search and toolbar */}
       <section className="border-b border-black/10 px-5 sm:px-8 lg:px-12">
         <div className="flex flex-col gap-4 py-4 sm:flex-row sm:items-center sm:justify-between">
-          <form
-            onSubmit={(event) => {
-              event.preventDefault();
-              setSubmittedSearch(search.trim());
-              setSearchFocused(false);
-            }}
-            className="w-full sm:max-w-xs"
-          >
+          <form onSubmit={handleSearchSubmit} className="w-full sm:max-w-xs">
             <div
               className={`flex w-full items-center gap-3 border-b transition-colors duration-300 ${
                 searchFocused ? "border-black" : "border-black/15"
@@ -634,11 +718,10 @@ const Shop = () => {
                   size={16}
                   className="pointer-events-none absolute left-0 top-1/2 -translate-y-1/2 text-black/40"
                 />
-
                 <input
                   type="search"
                   value={search}
-                  onChange={(event) => setSearch(event.target.value)}
+                  onChange={handleSearchChange}
                   onFocus={() => setSearchFocused(true)}
                   onBlur={() => setSearchFocused(false)}
                   placeholder="Search products..."
@@ -647,17 +730,16 @@ const Shop = () => {
                 />
               </div>
 
-              {/* Animated Search button */}
               <button
                 type="submit"
                 onMouseDown={(event) => event.preventDefault()}
-                tabIndex={searchFocused && !submittedSearch ? 0 : -1}
-                aria-hidden={!searchFocused || Boolean(submittedSearch)}
+                tabIndex={showSearchButton ? 0 : -1}
+                aria-hidden={!showSearchButton}
                 aria-label="Search products"
                 className={`grid shrink-0 place-items-center overflow-hidden transition-[width,opacity,transform] duration-300 ease-out ${
-                  searchFocused && !submittedSearch
+                  showSearchButton
                     ? "w-10 translate-x-0 opacity-100"
-                    : "w-0 translate-x-1 opacity-0"
+                    : "pointer-events-none w-0 translate-x-1 opacity-0"
                 }`}
               >
                 <span className="whitespace-nowrap text-[10px] font-semibold">
@@ -665,25 +747,21 @@ const Shop = () => {
                 </span>
               </button>
 
-              {/* Show only the custom X after submitting */}
-              <button
-                type="button"
-                onClick={clearSearch}
-                tabIndex={submittedSearch ? 0 : -1}
-                aria-hidden={!submittedSearch}
-                aria-label="Clear search"
-                className={`grid shrink-0 place-items-center overflow-hidden transition-[width,opacity,transform] duration-300 ease-out ${
-                  submittedSearch
-                    ? "w-5 translate-x-0 opacity-100"
-                    : "w-0 translate-x-1 opacity-0"
-                }`}
-              >
-                <X
-                  size={15}
-                  strokeWidth={1.8}
-                  className="transition-transform duration-300 hover:rotate-90"
-                />
-              </button>
+         <button
+  type="button"
+  onMouseDown={(event) => event.preventDefault()}
+  onClick={clearSearch}
+  tabIndex={showClearButton ? 0 : -1}
+  aria-hidden={!showClearButton}
+  aria-label="Clear search"
+  className={`flex shrink-0 items-center justify-center overflow-hidden rounded-full transition-[width,opacity,transform,background-color] duration-300 ease-out hover:bg-neutral-200 ${
+    showClearButton
+      ? "w-5 h-5 p-1 translate-x-0 opacity-100"
+      : "pointer-events-none w-0 translate-x-1 opacity-0"
+  }`}
+>
+  <X size={15} strokeWidth={1.8} />
+</button>
             </div>
           </form>
 
@@ -695,7 +773,6 @@ const Shop = () => {
             >
               <SlidersHorizontal size={14} />
               Filters
-
               {activeFilterCount > 0 && (
                 <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-black px-1 text-[9px] text-white">
                   {activeFilterCount}
@@ -712,11 +789,9 @@ const Shop = () => {
 
             <div className="flex items-center gap-2">
               <ArrowUpDown size={14} className="shrink-0 text-black/45" />
-
               <label htmlFor="shop-sort" className="sr-only">
                 Sort products
               </label>
-
               <select
                 id="shop-sort"
                 value={sortBy}
@@ -738,14 +813,14 @@ const Shop = () => {
       <section className="px-5 py-8 sm:px-8 sm:py-10 lg:px-12">
         <div className="mb-5 flex items-center justify-between lg:hidden">
           <p className="text-xs text-black/50">
-            Showingg{" "}
+            Showing{" "}
             <span className="font-semibold text-black">
               {filteredProducts.length}
             </span>{" "}
             of {PRODUCTS.length} products
           </p>
 
-          {activeFilterCount > 0 && (
+          {(activeFilterCount > 0 || submittedSearch) && (
             <button
               type="button"
               onClick={resetFilters}
@@ -756,50 +831,42 @@ const Shop = () => {
           )}
         </div>
 
-        {/* Collapsed desktop filter toggle */}
         <div
-          className={`hidden overflow-hidden transition-[max-height,opacity,margin] duration-[1500ms] ease-[cubic-bezier(0.16,1,0.3,1)] lg:block ${
-            showDesktopFilters
-              ? "mb-0 max-h-0 opacity-0"
-              : "mb-5 max-h-12 opacity-100"
-          }`}
-          aria-hidden={showDesktopFilters}
-        >
-          <button
-            type="button"
-            onClick={() => setShowDesktopFilters(true)}
-            aria-expanded={false}
-            tabIndex={showDesktopFilters ? -1 : 0}
-            className="flex items-center gap-0 text-sm font-bold tracking-tight text-black transition-colors hover:text-black/60"
-          >
-            <SlidersHorizontal size={20} strokeWidth={2} />
-            {/* <span>Filters</span> */}
-            {/* <ChevronRight size={15} strokeWidth={1.8} /> */}
-          </button>
-        </div>
-
-        <div
-          className={`grid min-w-0 grid-cols-1 transition-[grid-template-columns,gap] duration-[1500ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
-            showDesktopFilters
+          className={`grid min-w-0 grid-cols-1 ${
+            desktopFiltersExpanded
               ? "gap-8 lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-10 xl:grid-cols-[245px_minmax(0,1fr)] xl:gap-14"
-              : "gap-8 lg:grid-cols-[0_minmax(0,1fr)] lg:gap-0"
+              : "gap-8 lg:grid-cols-[0px_minmax(0,1fr)] lg:gap-0"
           }`}
+          style={{
+            transition: `grid-template-columns ${FILTER_DURATION}ms ${FILTER_EASING}, column-gap ${FILTER_DURATION}ms ${FILTER_EASING}`,
+          }}
         >
-          <aside
-            aria-hidden={!showDesktopFilters}
-            className={`relative hidden min-w-0 overflow-hidden lg:block ${
-              showDesktopFilters
-                ? "pointer-events-auto"
-                : "pointer-events-none"
-            }`}
-          >
+          {/* Desktop sidebar */}
+          <aside className="relative hidden min-w-0 overflow-hidden lg:block">
+            {desktopFiltersExpanded && (
+              <button
+                type="button"
+                onClick={closeDesktopFilters}
+                aria-label="Collapse filters"
+                aria-expanded={desktopFiltersExpanded}
+                className="absolute left-0 top-0 z-10 flex items-center text-sm font-bold tracking-tight text-black transition-colors hover:text-black/60"
+              >
+                <SlidersHorizontal size={18} strokeWidth={2} />
+                <span className="inline-block pl-2">Filters</span>
+              </button>
+            )}
             <div
-              className={`sticky top-28 w-[220px] transition-[transform,opacity] duration-[1500ms] ease-[cubic-bezier(0.16,1,0.3,1)] xl:w-[245px] ${
-                showDesktopFilters
-                  ? "translate-x-0 opacity-100"
-                  : "-translate-x-full opacity-0"
-              }`}
-              inert={!showDesktopFilters}
+              inert={!showDesktopFilters || desktopFilterClosing}
+              onTransitionEnd={handleDesktopFilterTransitionEnd}
+              className="w-[220px] overflow-hidden xl:w-[245px]"
+              style={{
+                clipPath:
+                  desktopFilterClosing || desktopFilterOpening
+                    ? "inset(0 100% 0 0)"
+                    : "inset(0 0 0 0)",
+                transition: `clip-path ${FILTER_DURATION}ms ${FILTER_EASING}`,
+                willChange: "clip-path",
+              }}
             >
               {renderFilters()}
             </div>
@@ -807,112 +874,143 @@ const Shop = () => {
 
           {/* Product listing */}
           <div className="min-w-0">
-            <div className="mb-5 hidden items-center justify-between lg:flex">
-              <p className="text-xs text-black/50">
-                Showing{" "}
-                <span className="font-semibold text-black">
-                  {filteredProducts.length}
-                </span>{" "}
-                products
-              </p>
+            <div className="mb-5 hidden w-full items-center justify-between gap-6 lg:flex">
+              <div className="flex min-w-0 shrink-0 items-center justify-start gap-3">
+                {!desktopFiltersExpanded && (
+                  <button
+                    type="button"
+                    onClick={openDesktopFilters}
+                    aria-label="Expand filters"
+                    aria-expanded={desktopFiltersExpanded}
+                    className="flex shrink-0 items-center text-sm font-bold tracking-tight text-black transition-colors hover:text-black/60"
+                  >
+                    <SlidersHorizontal size={18} strokeWidth={2} />
+                  </button>
+                )}
 
-              {activeFilterCount > 0 && (
-                <button
-                  type="button"
-                  onClick={resetFilters}
-                  className="flex items-center gap-1.5 text-[10px] font-semibold text-black/45 transition-colors hover:text-black"
-                >
-                  <RotateCcw size={12} />
-                  Reset filters
-                </button>
+                <p className="shrink-0 text-xs text-black/50">
+                  Showing{" "}
+                  <span className="font-semibold text-black">
+                    {filteredProducts.length}
+                  </span>{" "}
+                  products
+                </p>
+              </div> 
+
+              {(activeFilterCount > 0 || submittedSearch) && !showDesktopFilters &&  (
+                 <button
+              type="button"
+              onClick={resetFilters}
+              className="text-[10px] font-semibold text-black underline underline-offset-4"
+            >
+              Clear filters
+            </button>
               )}
             </div>
 
             {filteredProducts.length > 0 ? (
-              <div className="grid grid-cols-2 gap-x-3 gap-y-8 sm:gap-x-5 sm:gap-y-10 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-6">
-                {filteredProducts.map((product) => (
-                  <article
-                    key={product.id}
-                    className="group min-w-0 animate-[shopFadeIn_450ms_cubic-bezier(0.16,1,0.3,1)_both]"
-                  >
-                    <div className="relative aspect-[3/4] overflow-hidden bg-neutral-100">
-                      <Link
-                        to={`/products/${product.id}`}
-                        aria-label={`View ${product.name}`}
-                        className="block h-full w-full"
-                      >
-                        <img
-                          src={product.image}
-                          alt={product.name}
-                          loading="lazy"
-                          className="h-full w-full object-cover transition-transform duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.045]"
-                        />
-                      </Link>
+              <>
+                <div
+                  className={`grid grid-cols-2 gap-x-3 gap-y-8 sm:gap-x-5 sm:gap-y-10 ${
+                    desktopFiltersExpanded
+                      ? "lg:grid-cols-3 xl:grid-cols-3"
+                      : "lg:grid-cols-4 xl:grid-cols-4"
+                  } xl:gap-x-6`}
+                >
+                  {paginatedProducts.map((product) => (
+                    <article
+                      key={product.id}
+                      className="group min-w-0 animate-[shopFadeIn_450ms_cubic-bezier(0.16,1,0.3,1)_both]"
+                    >
+                      <div className="relative aspect-[3/4] overflow-hidden bg-neutral-100">
+                        <Link
+                          to={`/products/${product.id}`}
+                          aria-label={`View ${product.name}`}
+                          className="block h-full w-full"
+                        >
+                          <img
+                            src={product.image}
+                            alt={product.name}
+                            loading="lazy"
+                            className="h-full w-full object-cover transition-transform duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.045]"
+                          />
+                        </Link>
 
-                      {product.badge && (
-                        <span className="absolute left-2.5 top-2.5 bg-white px-2.5 py-1.5 text-[8px] font-semibold uppercase tracking-[0.14em] text-black sm:left-3 sm:top-3 sm:text-[9px]">
-                          {product.badge}
-                        </span>
-                      )}
-
-                      <Link
-                        to={`/products/${product.id}`}
-                        aria-label={`View details for ${product.name}`}
-                        className="absolute bottom-0 left-0 right-0 flex translate-y-full items-center justify-between bg-white/95 px-3 py-3 text-[10px] font-semibold text-black backdrop-blur-sm transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-y-0"
-                      >
-                        <span>View Details</span>
-                        <ArrowRight
-                          size={14}
-                          className="transition-transform duration-300 group-hover:translate-x-1"
-                        />
-                      </Link>
-                    </div>
-
-                    <div className="pt-3.5 sm:pt-4">
-                      <div className="mb-1.5 flex items-start justify-between gap-2">
-                        <p className="text-[9px] font-medium uppercase tracking-[0.16em] text-black/40 sm:text-[10px]">
-                          {product.category}
-                        </p>
-
-                        <span className="text-[9px] text-black/40 sm:text-[10px]">
-                          {product.gender}
-                        </span>
-                      </div>
-
-                      <Link
-                        to={`/products/${product.id}`}
-                        className="block text-[11px] font-semibold leading-relaxed text-black transition-colors duration-300 hover:text-black/55 sm:text-xs"
-                      >
-                        {product.name}
-                      </Link>
-
-                      <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1">
-                        <span className="text-xs font-bold text-black">
-                          {formatPrice(product.price)}
-                        </span>
-
-                        {product.originalPrice > product.price && (
-                          <span className="relative inline-block text-[10px] text-black/35">
-                            {formatPrice(product.originalPrice)}
-                            <span className="absolute -left-[5%] top-1/2 h-px w-[110%] -translate-y-1/2 bg-black/35" />
+                        {product.badge && (
+                          <span className="absolute left-2.5 top-2.5 bg-white px-2.5 py-1.5 text-[8px] font-semibold uppercase tracking-[0.14em] text-black sm:left-3 sm:top-3 sm:text-[9px]">
+                            {product.badge}
                           </span>
                         )}
+
+                        <Link
+                          to={`/products/${product.id}`}
+                          aria-label={`View details for ${product.name}`}
+                          className="absolute bottom-0 left-0 right-0 flex translate-y-full items-center justify-between bg-white/95 px-3 py-3 text-[10px] font-semibold text-black backdrop-blur-sm transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-y-0"
+                        >
+                          <span>View Details</span>
+                          <ArrowRight
+                            size={14}
+                            className="transition-transform duration-300 group-hover:translate-x-1"
+                          />
+                        </Link>
                       </div>
 
-                      <div className="mt-3 flex items-center gap-1.5">
-                        {product.colors.map((color) => (
-                          <span
-                            key={color.name}
-                            title={color.name}
-                            className="h-3.5 w-3.5 rounded-full border border-black/10 transition-transform duration-300 hover:scale-125 sm:h-4 sm:w-4"
-                            style={{ backgroundColor: color.value }}
-                          />
-                        ))}
+                      <div className="pt-3.5 sm:pt-4">
+                        <div className="mb-1.5 flex items-start justify-between gap-2">
+                          <p className="text-[9px] font-medium uppercase tracking-[0.16em] text-black/40 sm:text-[10px]">
+                            {product.category}
+                          </p>
+                          <span className="text-[9px] text-black/40 sm:text-[10px]">
+                            {product.gender}
+                          </span>
+                        </div>
+
+                        <Link
+                          to={`/products/${product.id}`}
+                          className="block text-[11px] font-semibold leading-relaxed text-black transition-colors duration-300 hover:text-black/55 sm:text-xs"
+                        >
+                          {product.name}
+                        </Link>
+
+                        <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1">
+                          <span className="text-xs font-bold text-black">
+                            {formatPrice(product.price)}
+                          </span>
+
+                          {product.originalPrice > product.price && (
+                            <span className="relative inline-block text-[10px] text-black/35">
+                              {formatPrice(product.originalPrice)}
+                              <span className="absolute -left-[5%] top-1/2 h-px w-[110%] -translate-y-1/2 bg-black/35" />
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="mt-3 flex items-center gap-1.5">
+                          {product.colors.map((color) => (
+                            <span
+                              key={color.name}
+                              title={color.name}
+                              className="h-3.5 w-3.5 rounded-full border border-black/10 transition-transform duration-300 hover:scale-125 sm:h-4 sm:w-4"
+                              style={{ backgroundColor: color.value }}
+                            />
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  </article>
-                ))}
-              </div>
+                    </article>
+                  ))}
+                </div>
+
+                <Pagenation
+                  currentPage={currentPage}
+                  setCurrentPage={setCurrentPage}
+                  totalPages={totalPages}
+                  itemsPerPage={itemsPerPage}
+                  setItemsPerPage={setItemsPerPage}
+                  firstProduct={firstProduct}
+                  lastProduct={lastProduct}
+                  totalProducts={filteredProducts.length}
+                />
+              </>
             ) : (
               <div className="flex min-h-[350px] flex-col items-center justify-center px-5 text-center">
                 <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-neutral-100">
@@ -960,10 +1058,7 @@ const Shop = () => {
             aria-modal="true"
             aria-label="Product filters"
             onTransitionEnd={(event) => {
-              if (
-                event.target === event.currentTarget &&
-                !filtersOpen
-              ) {
+              if (event.target === event.currentTarget && !filtersOpen) {
                 setFiltersMounted(false);
               }
             }}
@@ -976,7 +1071,6 @@ const Shop = () => {
                 <p className="text-[9px] font-semibold uppercase tracking-[0.25em] text-black/40">
                   Find your style
                 </p>
-
                 <h2 className="mt-1 flex items-center gap-2 text-lg font-bold tracking-tight">
                   <SlidersHorizontal size={17} strokeWidth={1.7} />
                   Filters
@@ -1021,7 +1115,6 @@ const Shop = () => {
       )}
 
       <style>{`
-        /* Hide the browser's built-in search clear button */
         .shop-search-input::-webkit-search-cancel-button,
         .shop-search-input::-webkit-search-decoration,
         .shop-search-input::-webkit-search-results-button,

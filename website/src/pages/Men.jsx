@@ -1,4 +1,3 @@
-
 import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router";
 import {
@@ -21,47 +20,43 @@ const PRICE_MAX = 3000;
 const FILTER_DURATION = 1000;
 const FILTER_EASING = "cubic-bezier(0.22, 1, 0.36, 1)";
 
-const SHIRT = {
-  name: "Essential Everyday Shirt",
-  category: "Shirts",
-  gender: "Men",
-  price: 1260,
-  originalPrice: 1800,
-  colors: [
-    { name: "Olive", value: "#58732f" },
-    { name: "Black", value: "#171717" },
-    { name: "White", value: "#f5f5f5" },
-  ],
-  sizes: ["S", "M", "L", "XL"],
-  image:
-    "https://images.unsplash.com/photo-1603252110481-7ba873bf42ab?auto=format&fit=crop&w=900&q=85",
-  badge: "Bestseller",
-};
-
-const DENIM = {
-  name: "Relaxed Fit Denim",
-  category: "Jeans",
-  gender: "Men",
-  price: 1890,
-  originalPrice: 2400,
-  colors: [
-    { name: "Blue", value: "#536d91" },
-    { name: "Black", value: "#252525" },
-  ],
-  sizes: ["S", "M", "L", "XL"],
-  image:
-    "https://images.unsplash.com/photo-1542272604-787c3835535d?auto=format&fit=crop&w=900&q=85",
-  badge: "Sale",
-};
-
 const PRODUCTS = [
-  ...Array.from({ length: 20 }, (_, index) => ({
-    ...SHIRT,
-    id: `shirt-${index + 1}`,
-  })),
   {
-    id: "tshirt-1",
-    name: "Classic Cotton T-Shirt",
+    id: "shirt-men",
+    name: "Essential Men's Casual Shirt",
+    category: "Shirts",
+    gender: "Men",
+    price: 1350,
+    originalPrice: 1700,
+    colors: [
+      { name: "White", value: "#f5f5f5" },
+      { name: "Blue", value: "#536d91" },
+      { name: "Black", value: "#171717" },
+    ],
+    sizes: ["S", "M", "L", "XL"],
+    image:
+      "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&w=900&q=85",
+    badge: "New",
+  },
+  {
+    id: "jeans-men",
+    name: "Classic Men's Denim Jeans",
+    category: "Jeans",
+    gender: "Men",
+    price: 1750,
+    originalPrice: 2200,
+    colors: [
+      { name: "Blue", value: "#536d91" },
+      { name: "Black", value: "#252525" },
+    ],
+    sizes: ["S", "M", "L", "XL"],
+    image:
+      "https://images.unsplash.com/photo-1542272604-787c3835535d?auto=format&fit=crop&w=900&q=85",
+    badge: "",
+  },
+  {
+    id: "tshirt-men",
+    name: "Everyday Essential T-Shirt",
     category: "T-Shirts",
     gender: "Men",
     price: 890,
@@ -76,13 +71,76 @@ const PRODUCTS = [
       "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=900&q=85",
     badge: "",
   },
-  ...Array.from({ length: 5 }, (_, index) => ({
-    ...DENIM,
-    id: `denim-${index + 1}`,
-  })),
   {
     id: "hoodie-men",
-    name: "Minimal Everyday Hoodie",
+    name: "Essential Streetwear Hoodie",
+    category: "Hoodies",
+    gender: "Men",
+    price: 1590,
+    originalPrice: 1990,
+    colors: [
+      { name: "Gray", value: "#aaa9a6" },
+      { name: "Black", value: "#171717" },
+      { name: "Blue", value: "#536d91" },
+    ],
+    sizes: ["S", "M", "L", "XL"],
+    image:
+      "https://images.unsplash.com/photo-1556821840-3a63f95609a7?auto=format&fit=crop&w=900&q=85",
+    badge: "New",
+  },
+  {
+    id: "polo-men",
+    name: "Minimal Everyday Polo Shirt",
+    category: "T-Shirts",
+    gender: "Men",
+    price: 1250,
+    originalPrice: 1600,
+    colors: [
+      { name: "Black", value: "#171717" },
+      { name: "White", value: "#f5f5f5" },
+      { name: "Blue", value: "#536d91" },
+    ],
+    sizes: ["S", "M", "L", "XL"],
+    image:
+      "https://images.unsplash.com/photo-1625910513413-5fc4f6f5f4f3?auto=format&fit=crop&w=900&q=85",
+    badge: "Bestseller",
+  },
+  {
+    id: "jacket-men",
+    name: "Classic Men's Denim Jacket",
+    category: "Jeans",
+    gender: "Men",
+    price: 1950,
+    originalPrice: 2500,
+    colors: [
+      { name: "Blue", value: "#536d91" },
+      { name: "Black", value: "#252525" },
+    ],
+    sizes: ["M", "L", "XL"],
+    image:
+      "https://images.unsplash.com/photo-1516257984-b1b4d707412e?auto=format&fit=crop&w=900&q=85",
+    badge: "Sale",
+  },
+  {
+    id: "casual-shirt-men",
+    name: "Relaxed Fit Men's Shirt",
+    category: "Shirts",
+    gender: "Men",
+    price: 1390,
+    originalPrice: 1750,
+    colors: [
+      { name: "White", value: "#f5f5f5" },
+      { name: "Blue", value: "#536d91" },
+      { name: "Cream", value: "#e8dfd0" },
+    ],
+    sizes: ["S", "M", "L", "XL"],
+    image:
+      "https://images.unsplash.com/photo-1603252109303-2751441dd157?auto=format&fit=crop&w=900&q=85",
+    badge: "",
+  },
+  {
+    id: "sweatshirt-men",
+    name: "Relaxed Essential Sweatshirt",
     category: "Hoodies",
     gender: "Men",
     price: 1650,
@@ -90,79 +148,79 @@ const PRODUCTS = [
     colors: [
       { name: "Gray", value: "#aaa9a6" },
       { name: "Black", value: "#171717" },
-      { name: "Cream", value: "#e8dfd0" },
+      { name: "Blue", value: "#536d91" },
     ],
-    sizes: ["M", "L", "XL"],
+    sizes: ["S", "M", "L", "XL"],
     image:
-      "https://images.unsplash.com/photo-1556821840-3a63f95609a7?auto=format&fit=crop&w=900&q=85",
+      "https://images.unsplash.com/photo-1578681994506-b8f463449011?auto=format&fit=crop&w=900&q=85",
     badge: "",
   },
   {
-    id: "top-women",
-    name: "Contemporary Women's Top",
-    category: "Tops",
-    gender: "Women",
-    price: 1150,
-    originalPrice: 1500,
-    colors: [
-      { name: "White", value: "#f5f5f5" },
-      { name: "Brown", value: "#80624e" },
-      { name: "Black", value: "#171717" },
-    ],
-    sizes: ["XS", "S", "M", "L"],
-    image:
-      "https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?auto=format&fit=crop&w=900&q=85",
-    badge: "New",
-  },
-  {
-    id: "jeans-women",
-    name: "Classic Women's Denim",
+    id: "straight-jeans-men",
+    name: "Straight Fit Denim Jeans",
     category: "Jeans",
-    gender: "Women",
-    price: 1750,
-    originalPrice: 2200,
+    gender: "Men",
+    price: 1850,
+    originalPrice: 2300,
     colors: [
       { name: "Blue", value: "#536d91" },
       { name: "Black", value: "#252525" },
     ],
-    sizes: ["XS", "S", "M", "L"],
+    sizes: ["S", "M", "L", "XL"],
     image:
       "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=900&q=85",
     badge: "",
   },
   {
-    id: "shirt-women",
-    name: "Everyday Casual Shirt",
+    id: "basic-shirt-men",
+    name: "Classic Button-Down Shirt",
     category: "Shirts",
-    gender: "Women",
-    price: 1350,
-    originalPrice: 1700,
+    gender: "Men",
+    price: 1190,
+    originalPrice: 1500,
+    colors: [
+      { name: "White", value: "#f5f5f5" },
+      { name: "Black", value: "#171717" },
+      { name: "Blue", value: "#536d91" },
+    ],
+    sizes: ["S", "M", "L", "XL"],
+    image:
+      "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?auto=format&fit=crop&w=900&q=85",
+    badge: "New",
+  },
+  {
+    id: "knit-men",
+    name: "Soft Knit Men's Sweater",
+    category: "Tops",
+    gender: "Men",
+    price: 1490,
+    originalPrice: 1850,
     colors: [
       { name: "Cream", value: "#e8dfd0" },
-      { name: "Blue", value: "#536d91" },
-      { name: "White", value: "#f5f5f5" },
+      { name: "Black", value: "#171717" },
+      { name: "Brown", value: "#80624e" },
     ],
-    sizes: ["XS", "S", "M", "L"],
+    sizes: ["S", "M", "L", "XL"],
     image:
-      "https://images.unsplash.com/photo-1598554747436-c9293d6a588f?auto=format&fit=crop&w=900&q=85",
+      "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?auto=format&fit=crop&w=900&q=85",
     badge: "",
   },
   {
-    id: "hoodie-women",
-    name: "Essential Streetwear Hoodie",
+    id: "hoodie-men-2",
+    name: "Relaxed Fit Essential Hoodie",
     category: "Hoodies",
-    gender: "Women",
-    price: 1590,
-    originalPrice: 1990,
+    gender: "Men",
+    price: 1650,
+    originalPrice: 2100,
     colors: [
       { name: "Gray", value: "#aaa9a6" },
       { name: "Black", value: "#171717" },
-      { name: "Pink", value: "#d9a2ad" },
+      { name: "Blue", value: "#536d91" },
     ],
     sizes: ["S", "M", "L", "XL"],
     image:
       "https://images.unsplash.com/photo-1578681994506-b8f463449011?auto=format&fit=crop&w=900&q=85",
-    badge: "New",
+    badge: "",
   },
 ];
 
@@ -173,44 +231,52 @@ const formatPrice = (amount) => (
   </span>
 );
 
-const FilterGroup = ({ title, children }) => {
-  const [open, setOpen] = useState(false);
+// Accordion content animates independently.
+// The header and chevron remain stationary while the content collapses.
+const FilterGroup = ({ title, children, open, onToggle }) => (
+  <section className="border-b border-black/10 py-5">
+    <button
+      type="button"
+      onClick={onToggle}
+      aria-expanded={open}
+      className="flex w-full shrink-0 items-center justify-between gap-3 text-left"
+    >
+      <span className="shrink-0 text-xs font-bold tracking-tight text-black">
+        {title}
+      </span>
 
-  return (
-    <section className="border-b border-black/10 py-5">
-      <button
-        type="button"
-        onClick={() => setOpen((previous) => !previous)}
-        aria-expanded={open}
-        className="flex w-full items-center justify-between gap-3 text-left"
-      >
-        <span className="text-xs font-bold tracking-tight text-black">
-          {title}
-        </span>
-
-        <span
-          className={`transition-transform duration-500 ${
-            open ? "rotate-180" : "rotate-0"
-          }`}
-        >
-          <ChevronDown size={15} className="text-black/45" />
-        </span>
-      </button>
-
-      <div
-        className={`grid transition-[grid-template-rows,opacity] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-          open
-            ? "grid-rows-[1fr] opacity-100"
-            : "grid-rows-[0fr] opacity-0"
+      <span
+        className={`shrink-0 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+          open ? "rotate-180" : "rotate-0"
         }`}
       >
-        <div className="overflow-hidden">
-          <div className="pt-5">{children}</div>
+        <ChevronDown size={15} className="text-black/45" />
+      </span>
+    </button>
+
+    <div
+      className={`grid ${
+        open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+      }`}
+      style={{
+        transition: `grid-template-rows 650ms ${FILTER_EASING}`,
+      }}
+      aria-hidden={!open}
+    >
+      <div className="min-h-0 overflow-hidden">
+        <div
+          className={`pt-5 transition-[opacity,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+            open
+              ? "translate-y-0 opacity-100"
+              : "translate-y-1 opacity-0"
+          }`}
+        >
+          {children}
         </div>
       </div>
-    </section>
-  );
-};
+    </div>
+  </section>
+);
 
 const Men = () => {
   const [search, setSearch] = useState("");
@@ -223,6 +289,10 @@ const Men = () => {
   const [minPrice, setMinPrice] = useState(PRICE_MIN);
   const [maxPrice, setMaxPrice] = useState(PRICE_MAX);
   const [sortBy, setSortBy] = useState("featured");
+
+  // Keep Collection and Size accordion states independent.
+  const [collectionOpen, setCollectionOpen] = useState(false);
+  const [sizeOpen, setSizeOpen] = useState(false);
 
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [filtersMounted, setFiltersMounted] = useState(false);
@@ -239,7 +309,6 @@ const Men = () => {
   const desktopFiltersExpanded =
     showDesktopFilters && !desktopFilterClosing;
 
-  // Always show men's products on the Men page.
   const filteredProducts = useMemo(() => {
     const query = submittedSearch.trim().toLowerCase();
 
@@ -413,11 +482,19 @@ const Men = () => {
   useEffect(() => {
     if (!desktopFilterOpening) return;
 
-    const frame = requestAnimationFrame(() => {
-      setDesktopFilterOpening(false);
+    let firstFrame;
+    let secondFrame;
+
+    firstFrame = requestAnimationFrame(() => {
+      secondFrame = requestAnimationFrame(() => {
+        setDesktopFilterOpening(false);
+      });
     });
 
-    return () => cancelAnimationFrame(frame);
+    return () => {
+      cancelAnimationFrame(firstFrame);
+      cancelAnimationFrame(secondFrame);
+    };
   }, [desktopFilterOpening]);
 
   const handleDesktopFilterTransitionEnd = (event) => {
@@ -460,14 +537,17 @@ const Men = () => {
         </div>
       )}
 
-      {/* Fixed collection: Men only */}
       <div className="border-b border-black/10 py-5">
         <span className="text-xs font-bold tracking-tight text-black/40">
           Men
         </span>
       </div>
 
-      <FilterGroup title="Collection">
+      <FilterGroup
+        title="Collection"
+        open={collectionOpen}
+        onToggle={() => setCollectionOpen((previous) => !previous)}
+      >
         <div className="space-y-3">
           {CATEGORIES.map((item) => (
             <button
@@ -495,7 +575,11 @@ const Men = () => {
         </div>
       </FilterGroup>
 
-      <FilterGroup title="Size">
+      <FilterGroup
+        title="Size"
+        open={sizeOpen}
+        onToggle={() => setSizeOpen((previous) => !previous)}
+      >
         <div className="flex flex-wrap gap-2">
           {SIZES.map((size) => {
             const selected = selectedSizes.includes(size);
@@ -507,9 +591,7 @@ const Men = () => {
                 aria-pressed={selected}
                 onClick={() =>
                   setSelectedSizes((previous) =>
-                    selected
-                      ? previous.filter((item) => item !== size)
-                      : [...previous, size],
+                    selected ? [] : [size],
                   )
                 }
                 className={`flex h-9 min-w-9 items-center justify-center rounded-full border px-3 text-[10px] font-semibold transition-all duration-300 ${
@@ -529,7 +611,6 @@ const Men = () => {
 
   return (
     <main className="min-h-screen bg-bg-primary font-primary text-black">
-      {/* Page heading */}
       <section className="px-5 py-5 sm:px-8 lg:px-12">
         <div className="mb-2 flex items-center gap-2.5">
           <span className="h-px w-8 bg-black" />
@@ -549,7 +630,6 @@ const Men = () => {
         </div>
       </section>
 
-      {/* Search and sorting */}
       <section className="border-b border-black/10 px-5 sm:px-8 lg:px-12">
         <div className="flex flex-col gap-4 pb-4 pt-2 sm:flex-row sm:items-center sm:justify-between">
           <form onSubmit={handleSearchSubmit} className="w-full sm:max-w-xs">
@@ -637,7 +717,7 @@ const Men = () => {
                 onChange={(event) => setSortBy(event.target.value)}
                 className="max-w-[155px] cursor-pointer bg-transparent py-2 text-[11px] font-semibold outline-none"
               >
-                 <option value="featured">Featured</option>
+                <option value="featured">Featured</option>
                 <option value="newest">Newest arrivals</option>
                 <option value="price-low">Low to high</option>
                 <option value="price-high">High to low</option>
@@ -648,7 +728,6 @@ const Men = () => {
         </div>
       </section>
 
-      {/* Product listing */}
       <section className="px-5 py-8 sm:px-8 sm:py-10 lg:px-12">
         <div className="mb-5 flex items-center justify-between lg:hidden">
           <p className="text-xs text-black/50">
@@ -674,7 +753,7 @@ const Men = () => {
         <div
           className={`grid min-w-0 grid-cols-1 ${
             desktopFiltersExpanded
-              ? "gap-8 lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-10 xl:grid-cols-[245px_minmax(0,1fr)] xl:gap-14"
+              ? "gap-8 lg:grid-cols-[220px_minmax(0,1fr)]  xl:grid-cols-[245px_minmax(0,1fr)] xl:gap-10"
               : "gap-8 lg:grid-cols-[0px_minmax(0,1fr)] lg:gap-0"
           }`}
           style={{
@@ -686,38 +765,46 @@ const Men = () => {
           }}
         >
           {/* Desktop filters */}
-          <aside className="relative hidden min-w-0 overflow-hidden lg:block">
-            {showDesktopFilterHeader && (
-              <button
-                type="button"
-                onClick={closeDesktopFilters}
-                aria-label="Collapse filters"
-                aria-expanded={desktopFiltersExpanded}
-                className={`absolute left-0 top-0 z-10 flex items-center text-sm font-bold tracking-tight text-black transition-[opacity,transform] duration-[1000ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:text-black/60 ${
-                  desktopFilterClosing
-                    ? "pointer-events-none translate-x-[-8px] opacity-0"
-                    : "translate-x-0 opacity-100"
-                }`}
-              >
-                <SlidersHorizontal size={18} strokeWidth={2} />
-                <span className="inline-block pl-2">Filters</span>
-              </button>
-            )}
+          <aside className="relative hidden min-w-0 overflow-visible lg:block">
+            <div className="sticky top-24 h-fit self-start">
+              {showDesktopFilterHeader && (
+                <button
+                  type="button"
+                  onClick={closeDesktopFilters}
+                  aria-label="Collapse filters"
+                  aria-expanded={desktopFiltersExpanded}
+                  className={`absolute left-0 top-0 z-10 flex items-center text-sm font-bold tracking-tight text-black transition-opacity duration-[1000ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:text-black/60 ${
+                    desktopFilterClosing || desktopFilterOpening
+                      ? "pointer-events-none opacity-0"
+                      : "opacity-100"
+                  }`}
+                >
+                  <SlidersHorizontal size={18} strokeWidth={2} />
+                  <span className="inline-block pl-2">Filters</span>
+                </button>
+              )}
 
-            <div
-              inert={!showDesktopFilters || desktopFilterClosing}
-              onTransitionEnd={handleDesktopFilterTransitionEnd}
-              className="w-[220px] overflow-hidden xl:w-[245px]"
-              style={{
-                clipPath:
-                  desktopFilterClosing || desktopFilterOpening
-                    ? "inset(0 100% 0 0)"
-                    : "inset(0 0 0 0)",
-                transition: `clip-path ${FILTER_DURATION}ms ${FILTER_EASING}`,
-                willChange: "clip-path",
-              }}
-            >
-              {renderFilters()}
+              <div
+                inert={
+                  !showDesktopFilters ||
+                  desktopFilterClosing ||
+                  desktopFilterOpening
+                }
+                onTransitionEnd={handleDesktopFilterTransitionEnd}
+                className="w-[220px] overflow-hidden xl:w-[245px]"
+                style={{
+                  clipPath:
+                    !showDesktopFilters ||
+                    desktopFilterClosing ||
+                    desktopFilterOpening
+                      ? "inset(0 100% 0 0)"
+                      : "inset(0 0 0 0)",
+                  transition: `clip-path ${FILTER_DURATION}ms ${FILTER_EASING}`,
+                  willChange: "clip-path",
+                }}
+              >
+                {renderFilters()}
+              </div>
             </div>
           </aside>
 

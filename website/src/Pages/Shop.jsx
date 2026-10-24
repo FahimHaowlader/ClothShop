@@ -6,7 +6,6 @@ import {
   SlidersHorizontal,
   X,
   ChevronDown,
-  ArrowUpDown,
   ArrowRight,
   Check,
   RotateCcw,
@@ -15,6 +14,7 @@ import {
 import Pagenation from "../components/Pagenation.jsx";
 
 const CATEGORIES = ["All", "Shirts", "T-Shirts", "Tops", "Jeans", "Hoodies"];
+const GENDERS = ["All", "Men", "Women"];
 const SIZES = ["XS", "S", "M", "L", "XL"];
 const PRICE_MIN = 0;
 const PRICE_MAX = 3000;
@@ -22,46 +22,26 @@ const PRICE_MAX = 3000;
 const FILTER_DURATION = 1000;
 const FILTER_EASING = "cubic-bezier(0.22, 1, 0.36, 1)";
 
-const SHIRT = {
-  name: "Essential Everyday Shirt",
-  category: "Shirts",
-  gender: "Men",
-  price: 1260,
-  originalPrice: 1800,
-  colors: [
-    { name: "Olive", value: "#58732f" },
-    { name: "Black", value: "#171717" },
-    { name: "White", value: "#f5f5f5" },
-  ],
-  sizes: ["S", "M", "L", "XL"],
-  image:
-    "https://images.unsplash.com/photo-1603252110481-7ba873bf42ab?auto=format&fit=crop&w=900&q=85",
-  badge: "Bestseller",
-};
-
-const DENIM = {
-  name: "Relaxed Fit Denim",
-  category: "Jeans",
-  gender: "Men",
-  price: 1890,
-  originalPrice: 2400,
-  colors: [
-    { name: "Blue", value: "#536d91" },
-    { name: "Black", value: "#252525" },
-  ],
-  sizes: ["S", "M", "L", "XL"],
-  image:
-    "https://images.unsplash.com/photo-1542272604-787c3835535d?auto=format&fit=crop&w=900&q=85",
-  badge: "Sale",
-};
-
 const PRODUCTS = [
-  ...Array.from({ length: 20 }, (_, index) => ({
-    ...SHIRT,
-    id: `shirt-${index + 1}`,
-  })),
   {
-    id: "tshirt-1",
+    id: "shirt-men",
+    name: "Essential Everyday Shirt",
+    category: "Shirts",
+    gender: "Men",
+    price: 1260,
+    originalPrice: 1600,
+    colors: [
+      { name: "Black", value: "#171717" },
+      { name: "White", value: "#f5f5f5" },
+      { name: "Blue", value: "#536d91" },
+    ],
+    sizes: ["S", "M", "L", "XL"],
+    image:
+      "https://images.unsplash.com/photo-1603252109303-2751441dd157?auto=format&fit=crop&w=900&q=85",
+    badge: "Bestseller",
+  },
+  {
+    id: "tshirt-men",
     name: "Classic Cotton T-Shirt",
     category: "T-Shirts",
     gender: "Men",
@@ -75,28 +55,40 @@ const PRODUCTS = [
     sizes: ["S", "M", "L", "XL"],
     image:
       "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=900&q=85",
-    badge: "",
+    badge: "New",
   },
-  ...Array.from({ length: 5 }, (_, index) => ({
-    ...DENIM,
-    id: `denim-${index + 1}`,
-  })),
+  {
+    id: "jeans-men",
+    name: "Classic Denim Jeans",
+    category: "Jeans",
+    gender: "Men",
+    price: 1750,
+    originalPrice: 2200,
+    colors: [
+      { name: "Blue", value: "#536d91" },
+      { name: "Black", value: "#252525" },
+    ],
+    sizes: ["S", "M", "L", "XL"],
+    image:
+      "https://images.unsplash.com/photo-1542272604-787c3835535d?auto=format&fit=crop&w=900&q=85",
+    badge: "Sale",
+  },
   {
     id: "hoodie-men",
-    name: "Minimal Everyday Hoodie",
+    name: "Essential Streetwear Hoodie",
     category: "Hoodies",
     gender: "Men",
-    price: 1650,
-    originalPrice: 2100,
+    price: 1590,
+    originalPrice: 1990,
     colors: [
       { name: "Gray", value: "#aaa9a6" },
       { name: "Black", value: "#171717" },
-      { name: "Cream", value: "#e8dfd0" },
+      { name: "Brown", value: "#80624e" },
     ],
-    sizes: ["M", "L", "XL"],
+    sizes: ["S", "M", "L", "XL"],
     image:
       "https://images.unsplash.com/photo-1556821840-3a63f95609a7?auto=format&fit=crop&w=900&q=85",
-    badge: "",
+    badge: "New",
   },
   {
     id: "top-women",
@@ -149,20 +141,87 @@ const PRODUCTS = [
     badge: "",
   },
   {
-    id: "hoodie-women",
-    name: "Essential Streetwear Hoodie",
-    category: "Hoodies",
+    id: "dress-women",
+    name: "Minimal Everyday Dress",
+    category: "Tops",
     gender: "Women",
-    price: 1590,
-    originalPrice: 1990,
+    price: 1450,
+    originalPrice: 1850,
     colors: [
-      { name: "Gray", value: "#aaa9a6" },
       { name: "Black", value: "#171717" },
+      { name: "Cream", value: "#e8dfd0" },
+      { name: "Brown", value: "#80624e" },
+    ],
+    sizes: ["XS", "S", "M", "L"],
+    image:
+      "https://images.unsplash.com/photo-1539008835657-9e8e9680c956?auto=format&fit=crop&w=900&q=85",
+    badge: "Bestseller",
+  },
+  {
+    id: "tshirt-women",
+    name: "Classic Cotton T-Shirt",
+    category: "T-Shirts",
+    gender: "Women",
+    price: 890,
+    originalPrice: 1200,
+    colors: [
+      { name: "White", value: "#f5f5f5" },
+      { name: "Black", value: "#171717" },
+      { name: "Brown", value: "#80624e" },
+    ],
+    sizes: ["XS", "S", "M", "L", "XL"],
+    image:
+      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=900&q=85",
+    badge: "",
+  },
+  {
+    id: "blouse-women",
+    name: "Elegant Everyday Blouse",
+    category: "Tops",
+    gender: "Women",
+    price: 1250,
+    originalPrice: 1600,
+    colors: [
+      { name: "White", value: "#f5f5f5" },
       { name: "Pink", value: "#d9a2ad" },
+      { name: "Black", value: "#171717" },
+    ],
+    sizes: ["XS", "S", "M", "L"],
+    image:
+      "https://images.unsplash.com/photo-1564257577-7a5e7b7d5f8c?auto=format&fit=crop&w=900&q=85",
+    badge: "",
+  },
+  {
+    id: "denim-jacket-men",
+    name: "Relaxed Denim Jacket",
+    category: "Jeans",
+    gender: "Men",
+    price: 1950,
+    originalPrice: 2500,
+    colors: [
+      { name: "Blue", value: "#536d91" },
+      { name: "Black", value: "#252525" },
     ],
     sizes: ["S", "M", "L", "XL"],
     image:
-      "https://images.unsplash.com/photo-1578681994506-b8f463449011?auto=format&fit=crop&w=900&q=85",
+      "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=900&q=85",
+    badge: "Sale",
+  },
+  {
+    id: "knit-top-women",
+    name: "Soft Knit Everyday Top",
+    category: "Tops",
+    gender: "Women",
+    price: 1190,
+    originalPrice: 1500,
+    colors: [
+      { name: "Cream", value: "#e8dfd0" },
+      { name: "Black", value: "#171717" },
+      { name: "Brown", value: "#80624e" },
+    ],
+    sizes: ["XS", "S", "M", "L"],
+    image:
+      "https://images.unsplash.com/photo-1566206091558-7f218b696731?auto=format&fit=crop&w=900&q=85",
     badge: "New",
   },
 ];
@@ -174,44 +233,50 @@ const formatPrice = (amount) => (
   </span>
 );
 
-const FilterGroup = ({ title, children, }) => {
-  const [open, setOpen] = useState(false);
+const FilterGroup = ({ title, children, open, onToggle }) => (
+  <section className="border-b border-black/10 py-5">
+    <button
+      type="button"
+      onClick={onToggle}
+      aria-expanded={open}
+      className="flex w-full shrink-0 items-center justify-between gap-3 text-left"
+    >
+      <span className="shrink-0 text-xs font-bold tracking-tight text-black">
+        {title}
+      </span>
 
-  return (
-    <section className="border-b border-black/10 py-5">
-      <button
-        type="button"
-        onClick={() => setOpen((previous) => !previous)}
-        aria-expanded={open}
-        className="flex w-full items-center justify-between gap-3 text-left"
-      >
-        <span className="text-xs font-bold tracking-tight text-black">
-          {title}
-        </span>
-
-        <span
-          className={`transition-transform duration-500 ${
-            open ? "rotate-180" : "rotate-0"
-          }`}
-        >
-          <ChevronDown size={15} className="text-black/45" />
-        </span>
-      </button>
-
-      <div
-        className={`grid transition-[grid-template-rows,opacity] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-          open
-            ? "grid-rows-[1fr] opacity-100"
-            : "grid-rows-[0fr] opacity-0"
+      <span
+        className={`shrink-0 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+          open ? "rotate-180" : "rotate-0"
         }`}
       >
-        <div className="overflow-hidden">
-          <div className="pt-5">{children}</div>
+        <ChevronDown size={15} className="text-black/45" />
+      </span>
+    </button>
+
+    <div
+      className={`grid ${
+        open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+      }`}
+      style={{
+        transition: `grid-template-rows 650ms ${FILTER_EASING}`,
+      }}
+      aria-hidden={!open}
+    >
+      <div className="min-h-0 overflow-hidden">
+        <div
+          className={`pt-5 transition-[opacity,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+            open
+              ? "translate-y-0 opacity-100"
+              : "translate-y-1 opacity-0"
+          }`}
+        >
+          {children}
         </div>
       </div>
-    </section>
-  );
-};
+    </div>
+  </section>
+);
 
 const Shop = () => {
   const [search, setSearch] = useState("");
@@ -225,6 +290,10 @@ const Shop = () => {
   const [minPrice, setMinPrice] = useState(PRICE_MIN);
   const [maxPrice, setMaxPrice] = useState(PRICE_MAX);
   const [sortBy, setSortBy] = useState("featured");
+
+  // Both accordions start closed and operate independently.
+  const [collectionOpen, setCollectionOpen] = useState(false);
+  const [sizeOpen, setSizeOpen] = useState(false);
 
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [filtersMounted, setFiltersMounted] = useState(false);
@@ -251,7 +320,8 @@ const Shop = () => {
       const matchesSearch = !query || searchableText.includes(query);
       const matchesCategory =
         category === "All" || product.category === category;
-      const matchesGender = gender === "All" || product.gender === gender;
+      const matchesGender =
+        gender === "All" || product.gender === gender;
       const matchesPrice =
         product.price >= minPrice && product.price <= maxPrice;
 
@@ -399,6 +469,16 @@ const Shop = () => {
     setFiltersOpen(false);
   };
 
+  useEffect(() => {
+    if (filtersMounted && !filtersOpen) {
+      const timer = setTimeout(() => {
+        setFiltersMounted(false);
+      }, 700);
+
+      return () => clearTimeout(timer);
+    }
+  }, [filtersMounted, filtersOpen]);
+
   const closeDesktopFilters = () => {
     if (!showDesktopFilters || desktopFilterClosing) return;
 
@@ -418,11 +498,19 @@ const Shop = () => {
   useEffect(() => {
     if (!desktopFilterOpening) return;
 
-    const frame = requestAnimationFrame(() => {
-      setDesktopFilterOpening(false);
+    let firstFrame;
+    let secondFrame;
+
+    firstFrame = requestAnimationFrame(() => {
+      secondFrame = requestAnimationFrame(() => {
+        setDesktopFilterOpening(false);
+      });
     });
 
-    return () => cancelAnimationFrame(frame);
+    return () => {
+      cancelAnimationFrame(firstFrame);
+      cancelAnimationFrame(secondFrame);
+    };
   }, [desktopFilterOpening]);
 
   const handleDesktopFilterTransitionEnd = (event) => {
@@ -452,7 +540,7 @@ const Shop = () => {
             <button
               type="button"
               onClick={resetFilters}
-              className={`flex pt-1 items-center gap-1.5 text-[10px] font-semibold text-black/45 transition-[opacity,transform,color] duration-[1000ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:text-black ${
+              className={`flex items-center gap-1.5 pt-1 text-[10px] font-semibold text-black/45 transition-[opacity,transform,color] duration-[1000ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:text-black ${
                 desktopFilterClosing
                   ? "translate-x-[-8px] opacity-0 pointer-events-none"
                   : "translate-x-0 opacity-100"
@@ -467,26 +555,43 @@ const Shop = () => {
 
      
 
-      <FilterGroup title="Gender">
-        <div className="flex flex-wrap gap-2">
-          {["All", "Men", "Women"].map((item) => (
+      <FilterGroup
+        title="Gender"
+        open={genderOpen}
+        onToggle={() => setGenderOpen((previous) => !previous)}
+      >
+        <div className="space-y-3">
+          {GENDERS.map((item) => (
             <button
               key={item}
               type="button"
               onClick={() => setGender(item)}
-              className={`rounded-full border px-4 py-2 text-[10px] font-semibold transition-all duration-300 ${
+              className={`flex w-full items-center justify-between text-left text-xs transition-colors ${
                 gender === item
-                  ? "border-black bg-black text-white"
-                  : "border-black/10 text-black/55 hover:border-black/40"
+                  ? "font-semibold text-black"
+                  : "text-black/50 hover:text-black"
               }`}
             >
-              {item}
+              <span>{item}</span>
+              <span
+                className={`transition-all duration-300 ${
+                  gender === item
+                    ? "translate-x-0 opacity-100"
+                    : "-translate-x-1 opacity-0"
+                }`}
+              >
+                <Check size={14} strokeWidth={2} />
+              </span>
             </button>
           ))}
         </div>
       </FilterGroup>
 
- <FilterGroup title="Collection">
+      <FilterGroup
+        title="Collection"
+        open={collectionOpen}
+        onToggle={() => setCollectionOpen((previous) => !previous)}
+      >
         <div className="space-y-3">
           {CATEGORIES.map((item) => (
             <button
@@ -514,7 +619,11 @@ const Shop = () => {
         </div>
       </FilterGroup>
 
-      <FilterGroup title="Size">
+      <FilterGroup
+        title="Size"
+        open={sizeOpen}
+        onToggle={() => setSizeOpen((previous) => !previous)}
+      >
         <div className="flex flex-wrap gap-2">
           {SIZES.map((size) => {
             const selected = selectedSizes.includes(size);
@@ -526,9 +635,7 @@ const Shop = () => {
                 aria-pressed={selected}
                 onClick={() =>
                   setSelectedSizes((previous) =>
-                    selected
-                      ? previous.filter((item) => item !== size)
-                      : [...previous, size],
+                    selected ? [] : [size],
                   )
                 }
                 className={`flex h-9 min-w-9 items-center justify-center rounded-full border px-3 text-[10px] font-semibold transition-all duration-300 ${
@@ -543,141 +650,11 @@ const Shop = () => {
           })}
         </div>
       </FilterGroup>
-
-      {/* <FilterGroup title="Color">
-        <div className="flex flex-wrap gap-3">
-          {[
-            { name: "Olive", value: "#58732f" },
-            { name: "Black", value: "#171717" },
-            { name: "White", value: "#f5f5f5" },
-            { name: "Brown", value: "#80624e" },
-            { name: "Blue", value: "#536d91" },
-            { name: "Gray", value: "#aaa9a6" },
-            { name: "Cream", value: "#e8dfd0" },
-            { name: "Pink", value: "#d9a2ad" },
-          ].map((color) => {
-            const selected = selectedColors.includes(color.name);
-
-            return (
-              <button
-                key={color.name}
-                type="button"
-                title={color.name}
-                aria-label={color.name}
-                aria-pressed={selected}
-                onClick={() =>
-                  setSelectedColors((previous) =>
-                    selected
-                      ? previous.filter((item) => item !== color.name)
-                      : [...previous, color.name],
-                  )
-                }
-                className={`grid h-7 w-7 place-items-center rounded-full border transition-all duration-300 ${
-                  selected
-                    ? "border-black ring-2 ring-black ring-offset-2"
-                    : "border-black/10 hover:scale-110"
-                }`}
-                style={{ backgroundColor: color.value }}
-              >
-                {selected && (
-                  <Check
-                    size={13}
-                    className={
-                      ["Black", "Blue", "Olive", "Brown"].includes(color.name)
-                        ? "text-white"
-                        : "text-black"
-                    }
-                  />
-                )}
-              </button>
-            );
-          })}
-        </div>
-      </FilterGroup> */}
-
-      {/* <FilterGroup title="Price range">
-        <div className="space-y-4">
-          <div className="flex items-center justify-between gap-3">
-            <label className="min-w-0 flex-1">
-              <span className="mb-1 block text-[10px] text-black/45">
-                Minimum
-              </span>
-              <input
-                type="number"
-                min={PRICE_MIN}
-                max={maxPrice}
-                value={minPrice}
-                onChange={(event) =>
-                  setMinPrice(
-                    Math.max(
-                      PRICE_MIN,
-                      Math.min(
-                        maxPrice,
-                        Number(event.target.value) || PRICE_MIN,
-                      ),
-                    ),
-                  )
-                }
-                className="w-full rounded-lg border border-black/10 px-3 py-2 text-xs outline-none focus:border-black"
-              />
-            </label>
-
-            <label className="min-w-0 flex-1">
-              <span className="mb-1 block text-[10px] text-black/45">
-                Maximum
-              </span>
-              <input
-                type="number"
-                min={minPrice}
-                max={PRICE_MAX}
-                value={maxPrice}
-                onChange={(event) =>
-                  setMaxPrice(
-                    Math.max(
-                      minPrice,
-                      Math.min(
-                        PRICE_MAX,
-                        Number(event.target.value) || PRICE_MIN,
-                      ),
-                    ),
-                  )
-                }
-                className="w-full rounded-lg border border-black/10 px-3 py-2 text-xs outline-none focus:border-black"
-              />
-            </label>
-          </div>
-
-          <div className="flex items-center justify-between text-[10px] text-black/50">
-            <span>৳{minPrice.toLocaleString("en-BD")}</span>
-            <span>৳{maxPrice.toLocaleString("en-BD")}</span>
-          </div>
-
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              type="button"
-              onClick={() => {
-                setMinPrice(PRICE_MIN);
-                setMaxPrice(1500);
-              }}
-              className="rounded-full border border-black/10 px-3 py-2 text-[10px] transition-colors hover:border-black"
-            >
-              Under ৳1,500
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setMinPrice(1500);
-                setMaxPrice(PRICE_MAX);
-              }}
-              className="rounded-full border border-black/10 px-3 py-2 text-[10px] transition-colors hover:border-black"
-            >
-              ৳1,500+
-            </button>
-          </div>
-        </div>
-      </FilterGroup> */}
     </div>
   );
+
+  // Gender accordion state is independent from Collection and Size.
+  const [genderOpen, setGenderOpen] = useState(false);
 
   return (
     <main className="min-h-screen bg-bg-primary font-primary text-black">
@@ -693,15 +670,16 @@ const Shop = () => {
           <h1 className="text-[clamp(2.5rem,6vw,5rem)] font-bold leading-[0.95] tracking-[-0.065em]">
             Shop all
           </h1>
+
           <p className="max-w-md text-xs leading-relaxed text-black/50 sm:text-right sm:text-sm">
-            Thoughtfully selected essentials. Discover everyday pieces that
-            make getting dressed effortless.
+            Discover timeless wardrobe essentials and contemporary styles
+            designed for everyday living.
           </p>
         </div>
       </section>
 
       <section className="border-b border-black/10 px-5 sm:px-8 lg:px-12">
-        <div className="flex flex-col gap-4 pt-2 pb-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-4 pb-4 pt-2 sm:flex-row sm:items-center sm:justify-between">
           <form onSubmit={handleSearchSubmit} className="w-full sm:max-w-xs">
             <div
               className={`flex w-full items-center gap-3 border-b transition-colors duration-300 ${
@@ -713,6 +691,7 @@ const Shop = () => {
                   size={16}
                   className="pointer-events-none absolute left-0 top-1/2 -translate-y-1/2 text-black/40"
                 />
+
                 <input
                   type="search"
                   value={search}
@@ -751,7 +730,7 @@ const Shop = () => {
                 aria-label="Clear search"
                 className={`flex shrink-0 items-center justify-center overflow-hidden rounded-full transition-[width,opacity,transform,background-color] duration-300 ease-out hover:bg-neutral-200 ${
                   showClearButton
-                    ? "w-5 h-5 p-1 translate-x-0 opacity-100"
+                    ? "h-5 w-5 translate-x-0 p-1 opacity-100"
                     : "pointer-events-none w-0 translate-x-1 opacity-0"
                 }`}
               >
@@ -775,18 +754,11 @@ const Shop = () => {
               )}
             </button>
 
-           {/*  <p className="hidden text-[11px] text-black/45 sm:block">
-              <span className="font-semibold text-black">
-                {filteredProducts.length}
-              </span>{" "}
-              products
-            </p> */}
-
-            <div className="flex items-center gap-2 ">
-              {/* <ArrowUpDown size={14} className="shrink-0 text-black/45" /> */}
+            <div className="flex items-center gap-2">
               <label htmlFor="shop-sort" className="sr-only">
                 Sort products
               </label>
+
               <select
                 id="shop-sort"
                 value={sortBy}
@@ -828,7 +800,7 @@ const Shop = () => {
         <div
           className={`grid min-w-0 grid-cols-1 ${
             desktopFiltersExpanded
-              ? "gap-8 lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-10 xl:grid-cols-[245px_minmax(0,1fr)] xl:gap-14"
+              ? "gap-8 lg:grid-cols-[220px_minmax(0,1fr)]  xl:grid-cols-[245px_minmax(0,1fr)] xl:gap-10"
               : "gap-8 lg:grid-cols-[0px_minmax(0,1fr)] lg:gap-0"
           }`}
           style={{
@@ -839,38 +811,46 @@ const Shop = () => {
             willChange: "grid-template-columns, column-gap",
           }}
         >
-          <aside className="relative hidden min-w-0 overflow-hidden lg:block">
-            {showDesktopFilterHeader && (
-              <button
-                type="button"
-                onClick={closeDesktopFilters}
-                aria-label="Collapse filters"
-                aria-expanded={desktopFiltersExpanded}
-                className={`absolute left-0 top-0 z-10 flex items-center text-sm font-bold tracking-tight text-black transition-[opacity,transform] duration-[1000ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:text-black/60 ${
-                  desktopFilterClosing
-                    ? "translate-x-[-8px] opacity-0 pointer-events-none"
-                    : "translate-x-0 opacity-100"
-                }`}
-              >
-                <SlidersHorizontal size={18} strokeWidth={2} />
-                <span className="inline-block pl-2">Filters</span>
-              </button>
-            )}
+          <aside className="relative hidden min-w-0 overflow-visible lg:block">
+            <div className="sticky top-24 h-fit self-start">
+              {showDesktopFilterHeader && (
+                <button
+                  type="button"
+                  onClick={closeDesktopFilters}
+                  aria-label="Collapse filters"
+                  aria-expanded={desktopFiltersExpanded}
+                  className={`absolute left-0 top-0 z-10 flex items-center text-sm font-bold tracking-tight text-black transition-opacity duration-[1000ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:text-black/60 ${
+                    desktopFilterClosing || desktopFilterOpening
+                      ? "pointer-events-none opacity-0"
+                      : "opacity-100"
+                  }`}
+                >
+                  <SlidersHorizontal size={18} strokeWidth={2} />
+                  <span className="inline-block pl-2">Filters</span>
+                </button>
+              )}
 
-            <div
-              inert={!showDesktopFilters || desktopFilterClosing}
-              onTransitionEnd={handleDesktopFilterTransitionEnd}
-              className="w-[220px] overflow-hidden xl:w-[245px]"
-              style={{
-                clipPath:
-                  desktopFilterClosing || desktopFilterOpening
-                    ? "inset(0 100% 0 0)"
-                    : "inset(0 0 0 0)",
-                transition: `clip-path ${FILTER_DURATION}ms ${FILTER_EASING}`,
-                willChange: "clip-path",
-              }}
-            >
-              {renderFilters()}
+              <div
+                inert={
+                  !showDesktopFilters ||
+                  desktopFilterClosing ||
+                  desktopFilterOpening
+                }
+                onTransitionEnd={handleDesktopFilterTransitionEnd}
+                className="w-[220px] overflow-hidden xl:w-[245px]"
+                style={{
+                  clipPath:
+                    !showDesktopFilters ||
+                    desktopFilterClosing ||
+                    desktopFilterOpening
+                      ? "inset(0 100% 0 0)"
+                      : "inset(0 0 0 0)",
+                  transition: `clip-path ${FILTER_DURATION}ms ${FILTER_EASING}`,
+                  willChange: "clip-path",
+                }}
+              >
+                {renderFilters()}
+              </div>
             </div>
           </aside>
 
@@ -962,6 +942,7 @@ const Shop = () => {
                           <p className="text-[9px] font-medium uppercase tracking-[0.16em] text-black/40 sm:text-[10px]">
                             {product.category}
                           </p>
+
                           <span className="text-[9px] text-black/40 sm:text-[10px]">
                             {product.gender}
                           </span>
@@ -1058,11 +1039,6 @@ const Shop = () => {
             role="dialog"
             aria-modal="true"
             aria-label="Product filters"
-            onTransitionEnd={(event) => {
-              if (event.target === event.currentTarget && !filtersOpen) {
-                setFiltersMounted(false);
-              }
-            }}
             className={`absolute inset-y-0 right-0 flex w-full max-w-[390px] flex-col bg-white shadow-2xl transition-transform duration-[650ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
               filtersOpen ? "translate-x-0" : "translate-x-full"
             }`}
@@ -1072,6 +1048,7 @@ const Shop = () => {
                 <p className="text-[9px] font-semibold uppercase tracking-[0.25em] text-black/40">
                   Find your style
                 </p>
+
                 <h2 className="mt-1 flex items-center gap-2 text-lg font-bold tracking-tight">
                   <SlidersHorizontal size={17} strokeWidth={1.7} />
                   Filters
@@ -1143,6 +1120,7 @@ const Shop = () => {
             opacity: 0;
             transform: translateY(8px);
           }
+
           to {
             opacity: 1;
             transform: translateY(0);
@@ -1165,4 +1143,3 @@ const Shop = () => {
 };
 
 export default Shop;
-

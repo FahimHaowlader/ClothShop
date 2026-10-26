@@ -134,7 +134,7 @@ const About = () => {
           {BELIEFS.map((item) => (
             <li
               key={item.title}
-              className="group grid gap-2 border-b border-black/15 py-7 md:grid-cols-12 md:items-baseline md:gap-10 md:py-9"
+              className="group grid gap-2 border-b border-black py-7 md:grid-cols-12 md:items-baseline md:gap-10 md:py-9"
             >
               <h3 className="text-2xl font-medium tracking-[-0.03em] transition-transform duration-500 ease-out group-hover:translate-x-1 motion-reduce:transition-none sm:text-3xl md:col-span-6">
                 {item.title}
@@ -168,7 +168,7 @@ const About = () => {
       </section>
 
       {/* 5. Closing */}
-      <section className={`${pad} border-t border-black py-20 md:py-32`}>
+      <section className={`${pad} border-t border-black/10 py-16 md:py-24`}>
         <p className="max-w-5xl text-[clamp(2rem,5.5vw,5rem)] font-bold leading-[0.98] tracking-[-0.06em]">
           Find something you will{" "}
           <Link to="/shop" className={linkClass}>

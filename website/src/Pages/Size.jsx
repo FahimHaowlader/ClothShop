@@ -56,11 +56,11 @@ const Size = () => {
 
       {/* Intro */}
       <section className="px-5 py-10 sm:px-8">
-        <div className="grid gap-6 pb-9 md:grid-cols-[1fr_auto] md:items-end">
+        <div className="grid gap-6 pb-9 md:grid-cols-[1fr_auto] md:items-center md:gap-10">
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-black/40">
+            {/* <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-black/40">
               A guide to getting it right
-            </p>
+            </p> */}
 
             <h2 className="mt-4 max-w-3xl text-4xl font-bold leading-[1.02] tracking-[-0.06em] sm:text-5xl md:text-6xl">
               Good style starts
@@ -69,7 +69,7 @@ const Size = () => {
             </h2>
           </div>
 
-          <p className="max-w-sm text-sm leading-7 text-black/55 md:pb-1">
+          <p className="max-w-md text-sm leading-7 text-black/55 md:pb-1">
             Use your body measurements to find your size. Our guide helps you
             make a more confident choice before you order.
           </p>

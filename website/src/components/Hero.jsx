@@ -67,17 +67,15 @@ const Hero = () => {
   ];
 
   /*
-- ============================================
-- SLIDER
-- ============================================
-   */
+  ============================================
+  SLIDER
+  ============================================
+  */
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentSection(
-        (prev) => (prev + 1) % sections.length
-      );
-    }, 5000);
+      setCurrentSection((prev) => (prev + 1) % sections.length);
+    }, 4000);
 
     return () => clearInterval(interval);
   }, [sections.length]);
@@ -102,18 +100,15 @@ const Hero = () => {
 
         const isPrev =
           index ===
-          (currentSection - 1 + sections.length) %
-            sections.length;
+          (currentSection - 1 + sections.length) % sections.length;
 
-        const isNext =
-          index ===
-          (currentSection + 1) % sections.length;
+        const isNext = index === (currentSection + 1) % sections.length;
 
         /*
-- ============================================
-- LAYER (Fixed stacking order for smooth 1-to-2 transition)
-- ============================================
-         */
+        ============================================
+        LAYER
+        ============================================
+        */
 
         let layerClass = "z-10 pointer-events-none";
 
@@ -126,63 +121,55 @@ const Hero = () => {
         }
 
         /*
-- ============================================
-- LEFT IMAGE TRANSFORM
-- ============================================
-         */
+        ============================================
+        LEFT IMAGE TRANSFORM
+        ============================================
+        */
 
         let leftTransform =
           "translate-y-full [transform:rotateX(90deg)]";
 
         if (isActive) {
-          leftTransform =
-            "translate-y-0 [transform:rotateX(0deg)]";
+          leftTransform = "translate-y-0 [transform:rotateX(0deg)]";
         } else if (isPrev) {
-          leftTransform =
-            "-translate-y-full [transform:rotateX(-90deg)]";
+          leftTransform = "-translate-y-full [transform:rotateX(-90deg)]";
         } else if (isNext) {
-          leftTransform =
-            "translate-y-full [transform:rotateX(90deg)]";
+          leftTransform = "translate-y-full [transform:rotateX(90deg)]";
         }
 
         /*
-- ============================================
-- RIGHT IMAGE TRANSFORM
-- ============================================
-         */
+        ============================================
+        RIGHT IMAGE TRANSFORM
+        ============================================
+        */
 
         let rightTransform =
           "-translate-y-full [transform:rotateX(-90deg)]";
 
         if (isActive) {
-          rightTransform =
-            "translate-y-0 [transform:rotateX(0deg)]";
+          rightTransform = "translate-y-0 [transform:rotateX(0deg)]";
         } else if (isPrev) {
-          rightTransform =
-            "translate-y-full [transform:rotateX(90deg)]";
+          rightTransform = "translate-y-full [transform:rotateX(90deg)]";
         } else if (isNext) {
           rightTransform =
             "-translate-y-full [transform:rotateX(-90deg)]";
         }
 
         /*
-- ============================================
-- MOBILE IMAGE TRANSFORM
-- ============================================
-         */
+        ============================================
+        MOBILE IMAGE TRANSFORM
+        ============================================
+        */
 
         let mobileTransform =
           "translate-y-full [transform:rotateX(90deg)]";
 
         if (isActive) {
-          mobileTransform =
-            "translate-y-0 [transform:rotateX(0deg)]";
+          mobileTransform = "translate-y-0 [transform:rotateX(0deg)]";
         } else if (isPrev) {
-          mobileTransform =
-            "-translate-y-full [transform:rotateX(-90deg)]";
+          mobileTransform = "-translate-y-full [transform:rotateX(-90deg)]";
         } else if (isNext) {
-          mobileTransform =
-            "translate-y-full [transform:rotateX(90deg)]";
+          mobileTransform = "translate-y-full [transform:rotateX(90deg)]";
         }
 
         return (
@@ -237,8 +224,8 @@ const Hero = () => {
                     transform
                     will-change-transform
                     transition-transform
-                    duration-[1800ms]
-                    ease-[cubic-bezier(0.25,1,0.5,1)]
+                    duration-[2000ms]
+                    ease-[cubic-bezier(0.22,1,0.36,1)]
                     [backface-visibility:hidden]
                     ${leftTransform}
                   `}
@@ -278,8 +265,8 @@ const Hero = () => {
                     transform
                     will-change-transform
                     transition-transform
-                    duration-[1800ms]
-                    ease-[cubic-bezier(0.25,1,0.5,1)]
+                    duration-[2000ms]
+                    ease-[cubic-bezier(0.22,1,0.36,1)]
                     [backface-visibility:hidden]
                     ${rightTransform}
                   `}
@@ -325,8 +312,8 @@ const Hero = () => {
                   transform
                   will-change-transform
                   transition-transform
-                  duration-[1800ms]
-                  ease-[cubic-bezier(0.25,1,0.5,1)]
+                  duration-[2000ms]
+                  ease-[cubic-bezier(0.22,1,0.36,1)]
                   [backface-visibility:hidden]
                   ${mobileTransform}
                 `}
@@ -361,10 +348,10 @@ const Hero = () => {
       })}
 
       {/* ============================================
-          CENTER CONTENT (Moved outside the image loops to z-50 absolute top layer)
+          CENTER CONTENT
       ============================================ */}
 
-     <div
+      <div
         className="
           absolute
           inset-0
@@ -408,61 +395,64 @@ const Hero = () => {
                   pointer-events-auto
                 "
               >
-               {/* TITLE */}
-<h1
-  className={`
-    text-center
-    max-w-lg
-    uppercase
-    text-lg
-    sm:text-xl
-    font-black
-    leading-[0.95]
-    tracking-[-0.04em]
-    text-black
-    drop-shadow-[0_2px_8px_rgba(255,255,255,0.5)]
-    lg:max-w-2xl
-    lg:text-2xl
-    transition-all
-    duration-1500
-    ease-[cubic-bezier(0.25,1,0.5,1)]
-    ${
-      isActive
-        ? "opacity-100 scale-100"
-        : "opacity-0 scale-95"
-    }
-  `}
->
-  {sec.title}
-</h1>
+                {/* TITLE */}
 
-{/* SUBTITLE */}
-<p
-  className={`
-    text-center
-    mt-6
-    max-w-md
-    text-xs
-    font-medium
-    leading-6
-    text-black/70
-    sm:leading-7
-    md:text-sm
-    lg:max-w-lg
-    transition-all
-    duration-1500
-    ease-[cubic-bezier(0.25,1,0.5,1)]
-    ${
-      isActive
-        ? "opacity-100 scale-100"
-        : "opacity-0 scale-95"
-    }
-  `}
->
-  {sec.subtitle}
-</p>
+                <h1
+                  className={`
+                    text-center
+                    max-w-lg
+                    uppercase
+                    text-lg
+                    sm:text-xl
+                    font-black
+                    leading-[0.95]
+                    tracking-[-0.04em]
+                    text-black
+                    drop-shadow-[0_2px_8px_rgba(255,255,255,0.5)]
+                    lg:max-w-2xl
+                    lg:text-2xl
+                    transition-all
+                    duration-1500
+                    ease-[cubic-bezier(0.25,1,0.5,1)]
+                    ${
+                      isActive
+                        ? "opacity-100 scale-100"
+                        : "opacity-0 scale-95"
+                    }
+                  `}
+                >
+                  {sec.title}
+                </h1>
+
+                {/* SUBTITLE */}
+
+                <p
+                  className={`
+                    text-center
+                    mt-6
+                    max-w-md
+                    text-xs
+                    font-medium
+                    leading-6
+                    text-black/70
+                    sm:leading-7
+                    md:text-sm
+                    lg:max-w-lg
+                    transition-all
+                    duration-1500
+                    ease-[cubic-bezier(0.25,1,0.5,1)]
+                    ${
+                      isActive
+                        ? "opacity-100 scale-100"
+                        : "opacity-0 scale-95"
+                    }
+                  `}
+                >
+                  {sec.subtitle}
+                </p>
 
                 {/* BUTTON */}
+
                 <button
                   type="button"
                   className="
@@ -471,46 +461,33 @@ const Hero = () => {
                     cursor-pointer
                     relative
                     z-[130]
-                   
                     mt-6
-
                     inline-flex
                     items-center
                     gap-2
-
                     rounded-full
-                  
                     bg-black
-
                     px-5
                     py-3
-
                     text-xs
                     font-semibold
                     tracking-wide
-
                     text-white
-
                     shadow-xl
                     shadow-black/20
-
                     transition-all
                     duration-300
                     ease-out
-
                     hover:-translate-y-0.5
                     hover:scale-105
                     hover:bg-white
                     hover:text-black
                     hover:shadow-2xl
                     hover:shadow-black/40
-
                     active:translate-y-0
-                           
                     md:px-6
                     md:py-3
                     md:text-sm
-
                     lg:mt-8
                     lg:gap-3
                     lg:px-8
@@ -526,21 +503,15 @@ const Hero = () => {
                       w-6
                       items-center
                       justify-center
-
                       rounded-full
-
                       bg-white
                       text-black
-
                       text-xs
-
                       transition-all
                       duration-300
-
                       group-hover:translate-x-1
                       group-hover:bg-black
                       group-hover:text-white
-
                       md:h-6
                       md:w-6
                       font-sans
@@ -557,9 +528,8 @@ const Hero = () => {
           );
         })}
       </div>
-      
 
-    {/* ============================================
+      {/* ============================================
           SLIDE INDICATORS
       ============================================ */}
 
@@ -570,10 +540,8 @@ const Hero = () => {
           left-1/2
           z-[120]
           pointer-events-auto
-
           flex
           -translate-x-1/2
-
           items-center
           gap-2
         "
@@ -587,12 +555,9 @@ const Hero = () => {
             className={`
               h-1.5
               rounded-full
-              
               pointer-events-auto
-
               transition-all
               duration-500
-
               ${
                 currentSection === index
                   ? "w-10 bg-black"
@@ -614,17 +579,12 @@ const Hero = () => {
           left-4
           sm:left-6
           z-50
-          
           block
-
           text-[10px]
           font-semibold
           tracking-[0.3em]
-
           text-black/60
-
           [writing-mode:vertical-lr]
-
           md:[writing-mode:horizontal-tb]
         "
       >

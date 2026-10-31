@@ -14,6 +14,7 @@ import SocialShowcase from "../components/SocialShowCase";
 import BrandStory from "../components/BrandStory";
 import ProductBasic from "../components/ProductBasic";
 import ProductDetails from "../components/ProductDetails";
+import Character from "../components/Character";
 
 
 
@@ -44,6 +45,7 @@ const products = [
     soldOut: true,          // sold out case: greys out / overlays the sold out badge
     image: image1,          // works with single image or variants
   },
+  
 ];
 
 // const products = [
@@ -141,6 +143,7 @@ const Home = () => {
 
       <ProductDetails />
       </div>
+      <Character />
     </div>
       
     </div>

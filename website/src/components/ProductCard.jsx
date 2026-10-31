@@ -59,7 +59,7 @@ const ProductCard = ({ product }) => {
     }
 
     lastClickTimeRef.current = now;
-    navigate(product.path || `/products/${product.id}`);
+    navigate(product?.path || `/products/${product.id}`);
   };
 
   /* ==========================================
@@ -580,7 +580,7 @@ const ProductCard = ({ product }) => {
           "
         >
           <Link
-            to={product.path || `/products/${product.id}`}
+            to={product?.path || `/products/${product.id}`}
             className=""
           >
             {product.name}
@@ -713,7 +713,7 @@ const ProductCard = ({ product }) => {
 
         {/* VIEW DETAILS */}
         <Link
-          to={product.path || `/products/${product.id}`}
+          to={product?.path || `/products/${product.id}`}
           className="
             group/details
             relative

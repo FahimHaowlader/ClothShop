@@ -575,7 +575,7 @@ const Hero = () => {
       <div
         className="
           absolute
-          bottom-8
+         bottom-8
           left-4
           sm:left-6
           z-50
@@ -584,7 +584,9 @@ const Hero = () => {
           font-semibold
           tracking-[0.3em]
           text-black/60
-          [writing-mode:vertical-lr]
+          [writing-mode:vertical-rl]
+          rotate-180
+          sm:rotate-0
           md:[writing-mode:horizontal-tb]
         "
       >

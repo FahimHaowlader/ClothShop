@@ -1,6 +1,6 @@
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router";
-import images1 from "../assets/images.webp";
+import image from "../assets/images2.webp";
 
 /*
   One circle per character, filling the whole width of the screen, and the section is
@@ -150,8 +150,6 @@ const arrange = (shares, width, height) => {
   return result;
 };
 
-const formatPercent = (n) => (Number.isInteger(n) ? String(n) : n.toFixed(1).replace(/\.0$/, ""));
-
 const useIsoLayoutEffect = typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
 const Character = ({ characters = DEFAULT_CHARACTERS }) => {
@@ -175,13 +173,10 @@ const Character = ({ characters = DEFAULT_CHARACTERS }) => {
     return () => observer.disconnect();
   }, []);
 
-  const { shares, percents } = useMemo(() => {
+  const shares = useMemo(() => {
     const raw = characters.map((c) => Math.max(Number(c.percent ?? c.count ?? 1) || 0, 0));
     const total = raw.reduce((sum, n) => sum + n, 0) || 1;
-    return {
-      shares: raw.map((n) => n / total),
-      percents: raw.map((n, i) => characters[i].percent ?? (n / total) * 100),
-    };
+    return raw.map((n) => n / total);
   }, [characters]);
 
   const spots = useMemo(
@@ -199,18 +194,26 @@ const Character = ({ characters = DEFAULT_CHARACTERS }) => {
       style={{ height: "100svh" }}
     >
       {/* Heading */}
-      <div className="px-5 pt-10 sm:px-8 md:pt-14 lg:px-12">
-        <div className="mb-2 flex items-center gap-2.5">
-          <span className="h-px w-8 bg-black" />
-          <span className="text-[10px] font-semibold uppercase tracking-[0.35em] text-black/45">
-            Shop by Character
-          </span>
-        </div>
 
-        <h2 className="text-[clamp(2rem,4vw,3.5rem)] font-bold leading-[0.9] tracking-[-0.06em]">
-          Choose your character
-        </h2>
-      </div>
+       <div className="mb-10 flex items-end justify-between md:mb-14 px-12">
+  <div>
+    <div className="mb-2 flex items-center gap-2.5">
+      <span className="h-px w-8 bg-black" />
+
+      <span className="text-[10px] font-semibold uppercase tracking-[0.35em] text-black/45">
+        Shop by Character
+      </span>
+    </div>
+
+    <h2 className="text-[clamp(2rem,4vw,3.5rem)] font-bold leading-[0.9] tracking-[-0.06em]">
+      Choose your character
+    </h2>
+  </div>
+
+  <p className="text-xs max-w-md leading-relaxed text-black/50 hidden sm:block sm:text-right sm:text-sm">
+    Explore unique personalities and discover the character that best fits your everyday style and personality.
+  </p>
+</div>
 
       {/* The circles fill everything that is left, edge to edge */}
       <div ref={arenaRef} className="relative min-h-0 w-full flex-1">
@@ -219,9 +222,7 @@ const Character = ({ characters = DEFAULT_CHARACTERS }) => {
             const spot = spots[i];
             if (!spot) return null; // not measured yet, or a 0% character
 
-            const percent = formatPercent(percents[i]);
-            const showPercent = spot.d >= 96;
-            const nameSize = showPercent ? Math.min(22, spot.d * 0.1) : Math.max(10, spot.d * 0.17);
+            const nameSize = Math.min(18, Math.max(10, spot.d * 0.11));
 
             return (
               <li
@@ -236,48 +237,43 @@ const Character = ({ characters = DEFAULT_CHARACTERS }) => {
               >
                 <Link
                   to={pathFor(character)}
-                  aria-label={`${character.name}, ${percent}% of the shop`}
-                  title={`${character.name}, ${percent}%`}
+                  aria-label={`Shop ${character.name}’s collection`}
                   draggable={false}
                   className="
-                    group/circle relative flex h-full w-full items-center justify-center overflow-hidden rounded-full
-                    bg-neutral-200 text-white
-                    transition-all duration-700 ease-out motion-reduce:transition-none
-                    hover:z-10 hover:scale-[1.06]
-                    group-hover/cloud:opacity-50 hover:!opacity-100
+                    group/circle relative block h-full w-full overflow-hidden rounded-full
+                    transform-gpu bg-neutral-200 [backface-visibility:hidden]
+                    transition-transform duration-[900ms] ease-[cubic-bezier(0.25,1,0.5,1)] motion-reduce:transition-none
+                    hover:z-10 hover:scale-[1.05]
                     focus-visible:z-10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black
                   "
                 >
                   {character.image && (
                     <img
-                      src={images1}
+                      ref={(el) => el?.complete && el.classList.remove("opacity-0")}
+                      src={image}
                       alt=""
                       loading="lazy"
                       draggable={false}
+                      onLoad={(e) => e.currentTarget.classList.remove("opacity-0")}
                       className="
                         absolute inset-0 h-full w-full select-none object-cover object-top
-                        grayscale transition-[filter] duration-700 ease-out
-                        group-hover/circle:grayscale-0 group-focus-visible/circle:grayscale-0
+                        opacity-0 transition-opacity duration-700 ease-out motion-reduce:transition-none
                       "
                     />
                   )}
-                  <span className="absolute inset-0 bg-black/45 transition-colors duration-700 group-hover/circle:bg-black/30" />
 
-                  <span className="relative flex flex-col items-center px-[6%] text-center leading-none">
-                    {showPercent && (
-                      <span
-                        className="font-bold tracking-[-0.06em]"
-                        style={{ fontSize: Math.min(72, spot.d * 0.3) }}
-                      >
-                        {percent}%
-                      </span>
-                    )}
-                    <span
-                      className="mt-[0.3em] whitespace-nowrap font-semibold tracking-[0.02em]"
-                      style={{ fontSize: nameSize }}
-                    >
-                      {character.name}
-                    </span>
+                  {/* Name sits right on the photo: no box, just a soft white halo so it stays readable */}
+                  <span
+                    className="
+                      pointer-events-none absolute bottom-[10%] left-1/2 max-w-[86%] origin-bottom -translate-x-1/2 truncate
+                      px-[0.4em] font-bold leading-none tracking-[0.02em] text-black
+                     
+                      transition-transform duration-[900ms] ease-[cubic-bezier(0.25,1,0.5,1)] motion-reduce:transition-none
+                      group-hover/circle:scale-[1.18] group-focus-visible/circle:scale-[1.18]
+                    "
+                    style={{ fontSize: nameSize }}
+                  >
+                    {character.name}
                   </span>
                 </Link>
               </li>

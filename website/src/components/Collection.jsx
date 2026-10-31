@@ -40,25 +40,26 @@ const Collection = ({ onSelectGender }) => {
             HEADER
         ========================= */}
 
-        <div className="mb-6 flex flex-col sm:flex-row sm:items-end items-start justify-between">
-          <div>
-            <div className="mb-2 flex items-center gap-2.5">
-              <span className="h-px w-8 bg-black" />
+    <div className="mb-6 flex flex-col sm:flex-row sm:items-end items-start justify-between">
+  <div>
+    <div className="mb-2 flex items-center gap-2.5">
+      <span className="h-px w-8 bg-black" />
 
-              <span className="text-[10px]  font-semibold uppercase tracking-[0.35em] text-black/45">
-                Collections
-              </span>
-            </div>
+      <span className="text-[10px] font-semibold uppercase tracking-[0.35em] text-black/45">
+        Collections
+      </span>
+    </div>
 
-            <h2 className="text-[clamp(2rem,4vw,3.5rem)] font-bold leading-[0.9] tracking-[-0.06em]">
-              Shop by style
-            </h2>
-          </div>
+    <h2 className="text-[clamp(2rem,4vw,3.5rem)] font-bold leading-[0.9] tracking-[-0.06em]">
+      Shop by style
+    </h2>
+  </div>
 
-          <p className="text-xs leading-relaxed text-black/50 hidden sm:block sm:text-right sm:text-sm ">
-            Explore our latest clothing collections designed <br/> for everyday wear.
-          </p>
-        </div>
+ <p className="text-xs max-w-md leading-relaxed text-black/50 hidden sm:block sm:text-right sm:text-sm">
+  Discover our latest clothing collections, thoughtfully created to enhance your everyday look and confidence.
+</p>
+
+</div>
 
         {/* =========================
             SLIDER

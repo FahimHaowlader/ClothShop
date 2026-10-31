@@ -19,30 +19,39 @@ const BrandStory = () => {
     >
       <div>
         {/* Section Heading */}
-        <div className="mb-10 flex items-end justify-between md:mb-14">
-          <div>
-            <div className="mb-2 flex items-center gap-2.5">
-              <span className="h-px w-8 bg-black" />
+   
 
-              <span className="text-[10px] font-semibold uppercase tracking-[0.35em] text-black/45 ">
-                Our Story
-              </span>
-            </div>
 
-            <h2 className="text-[clamp(2rem,4vw,3.5rem)] font-bold leading-[0.9] tracking-[-0.06em]">
-              More than clothing
-            </h2>
-          </div>
+<div className="mb-10 flex items-end justify-between md:mb-14">
+  <div>
+    <div className="mb-2 flex items-center gap-2.5">
+      <span className="h-px w-8 bg-black" />
 
-          <p className="hidden text-right text-xs sm:text-sm  leading-5 text-black/40  md:block">
-            Built around modern essentials,
-            <br />
-            designed for everyday confidence.
-          </p>
-        </div>
+      <span className="text-[10px] font-semibold uppercase tracking-[0.35em] text-black/45">
+        Our Story
+      </span>
+    </div>
+
+    <h2 className="text-[clamp(2rem,4vw,3.5rem)] font-bold leading-[0.9] tracking-[-0.06em]">
+      More than clothing
+    </h2>
+  </div>
+
+ <p className="text-xs max-w-md leading-relaxed text-black/50 hidden sm:block sm:text-right sm:text-sm">
+  Built around high-quality essentials, thoughtfully designed  to
+   give you everyday comfort and Composure.
+</p>
+</div>
+
+
+
+
+
+          
+
 
         {/* Story */}
-        <div className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:gap-12">
+         <div className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:gap-12">
           {/* Image */}
           <div className="group relative overflow-hidden">
             <img
@@ -119,7 +128,7 @@ const BrandStory = () => {
               </button>
             </div>
           </div>
-        </div>
+        </div> 
       </div>
     </section>
   );

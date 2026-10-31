@@ -30,12 +30,12 @@ const SocialShowcase = () => {
       <div className="">
 
         {/* Heading */}
-       <div className="mb-6 flex items-end justify-between">
+      <div className="mb-6 flex items-end justify-between">
   <div>
     <div className="mb-2 flex items-center gap-2.5">
       <span className="h-px w-8 bg-black" />
 
-      <span className="text-[10px] font-semibold uppercase tracking-[0.35em] text-black/45 ">
+      <span className="text-[10px] font-semibold uppercase tracking-[0.35em] text-black/45">
         Stay Connected
       </span>
     </div>
@@ -45,12 +45,11 @@ const SocialShowcase = () => {
     </h2>
   </div>
 
-  <p className="hidden text-right text-xs sm:text-sm  leading-5 text-black/40  md:block">
-    Follow us for new collections, styling inspiration
-    <br />
-    and everything happening at BachelorShop.
-  </p>
+  <p className="text-xs max-w-md leading-relaxed text-black/50 hidden sm:block sm:text-right sm:text-sm">
+Follow us for new collections, daily style inspiration, and everything happening across BachelorShop.
+</p>
 </div>
+
 
         {/* Social Sections */}
         <div className="grid grid-cols-1 md:grid-cols-2">

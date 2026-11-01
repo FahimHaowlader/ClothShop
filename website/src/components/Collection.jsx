@@ -135,95 +135,75 @@ const Collection = ({ onSelectGender }) => {
                     {/* Image Label */}
 
                     <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-          <button
-                  type="button"
-                  className="
-                    group
-                    pointer-events-auto
-                    cursor-pointer
-                    relative
-                    z-[130]
-                   
-                    mt-6
+         <button
+  type="button"
+  className="
+    
+    shop-button
+    pointer-events-auto
+    relative
+    z-[130]
+    mt-6
+    inline-flex
+    items-center
+    gap-2
+    rounded-full
+    bg-black
+    px-5
+    py-3
+    text-xs
+    font-semibold
+    tracking-wide
+    text-white
+    shadow-xl
+    shadow-black/20
+    transition-all
+    duration-300
+    ease-out
+    hover:-translate-y-0.5
+    hover:scale-105
+    hover:bg-white
+    hover:text-black
+    hover:shadow-2xl
+    hover:shadow-black/40
+    active:translate-y-0
+    md:px-6
+    md:py-3
+    md:text-sm
+    lg:mt-8
+    lg:gap-3
+    lg:px-8
+    lg:py-4
+    hover:cursor-pointer
+  "
+>
+  <span className="font-primary">Shop Now</span>
 
-                    inline-flex
-                    items-center
-                    gap-2
-
-                    rounded-full
-                  
-                    bg-black
-
-                    px-5
-                    py-3
-
-                    text-xs
-                    font-semibold
-                    tracking-wide
-
-                    text-white
-
-                    shadow-xl
-                    shadow-black/20
-
-                    transition-all
-                    duration-300
-                    ease-out
-
-                    hover:-translate-y-0.5
-                    hover:scale-105
-                    hover:bg-white
-                    hover:text-black
-                    hover:shadow-2xl
-                    hover:shadow-black/40
-
-                    active:translate-y-0
-                           
-                    md:px-6
-                    md:py-3
-                    md:text-sm
-
-                    lg:mt-8
-                    lg:gap-3
-                    lg:px-8
-                    lg:py-4
-                  "
-                >
-                  <span className="font-primary">Shop Now</span>
-
-                  <span
-                    className="
-                      flex
-                      h-6
-                      w-6
-                      items-center
-                      justify-center
-
-                      rounded-full
-
-                      bg-white
-                      text-black
-
-                      text-xs
-
-                      transition-all
-                      duration-300
-
-                      group-hover:translate-x-1
-                      group-hover:bg-black
-                      group-hover:text-white
-
-                      md:h-6
-                      md:w-6
-                      font-sans
-                      lg:h-7
-                      lg:w-7
-                      lg:text-sm
-                    "
-                  >
-                    →
-                  </span>
-                </button>
+  <span
+    className="
+      shop-button-icon
+      flex
+      h-6
+      w-6
+      items-center
+      justify-center
+      rounded-full
+      bg-white
+      text-xs
+      text-black
+      transition-all
+      duration-300
+      md:h-6
+      md:w-6
+      lg:h-7
+      lg:w-7
+      lg:text-sm
+      font-sans
+    "
+  >
+    →
+  </span>
+</button>
                     </div>
 
                     {/* Image Bottom */}

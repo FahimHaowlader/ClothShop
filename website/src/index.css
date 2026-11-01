@@ -1,0 +1,6 @@
+.shop-button:hover .shop-button-icon {
+  background-color: black;
+  color: white;
+  transform: translateX(3px);
+  cursor: pointer;
+}

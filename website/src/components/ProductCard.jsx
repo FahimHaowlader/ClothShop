@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router";
 
 // Time each image stays before swapping automatically (ms)
-const AUTOPLAY_DELAY = 4000;
+const AUTOPLAY_DELAY = 3700;
 
 const ProductCard = ({ product }) => {
   const navigate = useNavigate();
@@ -321,7 +321,7 @@ const ProductCard = ({ product }) => {
               transform: `translate3d(-${currentImage * 100}%, 0, 0)`,
               transition: isResetting
                 ? "none"
-                : "transform 1000ms cubic-bezier(0.25, 1, 0.5, 1)",
+                : "transform 900ms cubic-bezier(0.65, 0, 0.35, 1)",
               backfaceVisibility: "hidden",
             }}
           >
@@ -354,8 +354,9 @@ const ProductCard = ({ product }) => {
                       object-cover
                       rounded-lg
                       transition-transform
-                      duration-[1000ms]
-                      ease-out
+                      duration-[1200ms]
+                      ease-[cubic-bezier(0.22,1,0.36,1)]
+                      motion-reduce:transition-none
 
                       group-hover/card:scale-[1.025]
                     "
@@ -573,6 +574,7 @@ const ProductCard = ({ product }) => {
         <h3
           className="
             line-clamp-1
+            pb-[2px]
             text-[14px]
             font-semibold
             leading-5
@@ -581,7 +583,19 @@ const ProductCard = ({ product }) => {
         >
           <Link
             to={product?.path || `/products/${product.id}`}
-            className=""
+            className="
+              bg-[linear-gradient(currentColor,currentColor)]
+              bg-no-repeat
+              bg-[position:0_100%]
+              bg-[length:0%_1px]
+              pb-[3px]
+              transition-[background-size]
+              duration-[800ms]
+              ease-[cubic-bezier(0.25,1,0.5,1)]
+              hover:bg-[length:100%_1.5px]
+              focus-visible:bg-[length:100%_1.5px]
+              focus-visible:outline-none
+            "
           >
             {product.name}
           </Link>
@@ -671,6 +685,7 @@ const ProductCard = ({ product }) => {
                       rounded-full
                       transition-all
                       duration-300
+                      hover:scale-105
                       focus-visible:outline
                       focus-visible:outline-2
                       focus-visible:outline-offset-2
@@ -711,71 +726,102 @@ const ProductCard = ({ product }) => {
           )}
         </div>
 
-        {/* VIEW DETAILS */}
-        <Link
-          to={product?.path || `/products/${product.id}`}
-          className="
-            group/details
-            relative
-            z-20
-            mt-5
-            flex
-            w-full
-            items-center
-            justify-center
-            gap-3
-            font-semibold
-            text-[12px]
-            tracking-[0.12em]
-          "
-        >
-          {/* Left line */}
-          <span
-            className="
-              block
-              h-px
-              w-5
-              sm:w-10
-              bg-black/40
-              transition-all
-              duration-[2000ms]
-              ease-out
-              motion-reduce:transition-none
-              group-hover/details:grow
-              group-hover/details:bg-black
-            "
-          />
 
-          <span
-            className="
-              shrink-0
-              transition-all
-              duration-[1400ms]
-              ease-out
-              motion-reduce:transition-none
-              group-hover/details:tracking-[0.18em]
-            "
-          >
-            View Details
-          </span>
 
-          {/* Right line */}
-          <span
-            className="
-              block
-              h-px
-              w-5
-              sm:w-10
-              bg-black/40
-              transition-all
-              duration-[2000ms]
-              ease-out
-              motion-reduce:transition-none
-              group-hover/details:grow
-              group-hover/details:bg-black
-            "
-          />
-        </Link>
+     
+
+{/* VIEW DETAILS */}
+
+<Link
+  to={product?.path || `/products/${product.id}`}
+  className="
+    group/details
+    relative
+    mt-3
+    flex
+    h-9.5
+    w-full
+    items-center
+    justify-center
+    gap-3
+    overflow-hidden
+    rounded-full
+    border
+    border-black/10
+    bg-white
+    px-5
+    text-[11px]
+    font-semibold
+    tracking-[0.15em]
+    text-black
+    shadow-md
+    shadow-black/5
+    transition-all
+    duration-500
+    ease-[cubic-bezier(0.25,1,0.5,1)]
+    hover:-translate-y-0.5
+    hover:border-black
+    hover:bg-black
+    hover:text-white
+    hover:shadow-lg
+    hover:shadow-black/15
+    active:translate-y-0
+    active:scale-[0.98]
+    focus-visible:outline
+    focus-visible:outline-2
+    focus-visible:outline-offset-4
+    focus-visible:outline-black
+  "
+>
+  <span className="font-primary whitespace-nowrap">
+    View Details
+  </span>
+
+  {/* ARROW */}
+
+  <span
+    className="
+      flex
+      h-7
+      w-7
+      shrink-0
+      items-center
+      justify-center
+      rounded-full
+      bg-black
+      text-white
+      transition-all
+      duration-500
+      ease-[cubic-bezier(0.25,1,0.5,1)]
+      group-hover/details:translate-x-1
+      group-hover/details:bg-white
+      group-hover/details:text-black
+    "
+  >
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="
+        h-4
+        w-4
+        transition-transform
+        duration-500
+        ease-[cubic-bezier(0.25,1,0.5,1)]
+      
+      "
+    >
+      <path d="M7 17 17 7" />
+      <path d="M7 7h10v10" />
+    </svg>
+  </span>
+</Link>
+
+
+
       </div>
     </article>
   );

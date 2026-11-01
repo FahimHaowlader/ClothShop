@@ -56,8 +56,8 @@ const Navbar = () => {
           <nav className="hidden lg:flex items-center gap-10">
             <NavLink to="/home" className={linkStyles}>Home</NavLink>
             <NavLink to="/shop" className={linkStyles}>Shop</NavLink>
-            <NavLink to="/men" className={linkStyles}>Men</NavLink>
-            <NavLink to="/women" className={linkStyles}>Women</NavLink>
+            <NavLink to="/collection/men" className={linkStyles}>Men</NavLink>
+            <NavLink to="/collection/women" className={linkStyles}>Women</NavLink>
           </nav>
         </div>
 

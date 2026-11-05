@@ -49,6 +49,9 @@ const ProductSchema = new mongoose.Schema(
         ],
       },
     ],
+    bestSeller: { type: Boolean, default: false },
+    featured: { type: Boolean, default: false },
+  
   },
   { timestamps: true },
 );

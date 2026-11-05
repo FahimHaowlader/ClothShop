@@ -17,18 +17,28 @@ const orderRouter = express.Router();
 // 🛒 CUSTOMER & PUBLIC ORDER ROUTES
 // ==========================================
 
-orderRouter.get('/', (req, res) => {
-  res.status(200).json({ message: "Order route is working!" });
+
+
+orderRouter.get('/test', (req, res) => {
+  res.status(200).json({ message: "Order test route is working!" });
 });
 
-// Create a new order (Supports guest or logged-in checkout)
-orderRouter.post('/', createOrder);
 
-// Get orders belonging to the logged-in user
-orderRouter.get('/my-orders', verifyUser, getMyOrders);
 
-// Get single order details by Mongo ID or custom orderId (e.g., ORD-829401)
-orderRouter.get('/:id', getOrderById);
+orderRouter.post('/order-total-price', (req, res) => {
+  res.status(200).json({ message: "Order total price before discount route is working!" });
+});
+
+orderRouter.get('/order-total-price-after-discount', (req, res) => {
+  res.status(200).json({ message: "Order total price after discount route is working!" });
+});
+
+orderRouter.post('/create-order', createOrder);
+orderRouter.use(verifyUser); // Enforce authentication on all order operations
+
+orderRouter.get('/my-orders', (req, res) => {
+  res.status(200).json({ message: "Order checkout route is working!" });
+});
 
 
 // ==========================================

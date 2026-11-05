@@ -13,13 +13,40 @@ import verifyUser from '../middleware/verifyUser.middleware.js';
 
 const productRouter = express.Router();
 
+productRouter.get('/test', (req, res) => {
+  res.status(200).json({ message: "Product test route is working!" });
+});
+
 // ==========================================
 // 🛍️ PUBLIC PRODUCT ROUTES
 // ==========================================
 
-productRouter.get('/', (req, res) => {
+productRouter.get('/shop', (req, res) => {
   res.status(200).json({ message: "Product route is working!" });
 });
+
+productRouter.get('/best-sellers', (req, res) => {
+  res.status(200).json({ message: "Best Sellers route is working!" });
+});
+
+productRouter.get('/featured', (req, res) => {
+  res.status(200).json({ message: "Featured Products route is working!" });
+});
+
+productRouter.get('/men', (req, res) => { 
+  res.status(200).json({ message: "Men's Products route is working!" });
+});
+
+productRouter.get('/women', (req, res) => {
+  res.status(200).json({ message: "Women's Products route is working!" });
+});
+
+productRouter.get('/collection/:collectionName', (req, res) => {
+  const { collectionName } = req.params;
+  res.status(200).json({ message: `Collection route for ${collectionName} is working!` });
+});
+
+
 
 // Get all products (with filtering, category search, and pagination)
 productRouter.get('/s', getAllProducts);

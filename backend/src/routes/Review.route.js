@@ -15,9 +15,14 @@ const reviewRouter = express.Router();
 // 💬 PUBLIC REVIEW ROUTES
 // ==========================================
 
-reviewRouter.get('/', (req, res) => {
+reviewRouter.get('/test', (req, res) => {
   res.status(200).json({ message: "Review route is working!" });
 });
+
+reviewRouter.get('/review/:productId', getProductReviews);
+
+reviewRouter.use(verifyUser); // Enforce authentication on all review operations
+reviewRouter.post('/create-review', createReview);
 
 
 // Get all approved reviews for a specific product with rating aggregates

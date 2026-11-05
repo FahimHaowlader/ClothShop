@@ -1007,7 +1007,7 @@ const Women = () => {
               filtersOpen ? "translate-x-0" : "translate-x-full"
             }`}
           >
-            <div className="flex items-center justify-between  border-black/10 px-5 py-5">
+            <div className="flex items-center justify-between border-b border-black/10 px-5 py-5">
               <div>
                 <p className="text-[9px] font-semibold uppercase tracking-[0.25em] text-black/40">
                   Find your style

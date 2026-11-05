@@ -1,4 +1,4 @@
-import {outlet} from "react-router";
+import {Outlet} from "react-router";
 
 
 
@@ -11,7 +11,7 @@ const CollectionLayout = () => {
     <div className="min-h-screen flex flex-col bg-gray-50 text-gray-900">
       {/* Main Content (Child routes render here) */}
       <main className="flex-1 min-h-[2400px] w-full bg-bg-primary font-primary ">
-        <outlet />
+        <Outlet />
       </main>
     </div>
   );

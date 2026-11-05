@@ -630,7 +630,7 @@ const Men = () => {
         </div>
       </section>
 
-      <section className="border-b border-black/10 px-5 sm:px-8 lg:px-12">
+      <section className="bord border-black/10 px-5 sm:px-8 lg:px-12">
         <div className="flex flex-col gap-4 pb-4 pt-2 sm:flex-row sm:items-center sm:justify-between">
           <form onSubmit={handleSearchSubmit} className="w-full sm:max-w-xs">
             <div
@@ -728,7 +728,7 @@ const Men = () => {
         </div>
       </section>
 
-      <section className="px-5 py-8 sm:px-8 sm:py-10 lg:px-12">
+      <section className="px-5 py-8 sm:px-8 lg:px-12">
         <div className="mb-5 flex items-center justify-between lg:hidden">
           <p className="text-xs text-black/50">
             Showing{" "}

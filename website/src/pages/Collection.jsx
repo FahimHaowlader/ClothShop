@@ -1,5 +1,5 @@
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState,useparams } from "react";
 import { Link, useParams } from "react-router";
 import {
   Search,
@@ -10,8 +10,13 @@ import {
   Check,
   RotateCcw,
   Package,
+ 
+  GalleryVerticalEnd,
+  
 } from "lucide-react";
 import Pagenation from "../components/Pagenation.jsx";
+import { collections } from "../assets/collection.js";
+import NoCollection from "../components/NoCollection.jsx";
 
 
 const CATEGORIES = ["All", "Shirts", "T-Shirts", "Tops", "Jeans", "Hoodies"];
@@ -79,7 +84,7 @@ const FilterGroup = ({ title, children, open, onToggle }) => (
   </section>
 );
 
-const Charater = () => {
+const Collection = () => {
     const PRODUCTS = [
   {
     id: "shirt-men",
@@ -99,12 +104,35 @@ const Charater = () => {
   },
 ]
 
-  const { CharaterName } = useParams();
+
+
+  const { charater } = useParams();
+  console.log("Charater from URL:", charater);
 
   const activeCharater = useMemo(
-    () => normalizeCharater(CharaterName),
-    [CharaterName],
+    () => normalizeCharater(charater),
+    [charater],
   );
+
+  const currentCollection = collections.find(
+    (col) => col.name.toLowerCase() === charater?.toLowerCase()
+  );
+
+  console.log("Current Collection:", currentCollection);
+
+  if(!currentCollection) {
+    return (
+      <NoCollection />
+    );
+  }
+
+  if (currentCollection.name === "men") {
+    return <Men />;
+  } 
+  if (currentCollection.name === "women") {
+    return <Women />;
+   }
+
 
   const [search, setSearch] = useState("");
   const [submittedSearch, setSubmittedSearch] = useState("");
@@ -570,7 +598,7 @@ const Charater = () => {
       </section>
 
       {/* Search and sorting */}
-      <section className="border-b border-black/10 px-5 sm:px-8 lg:px-12">
+      <section className=" border-black/10 px-5 sm:px-8 lg:px-12">
         <div className="flex flex-col gap-4 pb-4 pt-2 sm:flex-row sm:items-center sm:justify-between">
           <form onSubmit={handleSearchSubmit} className="w-full sm:max-w-xs">
             <div
@@ -670,7 +698,7 @@ const Charater = () => {
       </section>
 
       {/* Products and filters */}
-      <section className="px-5 py-8 sm:px-8 sm:py-10 lg:px-12">
+      <section className="px-5 py-8 sm:px-8 lg:px-12">
         <div className="mb-5 flex items-center justify-between lg:hidden">
           <p className="text-xs text-black/50">
             Showing{" "}
@@ -891,29 +919,110 @@ const Charater = () => {
                 />
               </>
             ) : (
-              <div className="flex min-h-[350px] flex-col items-center justify-center px-5 text-center">
-                <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-neutral-100">
-                  <Package size={23} strokeWidth={1.4} />
-                </div>
+             <div className="flex flex-col items-center justify-center px-5  text-center">
+  {/* Icon */}
+  <div className="relative mb-7 flex h-20 w-20 items-center justify-center rounded-full border border-black/[0.06] bg-neutral-50">
+    <Package
+      size={30}
+      strokeWidth={1.1}
+      className="text-black/65"
+    />
 
-                <h3 className="text-lg font-bold tracking-tight">
-                  No products found.
-                </h3>
+    <span className="absolute right-1 top-1 h-2.5 w-2.5 rounded-full bg-black" />
+  </div>
 
-                <p className="mt-2 max-w-xs text-xs leading-relaxed text-black/45">
-                  Try changing your search or adjusting your filters to
-                  discover more styles.
-                </p>
+  
 
-                <button
-                  type="button"
-                  onClick={resetFilters}
-                  className="mt-6 inline-flex items-center gap-2 rounded-full bg-black px-5 py-3 text-[11px] font-semibold text-white transition-all duration-300 hover:bg-black/75"
-                >
-                  <RotateCcw size={13} />
-                  Clear all filters
-                </button>
-              </div>
+  <h3 className="text-2xl font-bold tracking-[-0.06em] text-black sm:text-3xl">
+    No products found<span className="text-black/25">.</span>
+  </h3>
+
+  <p className="mt-3 max-w-[380px] sm:max-w-[450px] lg:max-w-[600px] text-[12px] leading-[1.9] text-black/45">
+    We couldn't find anything matching your selection.
+    Try adjusting your filters or exploring a different search.
+  </p>
+
+  {/* Action */}
+<button
+  type="button"
+  onClick={resetFilters}
+  className="
+    group
+    pointer-events-auto
+    cursor-pointer
+    relative
+    z-[130]
+    mt-8
+    inline-flex
+    items-center
+    gap-2
+    rounded-full
+    bg-black
+    px-5
+    py-3
+    text-xs
+    font-semibold
+    tracking-wide
+    text-white
+    shadow-xl
+    shadow-black/20
+    transition-all
+    duration-300
+    ease-out
+    hover:-translate-y-0.5
+    hover:scale-105
+    hover:bg-white
+    hover:text-black
+    hover:shadow-2xl
+    hover:shadow-black/40
+    active:translate-y-0
+    md:px-6
+    md:py-3
+    md:text-sm
+    lg:mt-8
+    lg:gap-3
+    lg:px-8
+    lg:py-4
+  "
+>
+  <span className="font-primary">Reset Filters</span>
+
+  <span
+    className="
+      flex
+      h-6
+      w-6
+      items-center
+      justify-center
+      rounded-full
+      bg-white
+      text-black
+      text-xs
+      transition-all
+      duration-300
+      group-hover:translate-x-1
+      group-hover:bg-black
+      group-hover:text-white
+      md:h-6
+      md:w-6
+      font-sans
+      lg:h-7
+      lg:w-7
+      lg:text-sm
+    "
+  >
+    <RotateCcw
+      size={13}
+      strokeWidth={1.8}
+      className="transition-transform duration-500 group-hover:-rotate-180"
+    />
+  </span>
+</button>
+
+  <span className="mt-5 text-[9px] font-medium tracking-[0.12em] text-black/50">
+    YOUR NEXT FAVORITE STYLE IS WAITING
+  </span>
+</div>
             )}
           </div>
         </div>
@@ -1044,4 +1153,4 @@ const Charater = () => {
   );
 };
 
-export default Charater;
+export default Collection;

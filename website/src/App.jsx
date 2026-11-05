@@ -5,6 +5,7 @@ import './App.css'
 
 // Layouts
 import MainLayout from './layouts/MainLayout.jsx'
+import CollectionLayout from './layouts/CollectionLayout.jsx'
 
 
 // pages
@@ -23,7 +24,7 @@ import Login from './pages/Login.jsx'
 import Register from './pages/Register.jsx'
 import Men from './pages/Men.jsx'
 import Women from './pages/Women.jsx'
-import Character from './pages/Character.jsx'
+import Collection from './pages/Collection.jsx'
 
 const router = createBrowserRouter([
   {
@@ -42,9 +43,24 @@ const router = createBrowserRouter([
       { path: 'size-guide', element: <Size /> },
       { path: 'checkout', element: <CheckOut /> },
       { path: 'addresses', element: <Addresses /> },
+     { path:'collection',element:<Navigate to="/collection/men" replace />},
+      { path:'collection/man', element: <Navigate to="/collection/men" replace />},
       { path:'collection/men', element: <Men />},
+      { path:'collection/woman', element: <Navigate to="/collection/women" replace />},
       { path:'collection/women', element: <Women />},
-      {path:'character', element: <Character />},
+      {path:'collection/:charater', element: <Collection />},
+      // {path:'collection/', 
+      //   element: <CollectionLayout />,
+      //   children: [{
+      //     path:':name',
+      //     element: <Collection />
+      //   },
+      //   {
+      //     path: '',
+      //     element: <Navigate to="/collection/men" replace /> 
+      //   }
+      // ]
+      // },
     ],
   },
   { path: 'login', element: <Login /> },

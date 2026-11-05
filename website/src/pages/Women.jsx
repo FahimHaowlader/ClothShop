@@ -633,7 +633,7 @@ const Women = () => {
         </div>
       </section>
 
-      <section className="border-b border-black/10 px-5 sm:px-8 lg:px-12">
+      <section className=" border-black/10 px-5 sm:px-8 lg:px-12">
         <div className="flex flex-col gap-4 pb-4 pt-2 sm:flex-row sm:items-center sm:justify-between">
           <form onSubmit={handleSearchSubmit} className="w-full sm:max-w-xs">
             <div
@@ -731,7 +731,7 @@ const Women = () => {
         </div>
       </section>
 
-      <section className="px-5 py-8 sm:px-8 sm:py-10 lg:px-12">
+      <section className="px-5 py-8 sm:px-8 lg:px-12">
         <div className="mb-5 flex items-center justify-between lg:hidden">
           <p className="text-xs text-black/50">
             Showing{" "}
@@ -1007,7 +1007,7 @@ const Women = () => {
               filtersOpen ? "translate-x-0" : "translate-x-full"
             }`}
           >
-            <div className="flex items-center justify-between border-b border-black/10 px-5 py-5">
+            <div className="flex items-center justify-between  border-black/10 px-5 py-5">
               <div>
                 <p className="text-[9px] font-semibold uppercase tracking-[0.25em] text-black/40">
                   Find your style

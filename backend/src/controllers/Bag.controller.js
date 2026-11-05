@@ -1,4 +1,4 @@
-import Cart from "../models/Cart.modal.js";
+import Bag from "../models/Bag.modal.js";
 import Product from "../models/Product.modal.js";
 import User from "../models/User.modal.js";
 

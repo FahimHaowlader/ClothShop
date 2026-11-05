@@ -34,6 +34,7 @@ orderRouter.get('/order-total-price-after-discount', (req, res) => {
 });
 
 orderRouter.post('/create-order', createOrder);
+
 orderRouter.use(verifyUser); // Enforce authentication on all order operations
 
 orderRouter.get('/my-orders', (req, res) => {

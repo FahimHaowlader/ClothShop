@@ -46,6 +46,11 @@ productRouter.get('/collection/:collectionName', (req, res) => {
   res.status(200).json({ message: `Collection route for ${collectionName} is working!` });
 });
 
+productRouter.get('product/:productId', (req, res) => {
+  const { productId } = req.params;
+  res.status(200).json({ message: `Product details route for product ID ${productId} is working!` });
+});
+
 
 
 // Get all products (with filtering, category search, and pagination)

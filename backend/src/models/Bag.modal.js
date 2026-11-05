@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const CartSchema = new mongoose.Schema(
+const BagSchema = new mongoose.Schema(
   {
     user: { 
       type: mongoose.Schema.Types.ObjectId, 
@@ -33,11 +33,11 @@ const CartSchema = new mongoose.Schema(
       ],
       validate: [
         (val) => val.length <= 20,
-        'Cart max limit reached (20 items max)',
+        'Bag max limit reached (20 items max)',
       ],
     },
   },
   { timestamps: true }
 );
 
-export default mongoose.model('Cart', CartSchema);
+export default mongoose.model('Bag', BagSchema);

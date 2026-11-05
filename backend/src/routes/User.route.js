@@ -51,6 +51,29 @@ userRouter.post('/forgot-password', (req, res) => {
   res.status(200).json({ message: "Forgot password route is working!" });
 });
 
+userRouter.post('/add-new-address', (req, res) => {
+  res.status(200).json({ message: "Add new address route is working!" });
+});
+
+userRouter.get('/get-addresses', (req, res) => {
+  res.status(200).json({ message: "Get user addresses route is working!" });
+});
+
+userRouter.patch('/update-address/:addressId', (req, res) => {
+  const { addressId } = req.params;
+  res.status(200).json({ message: `Update address with ID ${addressId} route is working!` });
+});
+
+userRouter.delete('/delete-address/:addressId', (req, res) => {
+  const { addressId } = req.params;
+  res.status(200).json({ message: `Delete address with ID ${addressId} route is working!` });
+});
+
+userRouter.post('/set-default-address/:addressId', (req, res) => {
+  const { addressId } = req.params;
+  res.status(200).json({ message: `Set default address with ID ${addressId} route is working!` });
+});
+
 
 
 

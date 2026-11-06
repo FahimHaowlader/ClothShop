@@ -5,7 +5,8 @@ import {
   addItemToBag,
   removeItemFromBag,
   clearBag,
-  updateItemQuantityInBag
+  updateItemQuantityInBag,
+  getBagTotalPriceAfterDiscount
 } from '../controllers/Bag.controller.js';
 import verifyUser from '../middleware/verifyUser.middleware.js'
 
@@ -69,6 +70,8 @@ bagRouter.get('/update-item-quantity', (req, res) => {
   res.status(200).json({ message: "Update item quantity by verified users route is working!" });
 }); 
 
+
+// do not use this route for clearing bag, people will abuse it, use it only for testing purposes
 bagRouter.get('/clear', (req, res) => {
   res.status(200).json({ message: "Clear bag by verified users route is working!" });
 });

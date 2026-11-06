@@ -17,17 +17,7 @@ const BagSchema = new mongoose.Schema(
           size: { type: String  ,required: true},
           quantity: { type: Number, required: true, min: 1 },
           unitPrice: { type: Number, required: true },
-          preOrder: { type: Boolean, default: false },
-          preOrderValid: {
-            type: Date,
-            validate: {
-              validator: function (v) {
-                if (!v) return true; // Allows null/undefined if optional
-                return v >= new Date();
-              },
-              message: "preOrderValid date cannot be earlier than the current date.",
-            },
-          },
+         
           
         },
       ],

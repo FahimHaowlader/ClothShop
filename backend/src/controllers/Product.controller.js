@@ -70,7 +70,7 @@ const getBestSellerProducts = asyncHandler(async (req, res) => {
 @route   POST /api/products/filter
 @access  Public
  */
-export const getAllProducts = asyncHandler(async (req, res) => {
+ const getAllProducts = asyncHandler(async (req, res) => {
   try {
     const {
       category,
@@ -158,7 +158,7 @@ export const getAllProducts = asyncHandler(async (req, res) => {
 @route   GET /api/products/:id
 @access  Public
  */
-export const getProductById = asyncHandler(async (req, res) => {
+ const getProductById = asyncHandler(async (req, res) => {
   try {
     const { id } = req.params;
     if (!id) {
@@ -597,6 +597,8 @@ export const deleteProduct = async (req, res) => {
 
 
 export  { getFeaturedProduct,
-          getBestSellerProducts
+          getBestSellerProducts,
+          getAllProducts,
+          getProductById
 
         };

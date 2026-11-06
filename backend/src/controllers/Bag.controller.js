@@ -3,184 +3,315 @@ import Product from "../models/Product.modal.js";
 import User from "../models/User.modal.js";
 
 
+import asyncHandler from "../utils/asyncHandler.js";
+import apiResponse from "../utils/apiResponse.js";
+import apiError from "../utils/apiError.js";
 
-// 🔹 Add item to cart
-export const addItemToCart = async (req, res) => {
+
+
+/** 
+@desc    Get user's bag items
+@route   GET /api/bag/items
+@access  Public (or Private depending on your auth middleware)
+*/
+ const getBagItems = asyncHandler(async (req, res) => {
   try {
-    const { productId, color, size, quantity, preOrder } = req.body;
-    const userId = req.user._id;
-
-    // Validate product existence
-    const product = await Product.findById(productId);
-    if (!product) {
-      return res.status(404).json({ message: "Product not found" });
+    // Ensure user is authenticated (if this route requires a logged-in user)
+    if (!req.user?._id) {
+      throw new apiError(401, "Unauthorized request");
     }
 
-    // Validate size availability
-    const variant = product.variants.find((v) => v.color === color);
-    if (!variant) {
-      return res.status(400).json({ message: "Color not available" });
+    // Find the bag associated with the logged-in user
+    const bag = await Bag.findOne({ user: req.user._id });
+
+    // Calculate total item quantity (returns 0 if cart doesn't exist yet)
+    const items = bag && bag?.items || [];
+
+    return res.status(200).json(
+      new apiResponse(
+        200,
+        { items },
+        "Bag items retrieved successfully"
+      )
+    );
+  } catch (error) {
+    if (error instanceof apiError) {
+      throw error;
+    }
+    throw new apiError(500, error.message);
+  }
+});
+
+
+/** 
+@desc    Get multiple product details for bag items
+@route   POST /api/bag/item-details
+@access  Public
+*/
+ const getBagItemsDetails = asyncHandler(async (req, res) => {
+  try {
+    const { productIds } = req.body;
+
+    // Validate that productIds is provided and is a non-empty array
+    if (!productIds || !Array.isArray(productIds) || productIds.length === 0) {
+      throw new apiError(400, "An array of product IDs is required");
     }
 
-    const availability = variant.availability.find((a) => a.size === size);
-    if (!availability || !availability.available) {
-      return res.status(400).json({ message: "Size not available" });
-    }
-
-    // Check if the user already has a cart
-    let cart = await Cart.findOne({ user: userId });
-    if (!cart) {
-      // Create a new cart for the user if it doesn't exist
-      cart = new Cart({ user: userId, items: [] });
-    }
-
-    // Check if the item already exists in the cart
-    const existingItemIndex = cart.items.findIndex(
-      (item) =>
-        item.productId.toString() === productId &&
-        item.color === color &&
-        item.size === size
+    // Fetch all products whose IDs are in the array AND are set to display
+    const products = await Product.find({
+      _id: { $in: productIds },
+      display: true
+    }).select(
+      "-sizeGuide -description -specification -instructor -gender -category -collectionName -variant -bestSeller -featured"
     );
 
-    if (existingItemIndex > -1) {
-      // If the item exists, update the quantity
-      cart.items[existingItemIndex].quantity += quantity;
-    } else {
-      // If the item doesn't exist, add it to the cart
-      cart.items.push({
-        productId,
-        pic: variant.pic[0], // Assuming you want to use the first picture of the variant
-        color,
-        size,
-        quantity,
-        unitPrice: product.price,
-        preOrder: preOrder || false,
-      });
-    }
-
-    // Save the cart
-    await cart.save();
-
-    return res.status(200).json({ message: "Item added to cart", cart });
+    return res.status(200).json(
+      new apiResponse(
+        200,
+        products,
+        "Products details retrieved successfully"
+      )
+    );
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Server error" });
-  }
-};
-
-
-// 🔹 Get user's cart
-export const getUserCart = async (req, res) => {
-  try {
-    const userId = req.user._id;
-
-    // Find the user's cart and populate product details
-    const cart = await Cart.findOne({ user: userId }).populate({
-        path: "items.productId",
-        select: "name price pic variants", // Select only the fields you need
-      });
-
-    if (!cart) {
-      return res.status(404).json({ message: "Cart not found" });
+    if (error instanceof apiError) {
+      throw error;
     }
-
-    return res.status(200).json({ cart });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Server error" });
+    throw new apiError(500, error.message);
   }
-};
+});
 
 
-// 🔹 Remove item from cart
-export const removeItemFromCart = async (req, res) => {
+
+/**
+@desc    Remove item from bag atomically and return updated bag
+@route   DELETE /api/bag/item
+@access  Private
+*/
+ const removeItemFromBag = asyncHandler(async (req, res) => {
   try {
     const { productId, color, size } = req.body;
-    const userId = req.user._id;
+    const userId = req.user?._id;
 
-    // Find the user's cart
-    const cart = await Cart.findOne({ user: userId });
-    if (!cart) {
-      return res.status(404).json({ message: "Cart not found" });
+    if (!userId) {
+      throw new apiError(401, "Unauthorized request");
     }
 
-    // Filter out the item to be removed
-    cart.items = cart.items.filter(
-      (item) =>
-        !(
-          item.productId.toString() === productId &&
-          item.color === color &&
-          item.size === size
-        )
+    if (!productId || !size || !color) {
+      throw new apiError(400, "Product ID, size, and color are required");
+    }
+
+    // Build the query criteria for the subdocument inside the array
+    const pullCondition = { productId, size ,colors };
+    
+
+    // Atomically pull the matching item and return the newly updated document
+    const updatedBag = await Bag.findOneAndUpdate(
+      { user: userId },
+      { $pull: { items: pullCondition } },
+      { new: true }
     );
 
-    // Save the updated cart
-    await cart.save();
-
-    return res.status(200).json({ message: "Item removed from cart", cart });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Server error" });
-  }
-}; 
-
-// 🔹 Clear user's cart
-export const clearUserCart = async (req, res) => {
-  try {
-    const userId = req.user._id;
-
-    // Find the user's cart
-    const cart = await Cart.findOne({ user: userId });
-    if (!cart) {
-      return res.status(404).json({ message: "Cart not found" });
+    if (!updatedBag) {
+      throw new apiError(404, "Bag not found");
     }
 
-    // Clear the items in the cart
-    cart.items = [];
-
-    // Save the updated cart
-    await cart.save();
-
-    return res.status(200).json({ message: "Cart cleared", cart });
+    return res.status(200).json(
+      new apiResponse(
+        200,
+        updatedBag,
+        "Item removed from bag successfully"
+      )
+    );
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Server error" });
+    if (error instanceof apiError) {
+      throw error;
+    }
+    throw new apiError(500, error.message);
   }
-};
+});
 
-// update item quantity in cart
-export const updateItemQuantityInCart = async (req, res) => {
+/**
+@desc    Add item to bag 
+@route   POST /api/bag/add-item
+@access  Private
+*/
+ const addItemToBag = asyncHandler(async (req, res) => {
+  try {
+    const { productId, pic, color, size, quantity = 1, unitPrice } = req.body;
+    const userId = req.user?._id;
+
+    if (!userId) {
+      throw new apiError(401, "Unauthorized request");
+    }
+
+    if (!productId || !size || !unitPrice || !color || !pic) {
+      throw new apiError(400, "Product ID, size, and unit price are required");
+    }
+
+      if (quantity < 1) {
+      throw new apiError(422, "Quantity must be at least 1");
+    }
+
+
+    if (quantity > 10) {
+      throw new apiError(422, "Quantity can not be more than 10");
+    }
+
+    const newItem = {
+      productId,
+      pic,
+      color,
+      size,
+      quantity,
+      unitPrice
+    };
+
+    // Atomically push the new item if the bag has fewer than 20 items, or upsert a new bag
+    const updatedBag = await Bag.findOneAndUpdate(
+      { 
+        user: userId,
+        "items.19": { $exists: false } // Ensures array length is strictly under 20 before pushing
+      },
+      { 
+        $push: { items: newItem } 
+      },
+      { upsert: true, new: true, runValidators: true }
+    ).select("user");
+
+    if (!updatedBag) {
+      throw new apiError(400, "Bag max limit reached (20 items max)");
+    }
+
+    return res.status(200).json(
+      new apiResponse(
+        200,
+        updatedBag.user,
+        "Item added to bag successfully"
+      )
+    );
+  } catch (error) {
+    if (error instanceof apiError) {
+      throw error;
+    }
+    if (error.name === "ValidationError") {
+      throw new apiError(400, error.message);
+    }
+    throw new apiError(500, error.message);
+  }
+});
+
+
+
+/**
+@desc    Clear all items from the user's bag
+@route   DELETE /api/bag/clear
+@access  Private
+*/
+ const clearBag = asyncHandler(async (req, res) => {
+  try {
+    const userId = req.user?._id;
+
+    if (!userId) {
+      throw new apiError(401, "Unauthorized request");
+    }
+
+    // Atomically find the bag, clear the items array, and return the updated document
+    const updatedBag = await Bag.findOneAndUpdate(
+      { user: userId },
+      { $set: { items: [] } },
+      { new: true }
+    )
+
+    if (!updatedBag) {
+      throw new apiError(404, "Bag not found");
+    }
+
+    return res.status(200).json(
+      new apiResponse(
+        200,
+        updatedBag,
+        "Bag cleared successfully"
+      )
+    );
+  } catch (error) {
+    if (error instanceof apiError) {
+      throw error;
+    }
+    throw new apiError(500, error.message);
+  }
+});
+
+
+/**
+@desc    Update item quantity in bag 
+@route   PUT /api/bag/update-item-quantity
+@access  Private
+*/
+ const updateItemQuantityInBag = asyncHandler(async (req, res) => {
   try {
     const { productId, color, size, quantity } = req.body;
-    const userId = req.user._id;
+    const userId = req.user?._id;
 
-    // Find the user's cart
-    const cart = await Cart.findOne({ user: userId });
-    if (!cart) {
-      return res.status(404).json({ message: "Cart not found" });
+    if (!userId) {
+      throw new apiError(401, "Unauthorized request");
     }
 
-    // Find the item in the cart
-    const itemIndex = cart.items.findIndex(
-      (item) =>
-        item.productId.toString() === productId &&
-        item.color === color &&
-        item.size === size
+    if (!productId || !size || !quantity || !color) {
+      throw new apiError(400, "Product ID, size, color, and quantity are required");
+    }
+
+    if (quantity < 1) {
+      throw new apiError(422, "Quantity must be at least 1");
+    }
+
+    if (quantity > 10) {
+      throw new apiError(422, "Quantity cannot be more than 10");
+    }
+
+    // Match exact variant condition inside the items array
+    const variantCondition = { productId, size, color };
+
+    // Atomically find the bag and update the quantity of the specific array element
+    const updatedBag = await Bag.findOneAndUpdate(
+      { 
+        user: userId, 
+        items: { $elemMatch: variantCondition } 
+      },
+      { 
+        $set: { "items.$.quantity": quantity } 
+      },
+      { new: true, runValidators: true }
+    ).select("user");
+
+    if (!updatedBag) {
+      throw new apiError(404, "Bag or specific item variant not found");
+    }
+
+    return res.status(200).json(
+      new apiResponse(
+        200,
+        updatedBag.user,
+        "Item quantity updated successfully"
+      )
     );
-
-    if (itemIndex === -1) {
-      return res.status(404).json({ message: "Item not found in cart" });
-    }
-
-    // Update the quantity of the item
-    cart.items[itemIndex].quantity = quantity;
-
-    // Save the updated cart
-    await cart.save();
-
-    return res.status(200).json({ message: "Item quantity updated", cart });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Server error" });
+    if (error instanceof apiError) {
+      throw error;
+    }
+    if (error.name === "ValidationError") {
+      throw new apiError(400, error.message);
+    }
+    throw new apiError(500, error.message);
   }
-};
+});
+
+
+
+export {
+  getBagItems,
+  getBagItemsDetails,
+  addItemToBag,
+  removeItemFromBag,
+  clearBag,
+  updateItemQuantityInBag
+}

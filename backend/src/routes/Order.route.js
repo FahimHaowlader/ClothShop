@@ -1,9 +1,7 @@
 import express from 'express';
 import {
   createOrder,
-  getMyOrders,
-  getOrderById,
-  getAllOrders,
+
   updateOrderStatus,
   updatePaymentStatus,
   processRefund,
@@ -52,7 +50,7 @@ orderRouter.get('/my-orders', (req, res) => {
 
 
 // Get all store orders with query filtering (status, payment, preOrder, pagination)
-orderRouter.get('/', getAllOrders);
+
 
 // Update order shipping/delivery workflow status (shipped, delivered, cancelled)
 orderRouter.patch('/:id/status', updateOrderStatus);

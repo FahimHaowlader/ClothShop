@@ -16,7 +16,7 @@ const couponRouter = express.Router();
 
 // router.use(verufyUser);
 
-couponRouter.get('/text',(req, res) => {
+couponRouter.get('/test',(req, res) => {
   res.status(200).json({ message: "Coupon route is working!" });
 });
 

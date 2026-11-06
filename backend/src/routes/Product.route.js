@@ -3,7 +3,7 @@ import {
   getAllProducts,
   getProductById,
   createProduct,
-  updateProduct,
+ 
   deleteProduct,
   
   
@@ -21,7 +21,11 @@ productRouter.get('/test', (req, res) => {
 // 🛍️ PUBLIC PRODUCT ROUTES
 // ==========================================
 
-productRouter.get('/shop', (req, res) => {
+// productRouter.get('/shop', (req, res) => {
+//   res.status(200).json({ message: "Product route is working!" });
+// });
+
+productRouter.post('/products',(req,res) => {
   res.status(200).json({ message: "Product route is working!" });
 });
 
@@ -33,18 +37,18 @@ productRouter.get('/featured', (req, res) => {
   res.status(200).json({ message: "Featured Products route is working!" });
 });
 
-productRouter.get('/men', (req, res) => { 
-  res.status(200).json({ message: "Men's Products route is working!" });
-});
+// productRouter.get('/men', (req, res) => { 
+//   res.status(200).json({ message: "Men's Products route is working!" });
+// });
 
-productRouter.get('/women', (req, res) => {
-  res.status(200).json({ message: "Women's Products route is working!" });
-});
+// productRouter.get('/women', (req, res) => {
+//   res.status(200).json({ message: "Women's Products route is working!" });
+// });
 
-productRouter.get('/collection/:collectionName', (req, res) => {
-  const { collectionName } = req.params;
-  res.status(200).json({ message: `Collection route for ${collectionName} is working!` });
-});
+// productRouter.get('/collection/:collectionName', (req, res) => {
+//   const { collectionName } = req.params;
+//   res.status(200).json({ message: `Collection route for ${collectionName} is working!` });
+// });
 
 productRouter.get('product/:productId', (req, res) => {
   const { productId } = req.params;
@@ -74,7 +78,7 @@ productRouter.post('/', createProduct);
 
 // Single product update and deletion
 productRouter.route('/:id')
-  .put(updateProduct)
+  
   .delete(deleteProduct);
 
 

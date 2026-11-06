@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 
 
-import cartRouter from "./routes/Cart.route.js";
+import bagRouter from "./routes/Bag.route.js";
 import couponRouter from "./routes/Coupon.route.js";
 import employeeRouter from "./routes/Employee.route.js";
 import orderRouter from "./routes/Order.route.js";
@@ -23,11 +23,11 @@ app.get("/", (req, res) => {
 app.get("/api/v1/", (req, res) => {
   res.status(200).json({
     success: true,
-    message: "Welcome to the MyClass API v1",
+    message: "Welcome to the BachelorShop API v1",
   });
 });
 
-app.use("/api/v1/cart", cartRouter);
+app.use("/api/v1/bag", bagRouter);
 app.use("/api/v1/coupon", couponRouter);
 app.use("/api/v1/employee", employeeRouter);
 app.use("/api/v1/order", orderRouter);

@@ -16,7 +16,7 @@ const employeeRouter = express.Router();
 // ==========================================
 
 
-employeeRouter.get('/', (req, res) => {
+employeeRouter.get('/test', (req, res) => {
   res.status(200).json({ message: "Employee route is working!" });
 });
 

@@ -1,6 +1,193 @@
 import Product from "../models/Product.modal.js";
 
+import asyncHandler from "../utils/asyncHandler.js";
+import apiError from "../utils/apiError.js";
+import apiResponse from "../utils/apiResponse.js";
+
 // user controllers 
+
+/**
+@desc    Get featured product
+@route   GET /api/products/featured
+@access  Public
+ */
+const getFeaturedProduct = asyncHandler(async (req, res) => {
+  try {
+    const product = await Product.findOne({ display: true, featured: true })
+      .select(
+        "-sizeGuide -description -specifications -instructions -gender -category -collectionName -bestSeller -featured -createdAt -updatedAt"
+      );
+
+    if (!product) {
+      throw new apiError(404, "No featured product found");
+    }
+
+    return res.status(200).json(
+      new apiResponse(200, product, "Featured product retrieved successfully")
+    );
+    } catch (error) {
+    // Preserve custom operational errors (400, 404), otherwise throw 500
+    if (error instanceof apiError) {
+      throw error;
+    }
+    throw new apiError(500, error.message);
+  }
+});
+
+
+/**
+@desc    Get best seller products
+@route   GET /api/products/bestsellers
+@access  Public
+ */
+const getBestSellerProducts = asyncHandler(async (req, res) => {
+  try {
+    const products = await Product.find({ display: true, bestSeller: true })
+      .select(
+        "-sizeGuide -description -specifications -instructions -gender -category -collectionName -bestSeller -featured -createdAt -updatedAt"
+      )
+      .limit(4);
+
+    if (!products || products.length === 0) {
+      throw new apiError(404, "No best seller products found");
+    }
+
+    return res.status(200).json(
+      new apiResponse(200, products, "Best seller products retrieved successfully")
+    );
+  }catch (error) {
+    // Preserve custom operational errors (400, 404), otherwise throw 500
+    if (error instanceof apiError) {
+      throw error;
+    }
+    throw new apiError(500, error.message);
+  }
+});
+
+
+/**
+@desc    Get all products by user filter, category search, and pagination
+@route   POST /api/products/filter
+@access  Public
+ */
+export const getAllProducts = asyncHandler(async (req, res) => {
+  try {
+    const {
+      category,
+      collectionName,
+      gender,
+      search,
+      size,
+      sortBy,
+      page = 1,
+      limit = 20,
+    } = req.body;
+
+    // Must always show displayed products
+    const filter = { display: true };
+
+    if (category) filter.category = category;
+    if (collectionName) filter.collectionName = collectionName;
+    if (gender) filter.gender = gender;
+
+    // Search by product name or code
+    if (search) {
+      filter.$or = [
+        { name: { $regex: search, $options: "i" } },
+        { productCode: { $regex: search, $options: "i" } },
+      ];
+    }
+
+    // Filter by size inside variants.availability array
+    if (size) {
+      filter["variants.availability.size"] = size;
+    }
+
+    // Handle sort options
+    let sortOption = { createdAt: -1 }; // Default: newest first
+
+    if (sortBy === "pre-order") {
+      filter.canPreOrder = true;
+    } else if (sortBy === "a-z") {
+      sortOption = { name: 1 };
+    } else if (sortBy === "newest") {
+      sortOption = { createdAt: -1 };
+    } else if (sortBy === "price-high-to-low") {
+      sortOption = { price: -1 };
+    } else if (sortBy === "price-low-to-high") {
+      sortOption = { price: 1 };
+    }
+
+    const skip = (Number(page) - 1) * Number(limit);
+
+    const [products, total] = await Promise.all([
+      Product.find(filter)
+        .select(
+          "-sizeGuide -description -specifications -instructions -gender -category -collectionName -bestSeller -featured -createdAt -updatedAt"
+        )
+        .sort(sortOption)
+        .skip(skip)
+        .limit(Number(limit)),
+      Product.countDocuments(filter),
+    ]);
+
+    return res.status(200).json(
+      new apiResponse(
+        200,
+        {
+          total,
+          page: Number(page),
+          totalPages: Math.ceil(total / Number(limit)),
+          products,
+        },
+        "Products retrieved successfully"
+      )
+    );
+  } catch (error) {
+    // Preserve custom operational errors (400, 404), otherwise throw 500
+    if (error instanceof apiError) {
+      throw error;
+    }
+    throw new apiError(500, error.message);
+  }
+});
+
+
+/**
+@desc    Get single product details
+@route   GET /api/products/:id
+@access  Public
+ */
+export const getProductById = asyncHandler(async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!id) {
+      throw new apiError(400, "Product ID is required");
+    }
+    
+    const product = await Product.findById(id);
+
+    // Check if the product exists AND if it is set to display
+    if (!product || !product.display) {
+      throw new apiError(404, "Product not found");
+    }
+
+    return res.status(200).json(
+      new apiResponse(
+        200,
+        product,
+        "Product details retrieved successfully"
+      )
+    );
+  } catch (error) {
+    // Preserve custom operational errors (400, 404), otherwise throw 500
+    if (error instanceof apiError) {
+      throw error;
+    }
+    throw new apiError(500, error.message);
+  }
+});
+
 
 
 /**
@@ -70,81 +257,7 @@ export const createProduct = async (req, res) => {
   }
 };
 
-/**
- * @desc    Get all products (Filtered for storefront or admin panel)
- * @route   GET /api/products
- * @access  Public
- */
-export const getAllProducts = async (req, res) => {
-  try {
-    const {
-      category,
-      collectionName,
-      gender,
-      display,
-      minPrice,
-      maxPrice,
-      color,
-      search,
-      page = 1,
-      limit = 20,
-    } = req.query;
 
-    const filter = {};
-
-    // Filter by store active display unless specified by admin query
-    if (display !== undefined) {
-      filter.display = display === "true";
-    } else {
-      filter.display = true; // Default storefront mode
-    }
-
-    if (category) filter.category = category;
-    if (collectionName) filter.collectionName = collectionName;
-    if (gender) filter.gender = gender;
-
-    // Search by product name or code
-    if (search) {
-      filter.$or = [
-        { name: { $regex: search, $options: "i" } },
-        { productCode: { $regex: search, $options: "i" } },
-      ];
-    }
-
-    // Filter by color inside variants array
-    if (color) {
-      filter["variants.color"] = { $regex: color, $options: "i" };
-    }
-
-    // Filter by price range
-    if (minPrice || maxPrice) {
-      filter.price = {};
-      if (minPrice) filter.price.$gte = Number(minPrice);
-      if (maxPrice) filter.price.$lte = Number(maxPrice);
-    }
-
-    const skip = (Number(page) - 1) * Number(limit);
-
-    const [products, total] = await Promise.all([
-      Product.find(filter)
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(Number(limit)),
-      Product.countDocuments(filter),
-    ]);
-
-    return res.status(200).json({
-      success: true,
-      count: products.length,
-      total,
-      page: Number(page),
-      totalPages: Math.ceil(total / Number(limit)),
-      products,
-    });
-  } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
-  }
-};
 
 export const getproductsByCategory = async (req, res) => {
   try {
@@ -170,41 +283,6 @@ export const getproductsByCategory = async (req, res) => {
  * @route   GET /api/products/:id
  * @access  Public
  */
-export const getProductById = async (req, res) => {
-  try {
-    const product = await Product.findById(req.params.id);
-
-    if (!product) {
-      return res.status(404).json({ success: false, message: "Product not found" });
-    }
-
-    // Calculate dynamic effective final price based on active discount rules
-    let finalPrice = product.price;
-    const isDiscountValid =
-      product.discount?.amount > 0 &&
-      (!product.discount.valid || new Date(product.discount.valid) >= new Date());
-
-    if (isDiscountValid) {
-      if (product.discount.type === "percentage") {
-        finalPrice = product.price - (product.price * product.discount.amount) / 100;
-      } else if (product.discount.type === "flat") {
-        finalPrice = Math.max(0, product.price - product.discount.amount);
-      }
-    }
-
-    return res.status(200).json({
-      success: true,
-      product,
-      computedPrice: {
-        originalPrice: product.price,
-        finalPrice,
-        hasActiveDiscount: isDiscountValid,
-      },
-    });
-  } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
-  }
-};
 
 /**
  * @desc    Update product details or active discount settings // name , price ,              description , gender , category , product code , 
@@ -516,3 +594,9 @@ export const deleteProduct = async (req, res) => {
     return res.status(500).json({ success: false, message: error.message });
   }
 };
+
+
+export  { getFeaturedProduct,
+          getBestSellerProducts
+
+        };

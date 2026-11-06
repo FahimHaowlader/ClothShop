@@ -14,7 +14,7 @@ const userRouter = express.Router();
 // 🔓 PUBLIC AUTHENTICATION ROUTES
 // ==========================================
 
-userRouter.get('/text', (req, res) => {
+userRouter.get('/test', (req, res) => {
   res.status(200).json({ message: "User route is working!" });
 });
 

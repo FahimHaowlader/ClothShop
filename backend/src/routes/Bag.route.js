@@ -3,14 +3,14 @@ import {
   addItemToCart,
   getUserCart,
   removeItemFromCart
-} from '../controllers/Cart.controller.js';
+} from '../controllers/Bag.controller.js';
 import verifyUser from '../middleware/verifyUser.middleware.js'
 
 const bagRouter = express.Router();
 
 // Enforce authentication on all cart operations
 
-bagRouter.get("/text", (req, res) => {
+bagRouter.get("/test", (req, res) => {
   res.status(200).json({ message: "bag test route is working!" });
 });
 
@@ -63,7 +63,7 @@ bagRouter.get('/update-item-quantity-by-verified-users', (req, res) => {
 
 
 bagRouter.route('/checkout')
-  .get(getUserbag)
+ 
   .post(addItemToCart)
   .delete(removeItemFromCart);
 

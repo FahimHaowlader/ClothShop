@@ -87,7 +87,10 @@ cancelledAt: {
     refundReason: { type: String },
     refundDate: { type: Date },
     employeeId : { type: mongoose.Schema.Types.ObjectId, ref: 'Employee' },
+    orderNotes: { type: String },
+    orderType: { type: String, enum: ['online', 'offline'], default: 'online' },
   },
+  
   { timestamps: true }
 );
 

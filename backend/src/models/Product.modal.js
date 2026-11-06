@@ -5,6 +5,8 @@ const ProductSchema = new mongoose.Schema(
     name: { type: String, required: true, trim: true },
     sizeGuide: { type: String },
     description: { type: String },
+    specifications: { type: [String] },
+    instructions: { type: [String] },
     price: { type: Number, required: true, min: 0 },
     gender: { type: String },
     category: { type: String }, // hardcoded for now, can be changed to enum later
@@ -25,7 +27,7 @@ const ProductSchema = new mongoose.Schema(
       },
     },
     productCode: { type: String, unique: true, sparse: true },
-    display: { type: Boolean, default: false },
+    display: { type: Boolean, default: true },
     canPreOrder: { type: Boolean, default: false },
     preOrderValid: {
       type: Date,
@@ -44,7 +46,7 @@ const ProductSchema = new mongoose.Schema(
         availability: [
           {
             size: { type: String, required: true },
-            quntity : { type: Number, default: 0, min: 0 },
+            quantity: { type: Number, default: 0, min: 0 },
           },
         ],
       },

@@ -15,14 +15,38 @@ const ProductSchema = new mongoose.Schema(
     discount: {
       type: { type: String, enum: ["flat", "percentage"] },
       amount: { type: Number },
-      valid: {
+      validFrom: {
+        type: Date,
+        required: [true, "Valid from date is required"],
+        validate: {
+          validator: function (v) {
+            // Ensure it's a valid date and not in the past
+            return v instanceof Date && !isNaN(v) && v >= new Date();
+          },
+          message:
+            "Valid from date must be a valid date and cannot be in the past.",
+        },
+      },
+      validUntil: {
         type: Date,
         validate: {
           validator: function (v) {
-            if (!v) return true; // Allows null/undefined if optional
+            // Allows null, undefined, or empty values if optional
+            if (!v) return true;
+
+            // Must be a valid date object
+            if (!(v instanceof Date) || isNaN(v)) return false;
+
+            // If validFrom exists on the document, validUntil must be >= validFrom
+            if (this.validFrom && v < this.validFrom) {
+              return false;
+            }
+
+            // Also ensure it's not earlier than the current date
             return v >= new Date();
           },
-          message: "Valid date cannot be earlier than the current date.",
+          message:
+            "Valid until date must be a valid date, cannot be in the past, and must be equal to or after the valid from date.",
         },
       },
     },
@@ -53,7 +77,6 @@ const ProductSchema = new mongoose.Schema(
     ],
     bestSeller: { type: Boolean, default: false },
     featured: { type: Boolean, default: false },
-  
   },
   { timestamps: true },
 );

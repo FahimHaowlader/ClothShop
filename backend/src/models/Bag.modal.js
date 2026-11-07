@@ -12,13 +12,10 @@ const BagSchema = new mongoose.Schema(
       type: [
         {
           productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
-          pic: { type: String },
-          color: { type: String },
+          pic: { type: String , required: true },
+          color: { type: String ,required: true},
           size: { type: String  ,required: true},
-          quantity: { type: Number, required: true, min: 1 },
-          unitPrice: { type: Number, required: true },
-         
-          
+          quantity: { type: Number, required: true, min: 1 ,max: 10},
         },
       ],
       validate: [

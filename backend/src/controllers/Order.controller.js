@@ -4,206 +4,609 @@ import Coupon from '../models/Coupon.modal.js';
 
 
 import asyncHandler from '../utils/asyncHandler.js';
+import apiError from '../utils/apiError.js';
+import apiResponse from '../utils/apiResponse.js';
 
 // user controllers
 
-export const calculateOrderTotal = async (req, res) => {
+/**
+  @desc Calculate the total price of an order
+  @route POST /api/orders/calculate-total
+  @access public (no authentication required)
+ */
+
+const calculateOrderTotal = async (req, res) => {
   try {
     const { orderItems, couponCode } = req.body;
 
-    if (!orderItems || orderItems.length === 0) {
-      return res.status(400).json({ success: false, message: 'No items in order.' });
+    if (
+      !Array.isArray(orderItems) ||
+      orderItems.length === 0
+    ) {
+      throw new apiError(400, "No items in order.");
     }
 
-    let calculatedSubTotal = 0;
+    let totalPriceBeforeDiscount = 0;
+    let totalPriceAfterDiscount = 0;
 
-    // 1. Process items and verify prices & stock
+    let couponDiscountAmount = 0;
+    let eligibleTotal = 0;
+    let appliedCoupon = null;
+
+    const validItems = [];
+    const removedItems = [];
+
+    const now = new Date();
+
+    // 1. Validate coupon if provided
+    let coupon = null;
+
+    if (couponCode) {
+      coupon = await Coupon.findOne({
+        code: couponCode.toUpperCase().trim()
+      });
+
+      if (!coupon) {
+        throw new apiError(404, "Invalid coupon code");
+      }
+
+      if (coupon.validFrom && now < coupon.validFrom) {
+        throw new apiError(400, "Coupon is not active yet");
+      }
+
+      if (coupon.validUntil && now > coupon.validUntil) {
+        throw new apiError(400, "Coupon has expired");
+      }
+    }
+
+    // 2. Validate products, variants and inventory
     for (const item of orderItems) {
-      const product = await Product.findById(item.productId);
+      const product = await Product.findById(item.productId).select(
+        "-name -pic -sizeGuide -description -specifications -instructions -gender -category -collectionName -bestSeller -featured -createdAt -updatedAt"
+      );
+
       if (!product) {
-        return res
-          .status(404)
-          .json({ success: false, message: `Product not found: ${item.productId}` });
+        removedItems.push(item.itemId);
+        continue;
       }
 
-      // Find selected color variant
-      const variant = product.variants.find((v) => v.color === item.color);
+      const variant = product.variants.find(
+        v => v.color === item.color
+      );
+
       if (!variant) {
-        return res
-          .status(400)
-          .json({ success: false, message: `Color '${item.color}' not available for ${product.name}` });
+        removedItems.push(item.itemId);
+        continue;
       }
 
-      // Check stock size availability
-      const sizeInfo = variant.availability.find((s) => s.size === item.size);
+      const sizeInfo = variant.availability.find(
+        s =>
+          s._id.toString() === item.itemId.toString() &&
+          s.size === item.size
+      );
+
       if (!sizeInfo || !sizeInfo.available) {
-        return res
-          .status(400)
-          .json({ success: false, message: `Size '${item.size}' is out of stock for ${product.name}` });
+        removedItems.push(item.itemId);
+        continue;
       }
 
-      // Compute item discount if active on product
-      let itemPrice = product.price;
+      const availableQuantity = sizeInfo.quantity;
 
       if (
-        product.discount?.amount > 0 &&
-        (!product.discount.valid || new Date(product.discount.valid) >= new Date())
+        !Number.isInteger(item.quantity) ||
+        item.quantity < 1 ||
+        !Number.isInteger(availableQuantity) ||
+        availableQuantity <= 0
       ) {
-        if (product.discount.type === 'percentage') {
-          itemPrice = product.price - (product.price * product.discount.amount) / 100;
-        } else if (product.discount.type === 'flat') {
-          itemPrice = Math.max(0, product.price - product.discount.amount);
+        removedItems.push(item.itemId);
+        continue;
+      }
+
+      const finalQuantity = Math.min(
+        item.quantity,
+        availableQuantity
+      );
+
+      // 3. Calculate product discount
+      const originalPrice = Math.ceil(product.price);
+
+      let productDiscountAmount = 0;
+
+      const discount = product.discount;
+
+      if (
+        discount?.amount > 0 &&
+        discount.validFrom &&
+        now >= discount.validFrom &&
+        (!discount.validUntil || now <= discount.validUntil)
+      ) {
+        if (discount.type === "percentage") {
+          productDiscountAmount = Math.ceil(
+            originalPrice * discount.amount / 100
+          );
+        } else if (discount.type === "flat") {
+          productDiscountAmount = Math.ceil(
+            discount.amount
+          );
         }
       }
 
-      const itemSubTotal = itemPrice * item.quantity;
-      calculatedSubTotal += itemSubTotal;
-    } 
-    console.log('Calculated Subtotal:', calculatedSubTotal);
+      productDiscountAmount = Math.min(
+        productDiscountAmount,
+        originalPrice
+      );
 
-    let finalTotal = calculatedSubTotal;
+      const discountedPrice =
+        originalPrice - productDiscountAmount;
 
-    // 2. Apply Coupon if supplied
-    if (couponCode) {
-      const coupon = await Coupon.findOne({ code: couponCode.toUpperCase().trim() });
-      if (coupon && coupon.minPurchaseAmount <= calculatedSubTotal) {
-        let couponDiscount = 0;
-        if (coupon.discountType === 'percentage') {
-          couponDiscount = (calculatedSubTotal * coupon.discountValue) / 100;
-          if (coupon.maxDiscountAmount) {
-            couponDiscount = Math.min(couponDiscount, coupon.maxDiscountAmount);
-          }
-        } else {
-          couponDiscount = coupon.discountValue;
-        }
-        finalTotal = Math.max(0, calculatedSubTotal - couponDiscount);
+      const itemTotalBeforeDiscount =
+        originalPrice * finalQuantity;
+
+      const itemTotalAfterDiscount =
+        discountedPrice * finalQuantity;
+
+      totalPriceBeforeDiscount += itemTotalBeforeDiscount;
+      totalPriceAfterDiscount += itemTotalAfterDiscount;
+
+      // 4. Calculate coupon eligible total
+      if (
+        coupon &&
+        (
+          coupon.discountApplyTo.type === "general" ||
+          coupon.discountApplyTo.products.some(
+            id => id.toString() === product._id.toString()
+          )
+        )
+      ) {
+        eligibleTotal += itemTotalAfterDiscount;
       }
+
+      validItems.push({
+        ...item,
+        quantity: finalQuantity
+      });
     }
 
-    return res.status(200).json({
-      success: true,
-      calculatedSubTotal: Number(calculatedSubTotal.toFixed(2)),
-      finalTotal: Number(finalTotal.toFixed(2)),
-    });
+    // 5. Check valid items
+    if (validItems.length === 0) {
+      throw new apiError(
+        400,
+        "No valid items available in your order."
+      );
+    }
+
+    // 6. Apply coupon if provided
+    if (coupon) {
+      if (
+        coupon.discountApplyTo.type === "individual" &&
+        eligibleTotal === 0
+      ) {
+        throw new apiError(
+          400,
+          "Coupon does not apply to selected products"
+        );
+      }
+
+      if (eligibleTotal < coupon.minPurchaseAmount) {
+        throw new apiError(
+          400,
+          `Minimum purchase amount is ${coupon.minPurchaseAmount} for eligible products`
+        );
+      }
+
+      if (coupon.discountType === "percentage") {
+        couponDiscountAmount = Math.ceil(
+          eligibleTotal * coupon.discountValue / 100
+        );
+
+        if (coupon.maxDiscountAmount != null) {
+          couponDiscountAmount = Math.min(
+            couponDiscountAmount,
+            Math.floor(coupon.maxDiscountAmount)
+          );
+        }
+      } else {
+        couponDiscountAmount = Math.ceil(
+          coupon.discountValue
+        );
+      }
+
+      couponDiscountAmount = Math.min(
+        couponDiscountAmount,
+        eligibleTotal
+      );
+
+      appliedCoupon = coupon.code;
+    }
+
+    // 7. Calculate final total
+    const totalPriceAfterCoupon = Math.max(
+      0,
+      totalPriceAfterDiscount - couponDiscountAmount
+    );
+
+    // 8. Send response
+    return res.status(200).json(
+      new apiResponse(
+        200,
+        {
+          validItems,
+          removedItems,
+          totalPriceBeforeDiscount,
+          totalPriceAfterDiscount,
+          eligibleTotal,
+          couponDiscountAmount,
+          totalPriceAfterCoupon,
+          appliedCoupon
+        },
+        "Order total calculated successfully"
+      )
+    );
+
   } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
+    if (error instanceof apiError) {
+      throw error;
+    }
+    throw new apiError(500, error.message);
   }
 };
 
 
-export const createOrder = async (req, res) => {
+
+/**
+ @desc   Initialize an order with delivery charges and coupon application
+ @route  POST /api/orders/initialize-order
+ @access public (no authentication required)
+ */
+
+const DELIVERY_CHARGES = {
+  inside_dhaka: 70,
+  outside_dhaka: 130
+};
+
+export const initializeOrder = asyncHandler(async (req, res) => {
+  try{
+  const {
+    orderItems,
+    couponCode,
+    deliveryZone
+  } = req.body;
+
+  // 1. Validate order items
+  if (!Array.isArray(orderItems) || orderItems.length === 0) {
+    throw new apiError(400, "No items in order.");
+  }
+
+  // 2. Validate delivery zone
+  if (!Object.hasOwn(DELIVERY_CHARGES, deliveryZone)) {
+    throw new apiError(400, "Invalid delivery zone.");
+  }
+
+  const deliveryCharge = DELIVERY_CHARGES[deliveryZone];
+
+  const now = new Date();
+
+  let totalPriceBeforeDiscount = 0;
+  let totalPriceAfterDiscount = 0;
+
+  let couponDiscountAmount = 0;
+  let eligibleTotal = 0;
+  let appliedCoupon = null;
+
+  const validItems = [];
+  const removedItems = [];
+
+  // 3. Validate coupon
+  let coupon = null;
+
+  if (couponCode?.trim()) {
+    coupon = await Coupon.findOne({
+      code: couponCode.trim().toUpperCase()
+    });
+
+    if (!coupon) {
+      throw new apiError(404, "Invalid coupon code.");
+    }
+
+    if (coupon.validFrom && now < coupon.validFrom) {
+      throw new apiError(400, "Coupon is not active yet.");
+    }
+
+    if (coupon.validUntil && now > coupon.validUntil) {
+      throw new apiError(400, "Coupon has expired.");
+    }
+  }
+
+  // 4. Validate products, variants and inventory
+  for (const item of orderItems) {
+    const product = await Product.findById(item.productId).select(
+      "-sizeGuide -description -specifications -instructions -gender -category -collectionName -bestSeller -featured -createdAt -updatedAt"
+    );
+
+    if (!product) {
+      removedItems.push(item.itemId);
+      continue;
+    }
+
+    const variant = product.variants.find(
+      v => v.color === item.color
+    );
+
+    if (!variant) {
+      removedItems.push(item.itemId);
+      continue;
+    }
+
+    const sizeInfo = variant.availability.find(
+      s =>
+        s._id.toString() === item.itemId.toString() &&
+        s.size === item.size
+    );
+
+    if (!sizeInfo || !sizeInfo.available) {
+      removedItems.push(item.itemId);
+      continue;
+    }
+
+    const availableQuantity = sizeInfo.quantity;
+
+    if (
+      !Number.isInteger(item.quantity) ||
+      item.quantity < 1 ||
+      !Number.isInteger(availableQuantity) ||
+      availableQuantity <= 0
+    ) {
+      removedItems.push(item.itemId);
+      continue;
+    }
+
+    // 5. Validate requested quantity
+    if (item.quantity > availableQuantity) {
+      throw new apiError(
+        400,
+        `Only ${availableQuantity} items are available in stock.`
+      );
+    }
+
+    const finalQuantity = item.quantity;
+
+    // 6. Calculate product discount
+    const originalPrice = Math.ceil(product.price);
+
+    let productDiscountAmount = 0;
+
+    const discount = product.discount;
+
+    if (
+      discount?.amount > 0 &&
+      discount.validFrom &&
+      now >= discount.validFrom &&
+      (!discount.validUntil || now <= discount.validUntil)
+    ) {
+      if (discount.type === "percentage") {
+        productDiscountAmount = Math.ceil(
+          originalPrice * discount.amount / 100
+        );
+      } else if (discount.type === "flat") {
+        productDiscountAmount = Math.ceil(
+          discount.amount
+        );
+      }
+    }
+
+    productDiscountAmount = Math.min(
+      productDiscountAmount,
+      originalPrice
+    );
+
+    const discountedPrice =
+      originalPrice - productDiscountAmount;
+
+    const itemTotalBeforeDiscount =
+      originalPrice * finalQuantity;
+
+    const itemTotalAfterDiscount =
+      discountedPrice * finalQuantity;
+
+    totalPriceBeforeDiscount += itemTotalBeforeDiscount;
+    totalPriceAfterDiscount += itemTotalAfterDiscount;
+
+    // 7. Calculate coupon eligible total
+    if (
+      coupon &&
+      (
+        coupon.discountApplyTo.type === "general" ||
+        coupon.discountApplyTo.products.some(
+          id => id.toString() === product._id.toString()
+        )
+      )
+    ) {
+      eligibleTotal += itemTotalAfterDiscount;
+    }
+
+    // 8. Prepare valid order items
+    validItems.push({
+      ...item,
+      name: product.name,
+      productCode: product.productCode,
+      unitePrice: product.price,
+      subTotal: (product.price * finalQuantity),
+      discount: {
+        type: product.discount?.type || null, 
+        amount: product.discount?.amount || 0 
+      },
+      quantity: finalQuantity,
+      preOrder: product.canPreOrder && product.preOrderValid && product.preOrderValid >= now
+    });
+  }
+
+  // 9. Check valid items
+  if (validItems.length === 0) {
+    throw new apiError(
+      400,
+      "No valid items available in your order."
+    );
+  }
+
+  // 10. Apply coupon
+  if (coupon) {
+  if (
+    (
+      coupon.discountApplyTo.type === "individual" &&
+      eligibleTotal === 0
+    ) ||
+    eligibleTotal < coupon.minPurchaseAmount
+  ) {
+    couponDiscountAmount = 0;
+  } else {
+    if (coupon.discountType === "percentage") {
+      couponDiscountAmount = Math.ceil(
+        eligibleTotal * coupon.discountValue / 100
+      );
+
+      if (coupon.maxDiscountAmount != null) {
+        couponDiscountAmount = Math.min(
+          couponDiscountAmount,
+          Math.floor(coupon.maxDiscountAmount)
+        );
+      }
+    } else {
+      couponDiscountAmount = Math.ceil(
+        coupon.discountValue
+      );
+    }
+
+    couponDiscountAmount = Math.min(
+      couponDiscountAmount,
+      eligibleTotal
+    );
+
+    appliedCoupon = coupon.code;
+  }
+}
+  // 11. Calculate subtotal after discounts
+  const totalPriceAfterCoupon = Math.max(
+    0,
+    totalPriceAfterDiscount - couponDiscountAmount
+  );
+
+  // 12. Add delivery charge
+  const totalPriceWithDeliveryCharge = totalPriceAfterCoupon + deliveryCharge;
+
+  // 13. Send response
+  return res.status(200).json(
+    new apiResponse(
+      200,
+      {
+        validItems,
+        removedItems,
+
+        totalPriceBeforeDiscount,
+        totalPriceAfterDiscount,
+
+        eligibleTotal,
+        couponDiscountAmount,
+
+        totalPriceAfterCoupon,
+
+        deliveryZone,
+        deliveryCharge,
+
+        totalPriceWithDeliveryCharge,
+        appliedCoupon
+      },
+      "Order initialized successfully."
+    )
+  )
+} catch (error) {
+    if (error instanceof apiError) {
+      throw error;
+    }
+    throw new apiError(500, error.message);
+  }
+})
+;
+
+
+
+ const createOrder = async (req, res) => {
   try {
     const {
+      user,
       name,
       phone,
       shippingAddress,
       orderItems,
       couponCode,
+      totalPriceBeforeDiscount,
+      totalPriceAfterDiscount,
+      totalPriceAfterCoupon,
+      deliveryCharge,
+      orderNote,
+      orderFrom,
+      orderStatus,
+      paymentStatus,
       paymentMethod,
-      preOrder = false,
+      transactionId,
+      paidAt,
+      totalPriceWithDeliveryCharge,
+      storeAmount,
+      
+      
+      
     } = req.body;
 
     if (!orderItems || orderItems.length === 0) {
       return res.status(400).json({ success: false, message: 'No items in order.' });
     }
 
-    if (!shippingAddress || !phone || !name) {
+    if (!shippingAddress || !phone || !name || !totalPriceBeforeDiscount || !totalPriceAfterDiscount || !totalPriceAfterCoupon || !deliveryCharge || !totalPriceWithDeliveryCharge || !paymentMethod || !paymentStatus|| !orderStatus || !orderFrom) {
       return res.status(400).json({
         success: false,
         message: 'Name, phone number, and shipping address are required.',
       });
     }
+ if(paymentMethod === 'online' && ( paymentStatus !== 'paid' ||!transactionId || !paidAt ||!storeAmount )){
+  throw new apiError(400, 'Transaction ID, paidAt date, and store amount are required for online paid orders.'); }
 
-    let calculatedSubTotal = 0;
-    const processedItems = [];
+if(paymentMethod === 'cod' ){
+  storeAmount = Number(storeAmount.toFixed(2) * .01) - deliveryCharge;
+    
+}
 
-    // 1. Process items and verify prices & stock
-    for (const item of orderItems) {
-      const product = await Product.findById(item.productId);
-      if (!product) {
-        return res
-          .status(404)
-          .json({ success: false, message: `Product not found: ${item.productId}` });
-      }
+if(paymentMethod === 'online' ){
+  storeAmount = Number(storeAmount.toFixed(2)) - deliveryCharge;
+}
 
-      // Find selected color variant
-      const variant = product.variants.find((v) => v.color === item.color);
-      if (!variant) {
-        return res
-          .status(400)
-          .json({ success: false, message: `Color '${item.color}' not available for ${product.name}` });
-      }
-
-      // Check stock size availability unless it's a pre-order
-      const sizeInfo = variant.availability.find((s) => s.size === item.size);
-      if (!preOrder && (!sizeInfo || !sizeInfo.available)) {
-        return res
-          .status(400)
-          .json({ success: false, message: `Size '${item.size}' is out of stock for ${product.name}` });
-      }
-
-      // Compute item discount if active on product
-      let discountObj = { type: undefined, amount: 0 };
-      let itemPrice = product.price;
-
-      if (
-        product.discount?.amount > 0 &&
-        (!product.discount.valid || new Date(product.discount.valid) >= new Date())
-      ) {
-        discountObj = {
-          type: product.discount.type,
-          amount: product.discount.amount,
-        };
-        if (product.discount.type === 'percentage') {
-          itemPrice = product.price - (product.price * product.discount.amount) / 100;
-        } else if (product.discount.type === 'flat') {
-          itemPrice = Math.max(0, product.price - product.discount.amount);
-        }
-      }
-
-      const itemSubTotal = itemPrice * item.quantity;
-      calculatedSubTotal += itemSubTotal;
-
-      processedItems.push({
-        productId: product._id,
-        pic: item.pic || (variant.pic && variant.pic[0]) || '',
-        color: item.color,
-        size: item.size,
-        quantity: item.quantity,
-        unitPrice: product.price,
-        subTotal: Number(itemSubTotal.toFixed(2)),
-        discount: discountObj,
-      });
-    }
-
-    let finalTotal = calculatedSubTotal;
-
-    // 2. Apply Coupon if supplied
-    if (couponCode) {
-      const coupon = await Coupon.findOne({ code: couponCode.toUpperCase().trim() });
-      if (coupon && coupon.minPurchaseAmount <= calculatedSubTotal) {
-        let couponDiscount = 0;
-        if (coupon.discountType === 'percentage') {
-          couponDiscount = (calculatedSubTotal * coupon.discountValue) / 100;
-          if (coupon.maxDiscountAmount) {
-            couponDiscount = Math.min(couponDiscount, coupon.maxDiscountAmount);
-          }
-        } else {
-          couponDiscount = coupon.discountValue;
-        }
-        finalTotal = Math.max(0, calculatedSubTotal - couponDiscount);
-        coupon.useCount += 1;
-        await coupon.save();
-      }
-    }
-
-    // 3. Save Order
-    const order = await Order.create({
-      orderId: generateOrderId(),
-      user: req.user ? req.user._id : undefined,
-      name,
+const orderObject = {
+  user,
+   name,
       phone,
       shippingAddress,
+      orderItems,
+      couponCode,
+      totalPriceBeforeDiscount,
+      totalPriceAfterDiscount,
+      totalPriceAfterCoupon,
+      deliveryCharge,
+      orderNote,
+      orderFrom,
+      orderStatus,
+      paymentStatus,
+      paymentMethod,
+      totalPriceWithDeliveryCharge,
+      storeAmount,
+}
+
+
+if(paymentMethod === 'online'){
+  orderObject.transactionId = transactionId;
+  orderObject.paidAt = paidAt;
+}
+    // 3. Save Order
+    const order = await Order.create({
+      
+     
       orderItems: processedItems,
       subTotalAfterDiscount: Number(finalTotal.toFixed(2)),
       preOrder,

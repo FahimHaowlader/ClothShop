@@ -368,7 +368,7 @@ const getBagTotalPriceAfterDiscount = asyncHandler(async (req, res) => {
 
     const dbProducts = await Product.find({
       _id: { $in: productIds }
-    });
+    }).select('-name -pic -sizeGuide -description -specifications -instructions -gender -category -collectionName -bestSeller -featured -variants -createdAt -updatedAt');
 
     if (dbProducts.length !== new Set(productIds.map(String)).size) {
       throw new apiError(404, "One or more products not found");
@@ -529,7 +529,6 @@ const getBagTotalPriceAfterDiscount = asyncHandler(async (req, res) => {
     throw new apiError(500, error.message);
   }
 });
-
 
 
 

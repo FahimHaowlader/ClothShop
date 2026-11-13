@@ -4,6 +4,79 @@
 // multiple image delete
 // only manager and admin can upload and delete images
 
+import mongoose from "mongoose";
+import Order from "../models/Order.modal.js";
+import Product from "../models/Product.modal.js";
+import apiError from "../utils/apiError.js";
+import apiResponse from "../utils/apiResponse.js";
+
+
+
+
+
+
+export const cancelOrderAndReleaseStock = async (order) => {
+  const session = await mongoose.startSession();
+
+  try {
+    await session.withTransaction(async () => {
+      for (const item of order.orderItems) {
+        const stockUpdate = await Product.updateOne(
+          {
+            _id: item.productId,
+            variants: {
+              $elemMatch: {
+                color: item.color,
+                availability: {
+                  $elemMatch: {
+                    size: item.size,
+                  },
+                },
+              },
+            },
+          },
+          {
+            $inc: {
+              "variants.$[variant].availability.$[size].quantity":
+                item.quantity,
+            },
+          },
+          {
+            arrayFilters: [
+              { "variant.color": item.color },
+              { "size.size": item.size },
+            ],
+            session,
+          }
+        );
+
+        if (stockUpdate.modifiedCount !== 1) {
+          throw new Error(
+            `Unable to restore stock for ${item.name} (${item.color}, ${item.size}).`
+          );
+        }
+      }
+    });
+
+   
+
+    return {
+      success: true,
+      message: "Product stock restored successfully.",
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: error.message || "Failed to restore product stock.",
+    };
+  } finally {
+    await session.endSession();
+  }
+};
+
+
+
+
 export const uploadSingleImage = async (req, res) => {
   try {
 

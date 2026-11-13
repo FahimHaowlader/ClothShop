@@ -9,3 +9,8 @@ export const refreshCookieOptions = {
   ...cookieOptions,
   maxAge: 10 * 24 * 60 * 60 * 1000, // 10 days
 };
+
+export const DELIVERY_CHARGES = {
+  inside_dhaka: process.env.DELIVERY_CHARGES_INSIDE_DHAKA || 70,
+  outside_dhaka: process.env.DELIVERY_CHARGES_OUTSIDE_DHAKA || 130
+};

@@ -1,7 +1,8 @@
 import express from 'express';
 import {
-  createOrder,
-
+   createOrder,
+   orderSuccess,
+paymentFail,
   updateOrderStatus,
   updatePaymentStatus,
   processRefund,
@@ -21,6 +22,8 @@ orderRouter.get('/test', (req, res) => {
   res.status(200).json({ message: "Order test route is working!" });
 });
 
+orderRouter.post('/success/:tran_id', orderSuccess); 
+orderRouter.post('/fail/:tran_id', paymentFail);
 
 
 orderRouter.post('/order-total-price', (req, res) => {

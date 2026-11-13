@@ -1,12 +1,18 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { ObjectId } from 'mongodb';
 
 const UserSchema = new mongoose.Schema(
   {
-    name: { 
+    firstName: { 
       type: String, 
-      required: [true, 'Name is required'], 
+      required: [true, 'First name is required'], 
+      trim: true 
+    },
+    lastName: { 
+      type: String, 
+      required: [true, 'Last name is required'], 
       trim: true 
     },
     phone: {
@@ -74,7 +80,8 @@ UserSchema.methods.generateAccessToken = function () {
     {
       _id: this._id,
       email: this.email,
-      name: this.name,
+      firstName: this.firstName,
+      lastName: this.lastName,
     },
     process.env.ACCESS_TOKEN_SECRET,
     { expiresIn: process.env.ACCESS_TOKEN_EXPIRY || '1d' }

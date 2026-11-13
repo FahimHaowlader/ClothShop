@@ -12,9 +12,12 @@ const OrderSchema = new mongoose.Schema(
       default: () => `${nanoid8Upper()}`,
     },
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-    name: { type: String, required: true },
+    firstName: { type: String, required: true },
+    lastName: { type: String, required: true },
     phone: { type: String, required: true },
     shippingAddress: { type: String, required: true },
+    shippingCity: { type: String, required: true },
+    shippingPostCode: { type: String, required: true },
     orderItems: [
       {
         productId: {
@@ -42,6 +45,7 @@ const OrderSchema = new mongoose.Schema(
     totalPriceAfterCoupon: { type: Number, required: true },
     couponCode: { type: String },
     deliveryCharge: { type: Number, required: true },
+    deliveryZone: { type: String, enum: ["inside_dhaka", "outside_dhaka"], required: true },
     orderStatus: {
       type: String,
       enum: [
@@ -51,6 +55,7 @@ const OrderSchema = new mongoose.Schema(
         "shipped",
         "delivered",
         "cancelled",
+        "returned",
       ],
       default: "pending",
     },
@@ -77,6 +82,17 @@ const OrderSchema = new mongoose.Schema(
         message: "deliveredAt date cannot be earlier than shippedAt date.",
       },
     },
+    returnedAt: {
+      type: Date,
+      validate: {
+        validator: function (v) {
+          if (!v) return true;
+          if (!this.shippedAt) return true; // If not shipped yet, pass validation
+          return v >= this.shippedAt;
+        },
+        message: "cancelledAt date cannot be earlier than shippedAt date.",
+      },
+    },
     cancelledAt: {
       type: Date,
       validate: {
@@ -90,24 +106,25 @@ const OrderSchema = new mongoose.Schema(
     },
     paymentStatus: {
       type: String,
-      enum: ["pending", "paid"],
+      enum: ["pending", "paid","failed","cancelled"],
       default: "pending",
     },
-    paymentMethod: { type: String, enum: ["cod", "online"] },
+    paymentMethod: { type: String, enum: ["cod", "online"],required:true },
     transactionId: { type: String },
+    bankTransactionId: { type: String },
     paidAt: { type: Date },
     refundStatus: {
       type: String,
       enum: ["requested", "refunded", "rejected"],
     },
     totalPriceWithDeliveryCharge: { type: Number, required: true },
-    storeAmount: { type: Number, required: true },
+    storeAmount: { type: Number, },
     refundMethod: { type: String, enum: ["offline", "online"] },
     refundReason: { type: String },
     refundDate: { type: Date },
     employeeId: { type: mongoose.Schema.Types.ObjectId, ref: "Employee" },
     orderNote: { type: String },
-    orderFrom: { type: String, enum: ["website", "social-media"] },
+    orderFrom: { type: String, enum: ["website", "social-media"], required: true },
   },
 
   { timestamps: true },

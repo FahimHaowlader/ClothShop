@@ -597,10 +597,6 @@ const createOrder = asyncHandler(async (req, res) => {
 });
 
 
-
-
-
-
 // Example Express route for your success_url
 
 
@@ -1132,6 +1128,8 @@ export const getMyOrders = async (req, res) => {
     return res.status(500).json({ success: false, message: error.message });
   }
 };
+
+// officer controllers
 
 /**
  * @desc    Get order details by orderId or ObjectId

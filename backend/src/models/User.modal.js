@@ -46,9 +46,52 @@ const UserSchema = new mongoose.Schema(
       minlength: [8, 'Password must be at least 8 characters'] 
     },
     refreshToken: { type: String },
-    address: { type: String, trim: true },
-    city: { type: String, trim: true },
-    postCode: { type: String, trim: true },
+   address: {
+  type: [
+    {
+      name: {
+        type: String,
+        required: true,
+        enum: ["home", "office", "other"],
+      },
+      street: {
+        type: String,
+        required: true,
+      },
+      city: {
+        type: String,
+        required: true,
+      },
+      postCode: {
+        type: String,
+        required: true,
+      },
+      isDefault: {
+        type: Boolean,
+        default: false,
+      },
+    },
+  ],
+  default: [],
+  validate: [
+    {
+      validator: (addresses) => addresses.length <= 3,
+      message: "You can add a maximum of 3 addresses.",
+    },
+    {
+      validator: (addresses) => {
+        const names = addresses.map((item) => item.name);
+        return new Set(names).size === names.length;
+      },
+      message: "Home, office, and other addresses must be unique.",
+    },
+    {
+      validator: (addresses) =>
+        addresses.filter((item) => item.isDefault).length <= 1,
+      message: "Only one address can be default.",
+    },
+  ],
+},
     access: { type: Boolean, default: true },
     cart: { type: mongoose.Schema.Types.ObjectId, ref: 'Cart' },
     orders: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Order' }], // Changed to Array

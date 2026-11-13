@@ -143,6 +143,156 @@ export const changePassword = async (req, res) => {
   }
 };
 
+export const updateEmail = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { newEmail } = req.body;
+
+    // Check if the new email already exists for another user
+    const existingUser = await User.findOne({ email: newEmail, _id: { $ne: userId } });
+    if (existingUser) {
+      return res.status(400).json({ message: 'Email already in use' });
+    }
+
+    // Update the user's email
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { email: newEmail },
+      { new: true, runValidators: true }
+    ).select('-password -refreshToken');
+
+    res.status(200).json(updatedUser);
+  } catch (error) {
+    console.error('Error updating email:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+export const addAddress = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { name, street, city, postCode, isDefault } = req.body;
+
+    // Create a new address object
+    const newAddress = { name, street, city, postCode, isDefault };
+
+    // If the new address is set as default, unset the previous default address
+    if (isDefault) {
+      await User.updateMany(
+        { _id: userId },
+        { $set: { "address.$[elem].isDefault": false } },
+        { arrayFilters: [{ "elem.isDefault": true }] }
+      );
+    }
+
+    // Add the new address to the user's addresses
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { $push: { address: newAddress } },
+      { new: true }
+    ).select('-password -refreshToken');
+
+    res.status(200).json(updatedUser);
+  } catch (error) {
+    console.error('Error adding address:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+const updateAddress = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { addressId } = req.params;
+    const { name, street, city, postCode, isDefault } = req.body;
+
+    // If the updated address is set as default, unset the previous default address
+    if (isDefault) {
+      await User.updateMany(
+        { _id: userId },
+        { $set: { "address.$[elem].isDefault": false } },
+        { arrayFilters: [{ "elem.isDefault": true }] }
+      );
+    }
+
+    // Update the specific address in the user's addresses
+    const updatedUser = await User.findOneAndUpdate(
+      { _id: userId, "address._id": addressId },
+      {
+        $set: {
+          "address.$.name": name,
+          "address.$.street": street,
+          "address.$.city": city,
+          "address.$.postCode": postCode,
+          "address.$.isDefault": isDefault,
+        },
+      },
+      { new: true }
+    ).select('-password -refreshToken');
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'Address not found' });
+    }
+
+    res.status(200).json(updatedUser);
+  } catch (error) {
+    console.error('Error updating address:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+export const deleteAddress = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { addressId } = req.params;
+
+    // Remove the specific address from the user's addresses
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { $pull: { address: { _id: addressId } } },
+      { new: true }
+    ).select('-password -refreshToken');
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'Address not found' });
+    }
+
+    res.status(200).json(updatedUser);
+  } catch (error) {
+    console.error('Error deleting address:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+const setDefaultAddress = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { addressId } = req.params;
+
+    // Unset the previous default address
+    await User.updateMany(
+      { _id: userId },
+      { $set: { "address.$[elem].isDefault": false } },
+      { arrayFilters: [{ "elem.isDefault": true }] }
+    );
+
+    // Set the new default address
+    const updatedUser = await User.findOneAndUpdate(
+      { _id: userId, "address._id": addressId },
+      { $set: { "address.$.isDefault": true } },
+      { new: true }
+    ).select('-password -refreshToken');
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'Address not found' });
+    }
+
+    res.status(200).json(updatedUser);
+  } catch (error) {
+    console.error('Error setting default address:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
 
 // forget password 
 export const forgotPassword = async (req, res) => {

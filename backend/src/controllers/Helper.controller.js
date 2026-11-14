@@ -3,7 +3,7 @@
 // multiple image upload
 // multiple image delete
 // only manager and admin can upload and delete images
-
+import cron from "node-cron";
 import mongoose from "mongoose";
 import Order from "../models/Order.modal.js";
 import Product from "../models/Product.modal.js";
@@ -15,7 +15,7 @@ import apiResponse from "../utils/apiResponse.js";
 
 
 
-export const cancelOrderAndReleaseStock = async (order) => {
+const cancelOrderAndReleaseStock = async (order) => {
   const session = await mongoose.startSession();
 
   try {
@@ -75,9 +75,152 @@ export const cancelOrderAndReleaseStock = async (order) => {
 };
 
 
+const cancelOrderAndReleaseStockForCleanUp = async (order) => {
+  const session = await mongoose.startSession();
+
+  try {
+    let cancelled = false;
+
+    await session.withTransaction(async () => {
+      // 1. Cancel only if the order is still pending
+      const orderUpdate = await Order.updateOne(
+        {
+          _id: order._id,
+          paymentMethod: "online",
+          paymentStatus: "pending",
+          orderStatus: "pending",
+        },
+        {
+          $set: {
+            paymentStatus: "failed",
+            orderStatus: "cancelled",
+          },
+        },
+        { session }
+      );
+
+      // Already paid, cancelled, or processed
+      if (orderUpdate.modifiedCount !== 1) {
+        return;
+      }
+
+      // 2. Restore reserved stock
+      for (const item of order.orderItems) {
+        const stockUpdate = await Product.updateOne(
+          {
+            _id: item.productId,
+            variants: {
+              $elemMatch: {
+                color: item.color,
+                availability: {
+                  $elemMatch: {
+                    size: item.size,
+                  },
+                },
+              },
+            },
+          },
+          {
+            $inc: {
+              "variants.$[variant].availability.$[size].quantity":
+                item.quantity,
+            },
+          },
+          {
+            arrayFilters: [
+              { "variant.color": item.color },
+              { "size.size": item.size },
+            ],
+            session,
+          }
+        );
+
+        if (stockUpdate.modifiedCount !== 1) {
+          throw new Error(
+            `Unable to restore stock for ${item.name} (${item.color}, ${item.size}).`
+          );
+        }
+      }
+
+      cancelled = true;
+    });
+
+    return {
+      success: true,
+      cancelled,
+      message: cancelled
+        ? "Order cancelled and product stock restored."
+        : "Order was already processed.",
+    };
+  } catch (error) {
+    console.error("Order cancellation error:", error);
+
+    return {
+      success: false,
+      cancelled: false,
+      message: error.message || "Failed to cancel order.",
+    };
+  } finally {
+    await session.endSession();
+  }
+};
 
 
-export const uploadSingleImage = async (req, res) => {
+const SIX_MINUTES = 6 * 60 * 1000;
+
+let isRunning = false;
+
+const startOrderCleanupWorker = () => {
+  // Run every minute
+  cron.schedule("* * * * *", async () => {
+    if (isRunning) return;
+
+    isRunning = true;
+
+    try {
+      const expirationTime = new Date(Date.now() - SIX_MINUTES);
+
+      // 1. Find expired online pending orders
+      const expiredOrders = await Order.find({
+        paymentMethod: "online",
+        paymentStatus: "pending",
+        orderStatus: "pending",
+        createdAt: { $lte: expirationTime },
+      })
+        .select("_id orderItems")
+        .limit(100)
+        .lean();
+
+      if (!expiredOrders.length) return;
+
+      console.log(
+        `Found ${expiredOrders.length} expired pending orders.`
+      );
+
+      // 2. Cancel each order and restore stock
+      for (const order of expiredOrders) {
+        const result = await cancelOrderAndReleaseStockForCleanUp(order);
+
+        if (result.success && result.cancelled) {
+          console.log(`Order ${order._id} cancelled successfully.`);
+        } else if (!result.success) {
+          console.error(
+            `Failed to cancel order ${order._id}:`,
+            result.message
+          );
+        }
+      }
+    } catch (error) {
+      console.error("Order cleanup worker error:", error);
+    } finally {
+      isRunning = false;
+    }
+  });
+
+  console.log("Order cleanup worker started.");
+};
+
+const uploadSingleImage = async (req, res) => {
   try {
 
     if (!req.file) {
@@ -97,7 +240,7 @@ export const uploadSingleImage = async (req, res) => {
 };
 
 
-export const deleteSingleImage = async (req, res) => {
+const deleteSingleImage = async (req, res) => {
   try {
     const { filename } = req.params;
     const filePath = `uploads/${filename}`;
@@ -120,7 +263,7 @@ export const deleteSingleImage = async (req, res) => {
 };
 
 
-export const uploadMultipleImages = async (req, res) => {
+const uploadMultipleImages = async (req, res) => {
   try {
     if (!req.files || req.files.length === 0) {
       return res.status(400).json({ success: false, message: "No files uploaded" });
@@ -138,7 +281,7 @@ export const uploadMultipleImages = async (req, res) => {
   }
 };
 
-export const deleteMultipleImages = async (req, res) => {
+const deleteMultipleImages = async (req, res) => {
   try {
     const { filenames } = req.body; // Expecting an array of filenames in the request body
 
@@ -170,3 +313,13 @@ export const deleteMultipleImages = async (req, res) => {
     return res.status(500).json({ success: false, message: error.message });
   }
 };
+
+
+export {
+  cancelOrderAndReleaseStock,
+  uploadSingleImage,
+  deleteSingleImage,
+  uploadMultipleImages,
+  deleteMultipleImages,
+  startOrderCleanupWorker,
+}

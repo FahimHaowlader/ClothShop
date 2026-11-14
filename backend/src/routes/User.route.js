@@ -2,9 +2,19 @@ import express from 'express';
 import {
   registerUser,
   loginUser,
- 
-  
-} from '../controllers/user.controller.js';
+  logoutUser,
+  getProfile,
+  updateProfile,
+  changePassword,
+  updateEmail,
+  getAddress,
+  addAddress,
+  updateAddress,
+  deleteAddress,
+  setDefaultAddress,
+  forgotPassword,
+  getAllUsers,
+} from '../controllers/User.controller.js';
 
 import verifyUser from '../middleware/verifyUser.middleware.js';
 
@@ -21,58 +31,54 @@ userRouter.get('/test', (req, res) => {
 // Register a new customer account
 userRouter.post('/register', registerUser);
 
-
-userRouter.use(verifyUser); // Enforce authentication on all user operations
 // Login customer and issue JWT
 userRouter.post('/login', loginUser);
 
-userRouter.post('/logout', (req, res) => {
-  res.status(200).json({ message: "User logout route is working!" });
-});
 
-userRouter.post('/logout-all-sessions', (req, res) => {
-  res.status(200).json({ message: "User logout from all sessions route is working!" });
-});
+userRouter.use(verifyUser); // Enforce authentication on all user operations
 
-userRouter.get('/profile', (req, res) => {
-  res.status(200).json({ message: "User profile route is working!" });
-});
-
-userRouter.patch('/change-profile-basic-info', (req, res) => {
-  res.status(200).json({ message: "Update user profile route is working!" });
-});
+// user logout routes
+userRouter.post('/logout', logoutUser);
 
 
-userRouter.patch('/change-profile-password', (req, res) => {
-  res.status(200).json({ message: "Change user password route is working!" });
-});
+// user logout from all sessions route
+userRouter.post('/logout-all-sessions', logoutUser);
 
-userRouter.post('/forgot-password', (req, res) => {
-  res.status(200).json({ message: "Forgot password route is working!" });
-});
+// user profile route
+userRouter.get('/profile', getProfile);
 
-userRouter.post('/add-new-address', (req, res) => {
-  res.status(200).json({ message: "Add new address route is working!" });
-});
+// user profile update route
+userRouter.patch('/update-profile', updateProfile);
 
-userRouter.get('/get-addresses', (req, res) => {
-  res.status(200).json({ message: "Get user addresses route is working!" });
-});
 
-userRouter.patch('/update-address/:addressId', (req, res) => {
-  const { addressId } = req.params;
-  res.status(200).json({ message: `Update address with ID ${addressId} route is working!` });
-});
+// user profile password change route
+userRouter.patch('/change-password', changePassword);
 
-userRouter.delete('/delete-address/:addressId', (req, res) => {
-  const { addressId } = req.params;
-  res.status(200).json({ message: `Delete address with ID ${addressId} route is working!` });
-});
+// user profile email update route
+userRouter.post('/forgot-password',forgotPassword);
 
-userRouter.post('/set-default-address/:addressId', (req, res) => {
-  const { addressId } = req.params;
-  res.status(200).json({ message: `Set default address with ID ${addressId} route is working!` });
-});
+// user profile email update route
+userRouter.patch('/update-email',updateEmail);
+
+
+// add new address route
+userRouter.post('/add-new-address', addAddress);
+
+
+// get all addresses route
+userRouter.get('/get-addresses', getAddress);
+
+
+// update address route
+userRouter.patch('/update-address/:addressId', updateAddress);
+
+
+// delete address route
+userRouter.delete('/delete-address/:addressId', deleteAddress);
+
+
+// set default address route
+userRouter.post('/set-default-address/:addressId', setDefaultAddress);
 
 
 
